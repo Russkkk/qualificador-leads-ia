@@ -2,206 +2,261 @@
 <html lang="pt-BR">
 <head>
   <meta charset="UTF-8" />
-  <title>Dashboard Avançado</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Dashboard • Qualificador de Leads IA</title>
 
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 
   <style>
-    body {
-      font-family: Arial, sans-serif;
-      background: #0f172a;
-      color: #e5e7eb;
-      padding: 20px;
-    }
-    h1 { margin-bottom: 10px; }
-
-    input, select, button {
-      padding: 8px;
-      border-radius: 6px;
-      border: none;
-      margin-right: 10px;
-    }
-
-    button {
-      cursor: pointer;
-      background: #2563eb;
-      color: white;
+    :root{
+      --bg:#0b1020;
+      --panel:#0f172a;
+      --panel2:#0b1224;
+      --border:#243047;
+      --text:#e5e7eb;
+      --muted:#94a3b8;
+      --primary:#2563eb;
+      --green:#22c55e;
+      --red:#ef4444;
+      --yellow:#eab308;
+      --radius:14px;
+      --shadow:0 20px 60px rgba(0,0,0,.45);
     }
 
-    .cards {
-      display: flex;
-      gap: 20px;
-      margin: 20px 0;
+    *{box-sizing:border-box}
+    body{
+      margin:0;
+      background:linear-gradient(180deg,#0b1020,#111b3a);
+      color:var(--text);
+      font-family:system-ui,-apple-system,Segoe UI,Roboto,Arial;
+      min-height:100vh;
+      padding:24px;
     }
 
-    .card {
-      background: #020617;
-      padding: 20px;
-      border-radius: 10px;
-      width: 200px;
-      text-align: center;
+    header{
+      display:flex;
+      justify-content:space-between;
+      align-items:center;
+      margin-bottom:20px;
     }
 
-    canvas {
-      background: #020617;
-      border-radius: 10px;
-      padding: 20px;
-      margin-bottom: 30px;
+    h1{
+      font-size:22px;
+      margin:0;
     }
 
-    table {
-      width: 100%;
-      border-collapse: collapse;
-      background: #020617;
-      border-radius: 10px;
-      overflow: hidden;
+    .top-actions{
+      display:flex;
+      gap:10px;
+      align-items:center;
     }
 
-    th, td {
-      padding: 10px;
-      border-bottom: 1px solid #1e293b;
-      text-align: center;
+    input{
+      background:var(--panel2);
+      border:1px solid var(--border);
+      color:var(--text);
+      padding:8px 10px;
+      border-radius:10px;
     }
 
-    th {
-      background: #020617;
-      font-weight: bold;
+    button{
+      background:var(--primary);
+      border:none;
+      color:white;
+      padding:8px 14px;
+      border-radius:10px;
+      cursor:pointer;
+      font-weight:600;
     }
 
-    tr:hover {
-      background: #1e293b;
-      cursor: pointer;
+    .cards{
+      display:grid;
+      grid-template-columns:repeat(auto-fit,minmax(160px,1fr));
+      gap:14px;
+      margin-bottom:22px;
+    }
+
+    .card{
+      background:var(--panel);
+      border:1px solid var(--border);
+      border-radius:var(--radius);
+      padding:16px;
+      box-shadow:var(--shadow);
+    }
+
+    .card span{
+      color:var(--muted);
+      font-size:12px;
+    }
+
+    .card strong{
+      display:block;
+      font-size:26px;
+      margin-top:4px;
+    }
+
+    .grid{
+      display:grid;
+      grid-template-columns:1fr 2fr;
+      gap:18px;
+    }
+
+    .panel{
+      background:var(--panel);
+      border:1px solid var(--border);
+      border-radius:var(--radius);
+      padding:16px;
+      box-shadow:var(--shadow);
+    }
+
+    table{
+      width:100%;
+      border-collapse:collapse;
+      font-size:13px;
+    }
+
+    th, td{
+      padding:8px;
+      border-bottom:1px solid var(--border);
+      text-align:left;
+    }
+
+    th{
+      color:var(--muted);
+      font-weight:500;
+    }
+
+    .tag{
+      padding:2px 8px;
+      border-radius:999px;
+      font-size:11px;
+      font-weight:600;
+      display:inline-block;
+    }
+
+    .quente{background:rgba(34,197,94,.15);color:#86efac}
+    .frio{background:rgba(239,68,68,.15);color:#fecaca}
+    .pendente{background:rgba(234,179,8,.15);color:#fde68a}
+
+    @media(max-width:900px){
+      .grid{grid-template-columns:1fr}
     }
   </style>
 </head>
 
 <body>
+<header>
+  <h1>📊 Dashboard — Qualificador de Leads IA</h1>
+  <div class="top-actions">
+    <input id="clientIdInput" placeholder="client_id" />
+    <button onclick="loadData()">Atualizar</button>
+  </div>
+</header>
 
-<h1>📊 Dashboard Avançado</h1>
-
-<div>
-  <input id="clientId" placeholder="client_id" />
-  <select id="filtro">
-    <option value="todos">Todos</option>
-    <option value="quentes">Quentes</option>
-    <option value="frios">Frios</option>
-  </select>
-  <button onclick="carregar()">Carregar</button>
-</div>
-
-<div class="cards">
+<section class="cards">
   <div class="card">
-    <h2 id="total">0</h2>
-    <p>Total</p>
+    <span>Total de leads</span>
+    <strong id="totalLeads">0</strong>
   </div>
   <div class="card">
-    <h2 id="quentes">0</h2>
-    <p>Quentes</p>
+    <span>Convertidos</span>
+    <strong id="convertidos">0</strong>
   </div>
   <div class="card">
-    <h2 id="frios">0</h2>
-    <p>Frios</p>
+    <span>Pendentes</span>
+    <strong id="pendentes">0</strong>
   </div>
-</div>
+  <div class="card">
+    <span>Negados</span>
+    <strong id="negados">0</strong>
+  </div>
+</section>
 
-<canvas id="grafico"></canvas>
+<section class="grid">
+  <div class="panel">
+    <h3>Status dos Leads</h3>
+    <canvas id="chart"></canvas>
+  </div>
 
-<table>
-  <thead>
-    <tr>
-      <th>ID</th>
-      <th>Tempo</th>
-      <th>Páginas</th>
-      <th>Clicou Preço</th>
-      <th>Status</th>
-    </tr>
-  </thead>
-  <tbody id="tabela"></tbody>
-</table>
+  <div class="panel">
+    <h3>Lista de Leads</h3>
+    <table>
+      <thead>
+        <tr>
+          <th>Email</th>
+          <th>Status</th>
+        </tr>
+      </thead>
+      <tbody id="leadsTable"></tbody>
+    </table>
+  </div>
+</section>
 
 <script>
-let chart = null;
-let leads = [];
+  const API = "https://qualificador-leads-i-a.onrender.com";
 
-function carregar() {
-  const clientId = document.getElementById("clientId").value;
-  const filtro = document.getElementById("filtro").value;
+  const clientInput = document.getElementById("clientIdInput");
+  const savedClient = localStorage.getItem("client_id");
+  if(savedClient) clientInput.value = savedClient;
 
-  fetch(`https://qualificador-leads-i-a.onrender.com/dashboard_data?client_id=${clientId}`)
-    .then(res => res.json())
-    .then(data => {
-      leads = data.dados;
+  let chart;
 
-      document.getElementById("total").innerText = data.total_leads;
-      document.getElementById("quentes").innerText = data.leads_quentes;
-      document.getElementById("frios").innerText = data.leads_frios;
-
-      atualizarTabela(filtro);
-      atualizarGrafico(data.leads_quentes, data.leads_frios);
-    })
-    .catch(() => alert("Erro ao carregar dados"));
-}
-
-function atualizarTabela(filtro) {
-  const tbody = document.getElementById("tabela");
-  tbody.innerHTML = "";
-
-  let filtrados = leads;
-
-  if (filtro === "quentes") {
-    filtrados = leads.filter(l => l.virou_cliente === 1);
-  }
-
-  if (filtro === "frios") {
-    filtrados = leads.filter(l => l.virou_cliente === 0);
-  }
-
-  filtrados.forEach(l => {
-    const tr = document.createElement("tr");
-
-    tr.innerHTML = `
-      <td>${l.id}</td>
-      <td>${l.tempo_site}</td>
-      <td>${l.paginas_visitadas}</td>
-      <td>${l.clicou_preco ? "Sim" : "Não"}</td>
-      <td>${l.virou_cliente === 1 ? \"🔥 Quente\" : (l.virou_cliente === 0 ? \"❄️ Frio\" : \"⏳ Pendente\")}</td>
-    `;
-
-    tr.onclick = () => {
-      alert(
-        "Lead #" + l.id +
-        "\nTempo no site: " + l.tempo_site +
-        "\nPáginas: " + l.paginas_visitadas +
-        "\nClicou preço: " + (l.clicou_preco ? "Sim" : "Não")
-      );
-    };
-
-    tbody.appendChild(tr);
-  });
-}
-
-function atualizarGrafico(quentes, frios) {
-  const ctx = document.getElementById("grafico");
-
-  if (chart) chart.destroy();
-
-  chart = new Chart(ctx, {
-    type: "bar",
-    data: {
-      labels: ["Quentes", "Frios"],
-      datasets: [{
-        label: "Leads",
-        data: [quentes, frios],
-        backgroundColor: ["#22c55e", "#ef4444"]
-      }]
+  async function loadData(){
+    const clientId = clientInput.value.trim();
+    if(!clientId){
+      alert("Informe o client_id");
+      return;
     }
-  });
-}
 
-document.getElementById("filtro").onchange = () => {
-  atualizarTabela(document.getElementById("filtro").value);
-};
+    localStorage.setItem("client_id", clientId);
+
+    const res = await fetch(`${API}/dashboard_data?client_id=${clientId}`);
+    const data = await res.json();
+
+    document.getElementById("totalLeads").textContent = data.total;
+    document.getElementById("convertidos").textContent = data.convertidos;
+    document.getElementById("pendentes").textContent = data.pendentes;
+    document.getElementById("negados").textContent = data.negados;
+
+    const tbody = document.getElementById("leadsTable");
+    tbody.innerHTML = "";
+
+    data.leads.forEach(l => {
+      let status = "pendente";
+      let label = "Pendente";
+
+      if(l.virou_cliente === 1){ status="quente"; label="Convertido"; }
+      else if(l.virou_cliente === 0){ status="frio"; label="Negado"; }
+
+      tbody.innerHTML += `
+        <tr>
+          <td>${l.email}</td>
+          <td><span class="tag ${status}">${label}</span></td>
+        </tr>`;
+    });
+
+    drawChart(data);
+  }
+
+  function drawChart(data){
+    const ctx = document.getElementById("chart");
+
+    if(chart) chart.destroy();
+
+    chart = new Chart(ctx,{
+      type:"doughnut",
+      data:{
+        labels:["Convertidos","Pendentes","Negados"],
+        datasets:[{
+          data:[data.convertidos,data.pendentes,data.negados]
+        }]
+      }
+    });
+  }
+
+  if(savedClient){
+    loadData();
+  }
 </script>
-
 </body>
 </html>

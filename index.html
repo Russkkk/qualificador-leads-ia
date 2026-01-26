@@ -710,6 +710,7 @@
   const saved = localStorage.getItem("leadrank_client_id");
   if (saved) document.getElementById("clientId").value = saved;
   document.getElementById("backendLabel").textContent = BACKEND;
+  
 
   // Auto-load if client_id saved
   if (saved) carregar();

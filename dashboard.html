@@ -9,254 +9,464 @@
 
   <style>
     :root{
-      --bg:#0b1020;
-      --panel:#0f172a;
-      --panel2:#0b1224;
+      --bg1:#0b1020; --bg2:#111b3a;
+      --panel:#0f172a; --panel2:#0b1224;
       --border:#243047;
-      --text:#e5e7eb;
-      --muted:#94a3b8;
-      --primary:#2563eb;
-      --green:#22c55e;
-      --red:#ef4444;
-      --yellow:#eab308;
+      --text:#e5e7eb; --muted:#94a3b8;
+      --primary:#2563eb; --green:#22c55e; --red:#ef4444; --yellow:#eab308;
       --radius:14px;
-      --shadow:0 20px 60px rgba(0,0,0,.45);
+      --shadow:0 18px 50px rgba(0,0,0,.45);
     }
-
-    *{box-sizing:border-box}
+    *{ box-sizing:border-box; }
     body{
-      margin:0;
-      background:linear-gradient(180deg,#0b1020,#111b3a);
+      margin:0; padding:22px;
+      font-family: system-ui, -apple-system, Segoe UI, Roboto, Arial;
       color:var(--text);
-      font-family:system-ui,-apple-system,Segoe UI,Roboto,Arial;
+      background:
+        radial-gradient(1000px 520px at 20% 10%, rgba(37,99,235,.22), transparent 60%),
+        radial-gradient(900px 480px at 80% 20%, rgba(34,197,94,.14), transparent 55%),
+        linear-gradient(180deg, var(--bg1), var(--bg2));
       min-height:100vh;
-      padding:24px;
     }
-
     header{
-      display:flex;
-      justify-content:space-between;
-      align-items:center;
-      margin-bottom:20px;
+      display:flex; align-items:center; justify-content:space-between;
+      gap:14px; margin-bottom:16px;
+    }
+    h1{ margin:0; font-size:20px; letter-spacing:-.2px; }
+    .sub{ color:var(--muted); font-size:12px; margin-top:4px; }
+
+    .topbar{
+      display:flex; gap:10px; align-items:center; flex-wrap:wrap;
+      justify-content:flex-end;
     }
 
-    h1{
-      font-size:22px;
-      margin:0;
-    }
-
-    .top-actions{
-      display:flex;
-      gap:10px;
-      align-items:center;
-    }
-
-    input{
-      background:var(--panel2);
-      border:1px solid var(--border);
+    .input, select{
+      background: rgba(2,6,23,.45);
+      border:1px solid rgba(36,48,71,.95);
       color:var(--text);
-      padding:8px 10px;
-      border-radius:10px;
+      border-radius: 12px;
+      padding: 10px 12px;
+      outline:none;
+      min-width: 220px;
     }
+    select{ min-width: 180px; }
 
-    button{
-      background:var(--primary);
-      border:none;
+    .btn{
+      border:none; cursor:pointer;
+      padding: 10px 14px;
+      border-radius: 12px;
+      background: linear-gradient(180deg, #2563eb, #1d4ed8);
       color:white;
-      padding:8px 14px;
-      border-radius:10px;
+      font-weight:700;
+    }
+    .btnSecondary{
+      border:1px solid rgba(148,163,184,.22);
+      background: rgba(2,6,23,.35);
+      color: var(--text);
       cursor:pointer;
+      padding: 10px 12px;
+      border-radius: 12px;
       font-weight:600;
     }
+    .btnSmall{
+      padding: 7px 10px;
+      border-radius: 10px;
+      font-weight:700;
+      font-size: 12px;
+    }
+    .btnGreen{ background: rgba(34,197,94,.18); border:1px solid rgba(34,197,94,.35); color:#dcfce7; }
+    .btnRed{ background: rgba(239,68,68,.16); border:1px solid rgba(239,68,68,.32); color:#fee2e2; }
+    .btnDisabled{ opacity:.55; cursor:not-allowed; }
 
     .cards{
       display:grid;
-      grid-template-columns:repeat(auto-fit,minmax(160px,1fr));
-      gap:14px;
-      margin-bottom:22px;
+      grid-template-columns: repeat(auto-fit, minmax(170px, 1fr));
+      gap:12px;
+      margin: 14px 0 18px;
     }
-
     .card{
-      background:var(--panel);
-      border:1px solid var(--border);
-      border-radius:var(--radius);
-      padding:16px;
-      box-shadow:var(--shadow);
+      background: linear-gradient(180deg, rgba(255,255,255,.03), rgba(255,255,255,.01));
+      border:1px solid rgba(148,163,184,.16);
+      border-radius: var(--radius);
+      padding: 14px;
+      box-shadow: var(--shadow);
     }
-
-    .card span{
-      color:var(--muted);
-      font-size:12px;
-    }
-
-    .card strong{
-      display:block;
-      font-size:26px;
-      margin-top:4px;
-    }
+    .card span{ color:var(--muted); font-size: 12px; }
+    .card strong{ display:block; font-size: 24px; margin-top:4px; }
 
     .grid{
       display:grid;
-      grid-template-columns:1fr 2fr;
-      gap:18px;
+      grid-template-columns: 1fr 1.65fr;
+      gap:14px;
+      align-items:start;
     }
-
     .panel{
-      background:var(--panel);
-      border:1px solid var(--border);
-      border-radius:var(--radius);
-      padding:16px;
-      box-shadow:var(--shadow);
+      background: linear-gradient(180deg, rgba(255,255,255,.03), rgba(255,255,255,.01));
+      border:1px solid rgba(148,163,184,.16);
+      border-radius: var(--radius);
+      padding: 14px;
+      box-shadow: var(--shadow);
+    }
+    .panel h3{ margin:0 0 10px; font-size: 14px; color:#cbd5e1; }
+
+    .row2{
+      display:flex; gap:10px; flex-wrap:wrap; margin-bottom: 12px;
+    }
+    .search{
+      flex: 1;
+      min-width: 220px;
     }
 
     table{
-      width:100%;
-      border-collapse:collapse;
-      font-size:13px;
+      width: 100%;
+      border-collapse: collapse;
+      overflow:hidden;
+      border-radius: 12px;
+      background: rgba(2,6,23,.45);
+      border:1px solid rgba(36,48,71,.95);
     }
-
     th, td{
-      padding:8px;
-      border-bottom:1px solid var(--border);
+      padding: 10px 10px;
+      border-bottom: 1px solid rgba(36,48,71,.75);
+      font-size: 13px;
       text-align:left;
+      vertical-align: middle;
     }
-
     th{
-      color:var(--muted);
-      font-weight:500;
+      color: var(--muted);
+      font-weight: 600;
+      background: rgba(2,6,23,.55);
     }
+    tr:hover{ background: rgba(148,163,184,.06); }
 
     .tag{
-      padding:2px 8px;
-      border-radius:999px;
-      font-size:11px;
-      font-weight:600;
       display:inline-block;
+      padding: 3px 10px;
+      border-radius: 999px;
+      font-size: 12px;
+      font-weight: 800;
+      letter-spacing:.2px;
+      border:1px solid rgba(148,163,184,.18);
     }
+    .tConv{ background: rgba(34,197,94,.14); border-color: rgba(34,197,94,.35); color:#dcfce7; }
+    .tNeg{ background: rgba(239,68,68,.14); border-color: rgba(239,68,68,.33); color:#fee2e2; }
+    .tPen{ background: rgba(234,179,8,.14); border-color: rgba(234,179,8,.35); color:#fef3c7; }
 
-    .quente{background:rgba(34,197,94,.15);color:#86efac}
-    .frio{background:rgba(239,68,68,.15);color:#fecaca}
-    .pendente{background:rgba(234,179,8,.15);color:#fde68a}
+    .muted{ color: var(--muted); }
 
-    @media(max-width:900px){
-      .grid{grid-template-columns:1fr}
+    .toast{
+      position: fixed;
+      right: 18px;
+      bottom: 18px;
+      padding: 12px 14px;
+      border-radius: 12px;
+      border:1px solid rgba(148,163,184,.18);
+      background: rgba(2,6,23,.75);
+      box-shadow: var(--shadow);
+      color: var(--text);
+      font-size: 13px;
+      display:none;
+      max-width: 380px;
+      line-height: 1.35;
+    }
+    .toast.show{ display:block; }
+    .toast.success{ border-color: rgba(34,197,94,.35); }
+    .toast.error{ border-color: rgba(239,68,68,.35); }
+
+    @media (max-width: 980px){
+      .grid{ grid-template-columns: 1fr; }
     }
   </style>
 </head>
 
 <body>
-<header>
-  <h1>📊 Dashboard — Qualificador de Leads IA</h1>
-  <div class="top-actions">
-    <input id="clientIdInput" placeholder="client_id" />
-    <button onclick="loadData()">Atualizar</button>
-  </div>
-</header>
+  <header>
+    <div>
+      <h1>📊 Dashboard — Qualificador de Leads IA</h1>
+      <div class="sub">Filtro, busca, exportação CSV e ações rápidas</div>
+    </div>
 
-<section class="cards">
-  <div class="card">
-    <span>Total de leads</span>
-    <strong id="totalLeads">0</strong>
-  </div>
-  <div class="card">
-    <span>Convertidos</span>
-    <strong id="convertidos">0</strong>
-  </div>
-  <div class="card">
-    <span>Pendentes</span>
-    <strong id="pendentes">0</strong>
-  </div>
-  <div class="card">
-    <span>Negados</span>
-    <strong id="negados">0</strong>
-  </div>
-</section>
+    <div class="topbar">
+      <input id="clientId" class="input" placeholder="client_id" />
+      <button class="btn" id="btnLoad">Atualizar</button>
+      <button class="btnSecondary" id="btnExport">Exportar CSV</button>
+      <button class="btnSecondary" id="btnLogout">Limpar client_id</button>
+    </div>
+  </header>
 
-<section class="grid">
-  <div class="panel">
-    <h3>Status dos Leads</h3>
-    <canvas id="chart"></canvas>
-  </div>
+  <section class="cards">
+    <div class="card"><span>Total de leads</span><strong id="kpiTotal">0</strong></div>
+    <div class="card"><span>Convertidos</span><strong id="kpiConv">0</strong></div>
+    <div class="card"><span>Pendentes</span><strong id="kpiPen">0</strong></div>
+    <div class="card"><span>Negados</span><strong id="kpiNeg">0</strong></div>
+    <div class="card"><span>Taxa de conversão</span><strong id="kpiRate">0%</strong></div>
+  </section>
 
-  <div class="panel">
-    <h3>Lista de Leads</h3>
-    <table>
-      <thead>
-        <tr>
-          <th>Email</th>
-          <th>Status</th>
-        </tr>
-      </thead>
-      <tbody id="leadsTable"></tbody>
-    </table>
-  </div>
-</section>
+  <section class="grid">
+    <div class="panel">
+      <h3>Status dos leads</h3>
+      <canvas id="chart"></canvas>
+      <div class="muted" style="margin-top:10px;font-size:12px;">
+        Dica: “Pendentes” são leads ainda sem confirmação (virou_cliente = -1).
+      </div>
+    </div>
+
+    <div class="panel">
+      <h3>Leads</h3>
+
+      <div class="row2">
+        <select id="filtro">
+          <option value="todos">Todos</option>
+          <option value="convertidos">Convertidos</option>
+          <option value="pendentes">Pendentes</option>
+          <option value="negados">Negados</option>
+        </select>
+
+        <input id="busca" class="input search" placeholder="Buscar por ID (ex: 12)..." />
+      </div>
+
+      <div style="overflow:auto;">
+        <table>
+          <thead>
+            <tr>
+              <th style="width:70px;">ID</th>
+              <th>Tempo (s)</th>
+              <th>Páginas</th>
+              <th>Clicou preço</th>
+              <th>Status</th>
+              <th style="width:220px;">Ações</th>
+            </tr>
+          </thead>
+          <tbody id="tbody"></tbody>
+        </table>
+      </div>
+
+      <div class="muted" style="margin-top:10px;font-size:12px;">
+        * Export CSV usa os dados já carregados do endpoint <code>/dashboard_data</code>. :contentReference[oaicite:2]{index=2}
+      </div>
+    </div>
+  </section>
+
+  <div id="toast" class="toast"></div>
 
 <script>
-  const API = "https://qualificador-leads-i-a.onrender.com";
+  const API_BASE = "https://qualificador-leads-i-a.onrender.com"; // seu backend Python
+  const elClient = document.getElementById("clientId");
+  const elFiltro = document.getElementById("filtro");
+  const elBusca  = document.getElementById("busca");
+  const elTbody  = document.getElementById("tbody");
+  const toast    = document.getElementById("toast");
 
-  const clientInput = document.getElementById("clientIdInput");
-  const savedClient = localStorage.getItem("client_id");
-  if(savedClient) clientInput.value = savedClient;
+  const saved = localStorage.getItem("client_id");
+  if (saved) elClient.value = saved;
 
-  let chart;
+  let leads = [];
+  let chart = null;
 
-  async function loadData(){
-    const clientId = clientInput.value.trim();
-    if(!clientId){
-      alert("Informe o client_id");
+  function showToast(msg, type="success"){
+    toast.className = "toast show " + (type === "error" ? "error" : "success");
+    toast.innerHTML = msg;
+    clearTimeout(window.__t);
+    window.__t = setTimeout(() => toast.className = "toast", 3200);
+  }
+
+  function statusInfo(v){
+    if (v === 1) return { label:"✅ Convertido", cls:"tConv" };
+    if (v === 0) return { label:"❌ Negado", cls:"tNeg" };
+    return { label:"⏳ Pendente", cls:"tPen" };
+  }
+
+  function computeKPIs(){
+    const total = leads.length;
+    const conv = leads.filter(l => l.virou_cliente === 1).length;
+    const neg  = leads.filter(l => l.virou_cliente === 0).length;
+    const pen  = leads.filter(l => l.virou_cliente !== 1 && l.virou_cliente !== 0).length;
+
+    document.getElementById("kpiTotal").textContent = total;
+    document.getElementById("kpiConv").textContent  = conv;
+    document.getElementById("kpiNeg").textContent   = neg;
+    document.getElementById("kpiPen").textContent   = pen;
+
+    const rate = total ? Math.round((conv / total) * 100) : 0;
+    document.getElementById("kpiRate").textContent = rate + "%";
+
+    drawChart(conv, pen, neg);
+  }
+
+  function drawChart(conv, pen, neg){
+    const ctx = document.getElementById("chart");
+    if (chart) chart.destroy();
+
+    chart = new Chart(ctx, {
+      type: "doughnut",
+      data: {
+        labels: ["Convertidos", "Pendentes", "Negados"],
+        datasets: [{
+          data: [conv, pen, neg]
+        }]
+      },
+      options: {
+        plugins: {
+          legend: { labels: { color: "#cbd5e1" } }
+        }
+      }
+    });
+  }
+
+  function applyFilters(){
+    const filtro = elFiltro.value;
+    const q = elBusca.value.trim();
+
+    let arr = [...leads];
+
+    // filtro por status
+    if (filtro === "convertidos") arr = arr.filter(l => l.virou_cliente === 1);
+    if (filtro === "negados")     arr = arr.filter(l => l.virou_cliente === 0);
+    if (filtro === "pendentes")   arr = arr.filter(l => l.virou_cliente !== 1 && l.virou_cliente !== 0);
+
+    // busca por ID
+    if (q){
+      const id = parseInt(q, 10);
+      if (!Number.isNaN(id)) arr = arr.filter(l => l.id === id);
+    }
+
+    renderTable(arr);
+  }
+
+  function renderTable(arr){
+    elTbody.innerHTML = "";
+    if (!arr.length){
+      elTbody.innerHTML = `<tr><td colspan="6" class="muted">Nenhum lead encontrado.</td></tr>`;
+      return;
+    }
+
+    arr.forEach(l => {
+      const st = statusInfo(l.virou_cliente);
+
+      // ações: confirmar venda (backend tem endpoint) e negar (backend NÃO tem ainda)
+      const canConfirm = l.virou_cliente !== 1;
+      const canNegar   = true; // vai ficar "desabilitado" até você criar endpoint
+
+      const tr = document.createElement("tr");
+      tr.innerHTML = `
+        <td>${l.id}</td>
+        <td>${l.tempo_site ?? "-"}</td>
+        <td>${l.paginas_visitadas ?? "-"}</td>
+        <td>${(l.clicou_preco === 1) ? "Sim" : "Não"}</td>
+        <td><span class="tag ${st.cls}">${st.label}</span></td>
+        <td style="display:flex;gap:8px;flex-wrap:wrap;">
+          <button class="btnSecondary btnSmall btnGreen ${canConfirm ? "" : "btnDisabled"}"
+                  ${canConfirm ? "" : "disabled"}
+                  onclick="confirmarVenda(${l.id})">
+            Confirmar venda
+          </button>
+
+          <button class="btnSecondary btnSmall btnRed btnDisabled"
+                  title="Upgrade: criar endpoint /negar_venda para marcar virou_cliente=0"
+                  disabled>
+            Marcar negado
+          </button>
+        </td>
+      `;
+      elTbody.appendChild(tr);
+    });
+  }
+
+  async function carregar(){
+    const clientId = elClient.value.trim();
+    if (!clientId){
+      showToast("Informe o <b>client_id</b> para carregar os dados.", "error");
       return;
     }
 
     localStorage.setItem("client_id", clientId);
 
-    const res = await fetch(`${API}/dashboard_data?client_id=${clientId}`);
-    const data = await res.json();
-
-    document.getElementById("totalLeads").textContent = data.total;
-    document.getElementById("convertidos").textContent = data.convertidos;
-    document.getElementById("pendentes").textContent = data.pendentes;
-    document.getElementById("negados").textContent = data.negados;
-
-    const tbody = document.getElementById("leadsTable");
-    tbody.innerHTML = "";
-
-    data.leads.forEach(l => {
-      let status = "pendente";
-      let label = "Pendente";
-
-      if(l.virou_cliente === 1){ status="quente"; label="Convertido"; }
-      else if(l.virou_cliente === 0){ status="frio"; label="Negado"; }
-
-      tbody.innerHTML += `
-        <tr>
-          <td>${l.email}</td>
-          <td><span class="tag ${status}">${label}</span></td>
-        </tr>`;
-    });
-
-    drawChart(data);
-  }
-
-  function drawChart(data){
-    const ctx = document.getElementById("chart");
-
-    if(chart) chart.destroy();
-
-    chart = new Chart(ctx,{
-      type:"doughnut",
-      data:{
-        labels:["Convertidos","Pendentes","Negados"],
-        datasets:[{
-          data:[data.convertidos,data.pendentes,data.negados]
-        }]
+    try{
+      const res = await fetch(`${API_BASE}/dashboard_data?client_id=${encodeURIComponent(clientId)}`);
+      if (!res.ok){
+        const t = await res.text();
+        throw new Error(t || "Falha ao carregar");
       }
-    });
+      const data = await res.json();
+
+      // Seu backend retorna os leads em data.dados. :contentReference[oaicite:3]{index=3}
+      leads = (data.dados || []).map(x => ({
+        ...x,
+        // garante numérico
+        virou_cliente: Number(x.virou_cliente)
+      }));
+
+      computeKPIs();
+      applyFilters();
+      showToast("Dados carregados com sucesso ✅");
+    } catch (e){
+      showToast("Erro ao carregar dados. Verifique o backend no Render.", "error");
+    }
   }
 
-  if(savedClient){
-    loadData();
+  async function confirmarVenda(leadId){
+    const clientId = elClient.value.trim();
+    if (!clientId) return;
+
+    try{
+      const res = await fetch(`${API_BASE}/confirmar_venda`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ client_id: clientId, lead_id: leadId })
+      });
+
+      if (!res.ok){
+        const t = await res.text();
+        throw new Error(t || "Falha ao confirmar");
+      }
+
+      showToast(`Venda confirmada para o lead <b>#${leadId}</b> ✅`);
+      // recarrega para atualizar status
+      await carregar();
+    } catch (e){
+      showToast("Erro ao confirmar venda. Veja logs do Render.", "error");
+    }
   }
+
+  function exportCSV(){
+    if (!leads.length){
+      showToast("Não há dados para exportar.", "error");
+      return;
+    }
+
+    const headers = ["id","tempo_site","paginas_visitadas","clicou_preco","virou_cliente"];
+    const rows = leads.map(l => headers.map(h => (l[h] ?? "")).join(","));
+    const csv = [headers.join(","), ...rows].join("\n");
+
+    const blob = new Blob([csv], { type: "text/csv;charset=utf-8;" });
+    const url = URL.createObjectURL(blob);
+
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = "leads.csv";
+    a.click();
+    URL.revokeObjectURL(url);
+
+    showToast("CSV exportado 📄");
+  }
+
+  document.getElementById("btnLoad").addEventListener("click", carregar);
+  document.getElementById("btnExport").addEventListener("click", exportCSV);
+
+  document.getElementById("btnLogout").addEventListener("click", () => {
+    localStorage.removeItem("client_id");
+    elClient.value = "";
+    leads = [];
+    computeKPIs();
+    applyFilters();
+    showToast("client_id removido do navegador.");
+  });
+
+  elFiltro.addEventListener("change", applyFilters);
+  elBusca.addEventListener("input", applyFilters);
+
+  // auto-load se tiver client_id salvo
+  if (saved) carregar();
 </script>
 </body>
 </html>

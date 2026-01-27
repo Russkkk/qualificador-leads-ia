@@ -37,6 +37,30 @@ CORS(app, resources={r"/*": {"origins": [
 ]}})
 
 DATABASE_URL = os.getenv("DATABASE_URL", "").strip()
+
+# --- DB bootstrap/migrations (auto) ---
+_SCHEMA_READY = False
+_SCHEMA_LOCK = None  # lazy init
+
+def _raw_conn():
+    """Connection without triggering schema bootstrapping (used by migrations)."""
+    _db_required()
+    return psycopg2.connect(DATABASE_URL, cursor_factory=psycopg2.extras.RealDictCursor)
+
+def _ensure_schema_once():
+    """Run lightweight migrations once per process. Safe to call many times."""
+    global _SCHEMA_READY, _SCHEMA_LOCK
+    if _SCHEMA_READY:
+        return
+    if _SCHEMA_LOCK is None:
+        import threading as _t
+        _SCHEMA_LOCK = _t.Lock()
+    with _SCHEMA_LOCK:
+        if _SCHEMA_READY:
+            return
+        _ensure_schema()
+        _SCHEMA_READY = True
+
 DEMO_KEY = (os.getenv("DEMO_KEY") or "").strip()
 
 # Parâmetros padrões
@@ -46,13 +70,6 @@ MIN_LABELED_TO_TRAIN = 4  # 2 de cada classe recomendado
 # Threshold default (pode ser ajustado por /auto_threshold)
 DEFAULT_THRESHOLD = 0.35
 
-# Garante que migração rode ao subir o app (e também no 1o request)
-try:
-    _db_bootstrap()
-    app._db_bootstrapped = True
-    print("[BOOT] DB bootstrap OK")
-except Exception as e:
-    print("[BOOT] DB bootstrap FAIL:", repr(e))
 
 # =========================
 # Helpers
@@ -82,6 +99,8 @@ def _db_required():
 
 def db_conn():
     _db_required()
+    # Ensure schema/migrations before returning connections for normal operations
+    _ensure_schema_once()
     return psycopg2.connect(DATABASE_URL, cursor_factory=psycopg2.extras.RealDictCursor)
 
 def _safe_int(x, default=0):
@@ -428,18 +447,6 @@ except Exception:
 # =========================
 # Routes
 # =========================
-@app.before_request
-def _ensure_db_ready():
-    # Redundância: se por algum motivo não rodou no boot, roda aqui.
-    if not getattr(app, "_db_bootstrapped", False):
-        try:
-            _db_bootstrap()
-            app._db_bootstrapped = True
-            print("[BOOT] DB bootstrap OK (before_request)")
-        except Exception as e:
-            print("[BOOT] DB bootstrap FAIL (before_request):", repr(e))
-            # não bloqueia aqui; as rotas já vão acusar erro se DB estiver ruim
-            
 @app.get("/")
 def root():
     return jsonify({"ok": True, "service": "LeadRank backend", "ts": _iso(_now_utc())})
@@ -449,6 +456,19 @@ def health():
     # Não falha mesmo se DB off, mas avisa
     db_ok = bool(DATABASE_URL)
     return jsonify({"ok": True, "db_configured": db_ok, "ts": _iso(_now_utc())})
+
+@app.get("/health_db")
+def health_db():
+    """Healthcheck que realmente toca no Postgres e aplica migrações leves."""
+    try:
+        _ensure_schema_once()
+        with _raw_conn() as conn:
+            with conn.cursor() as cur:
+                cur.execute("SELECT 1 AS ok;")
+                row = cur.fetchone()
+        return jsonify({"ok": True, "db": True, "ts": _iso(_now_utc()), "select1": (row.get("ok") if row else 1)})
+    except Exception as e:
+        return jsonify({"ok": False, "db": False, "error": repr(e), "ts": _iso(_now_utc())}), 500
 
 @app.get("/metrics")
 def metrics():

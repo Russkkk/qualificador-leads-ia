@@ -46,6 +46,13 @@ MIN_LABELED_TO_TRAIN = 4  # 2 de cada classe recomendado
 # Threshold default (pode ser ajustado por /auto_threshold)
 DEFAULT_THRESHOLD = 0.35
 
+# Garante que migração rode ao subir o app (e também no 1o request)
+try:
+    _db_bootstrap()
+    app._db_bootstrapped = True
+    print("[BOOT] DB bootstrap OK")
+except Exception as e:
+    print("[BOOT] DB bootstrap FAIL:", repr(e))
 
 # =========================
 # Helpers
@@ -421,6 +428,18 @@ except Exception:
 # =========================
 # Routes
 # =========================
+@app.before_request
+def _ensure_db_ready():
+    # Redundância: se por algum motivo não rodou no boot, roda aqui.
+    if not getattr(app, "_db_bootstrapped", False):
+        try:
+            _db_bootstrap()
+            app._db_bootstrapped = True
+            print("[BOOT] DB bootstrap OK (before_request)")
+        except Exception as e:
+            print("[BOOT] DB bootstrap FAIL (before_request):", repr(e))
+            # não bloqueia aqui; as rotas já vão acusar erro se DB estiver ruim
+            
 @app.get("/")
 def root():
     return jsonify({"ok": True, "service": "LeadRank backend", "ts": _iso(_now_utc())})

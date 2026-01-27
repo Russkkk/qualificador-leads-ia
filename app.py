@@ -181,11 +181,15 @@ def _require_api_key(client_row: Dict[str, Any]) -> Tuple[bool, str]:
     return True, ""
 def _ensure_schema():
     """
-    Cria tabelas mínimas necessárias para Postgres.
-    Executa com IF NOT EXISTS.
+    Cria tabelas mínimas necessárias para Postgres e aplica migrações leves (ADD COLUMN IF NOT EXISTS)
+    para evitar 500 quando o schema já existe em versão antiga.
+
+    IMPORTANTE: Render/Postgres às vezes já tem a tabela criada por versões anteriores.
+    CREATE TABLE IF NOT EXISTS não adiciona colunas novas — por isso usamos ALTER TABLE.
     """
     with db_conn() as conn:
         with conn.cursor() as cur:
+            # --- leads ---
             cur.execute("""
             CREATE TABLE IF NOT EXISTS leads (
                 id SERIAL PRIMARY KEY,
@@ -201,13 +205,10 @@ def _ensure_schema():
                 created_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
             );
             """)
-            cur.execute("""
-            CREATE INDEX IF NOT EXISTS idx_leads_client_created ON leads(client_id, created_at DESC);
-            """)
-            cur.execute("""
-            CREATE INDEX IF NOT EXISTS idx_leads_client_label ON leads(client_id, virou_cliente);
-            """)
+            cur.execute("""CREATE INDEX IF NOT EXISTS idx_leads_client_created ON leads(client_id, created_at DESC);""")
+            cur.execute("""CREATE INDEX IF NOT EXISTS idx_leads_client_label ON leads(client_id, virou_cliente);""")
 
+            # --- clients (workspace / monetização) ---
             cur.execute("""
             CREATE TABLE IF NOT EXISTS clients (
                 client_id TEXT PRIMARY KEY,
@@ -220,8 +221,23 @@ def _ensure_schema():
                 updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
             );
             """)
-            cur.execute("CREATE UNIQUE INDEX IF NOT EXISTS idx_clients_api_key ON clients(api_key) WHERE api_key IS NOT NULL;")
+            # Migrações (para bancos já existentes)
+            cur.execute("""ALTER TABLE clients ADD COLUMN IF NOT EXISTS api_key TEXT;""")
+            cur.execute("""ALTER TABLE clients ADD COLUMN IF NOT EXISTS plan TEXT NOT NULL DEFAULT 'trial';""")
+            cur.execute("""ALTER TABLE clients ADD COLUMN IF NOT EXISTS status TEXT NOT NULL DEFAULT 'active';""")
+            cur.execute("""ALTER TABLE clients ADD COLUMN IF NOT EXISTS usage_month TEXT;""")
+            cur.execute("""ALTER TABLE clients ADD COLUMN IF NOT EXISTS leads_used_month INTEGER NOT NULL DEFAULT 0;""")
+            cur.execute("""ALTER TABLE clients ADD COLUMN IF NOT EXISTS created_at TIMESTAMPTZ NOT NULL DEFAULT NOW();""")
+            cur.execute("""ALTER TABLE clients ADD COLUMN IF NOT EXISTS updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW();""")
 
+            # Garante defaults onde fizer sentido
+            mk = _month_key()
+            cur.execute("""UPDATE clients SET usage_month=%s WHERE usage_month IS NULL OR usage_month='';""", (mk,))
+            cur.execute("""UPDATE clients SET updated_at=NOW() WHERE updated_at IS NULL;""")
+
+            cur.execute("""CREATE UNIQUE INDEX IF NOT EXISTS idx_clients_api_key ON clients(api_key) WHERE api_key IS NOT NULL;""")
+
+            # --- thresholds ---
             cur.execute("""
             CREATE TABLE IF NOT EXISTS thresholds (
                 client_id TEXT PRIMARY KEY,
@@ -230,6 +246,7 @@ def _ensure_schema():
             );
             """)
 
+            # --- model_meta ---
             cur.execute("""
             CREATE TABLE IF NOT EXISTS model_meta (
                 client_id TEXT PRIMARY KEY,

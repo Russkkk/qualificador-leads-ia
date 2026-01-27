@@ -531,6 +531,13 @@
 
   async function api(path, opts={}){
     const url = BACKEND + path;
+
+    // Injeta API Key em todas as chamadas (SaaS)
+    const apiKey = (localStorage.getItem("api_key") || "").trim();
+    const headers = Object.assign({}, (opts.headers || {}));
+    if (apiKey) headers["X-API-KEY"] = apiKey;
+    opts.headers = headers;
+
     const res = await fetch(url, opts);
     let data = null;
     try{ data = await res.json(); } catch(e){}

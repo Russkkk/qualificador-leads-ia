@@ -180,8 +180,22 @@
             </form>
 
             <div class="loading" id="loading">Criando sua conta...</div>
-            <div class="success" id="success"></div>
+                        <div class="success" id="success"></div>
             <div class="error" id="error"></div>
+
+            <div class="card" id="loginBox" style="display:none; margin-top:16px; padding:16px; background:#0f172a; border:1px solid rgba(148,163,184,0.15); border-radius:12px;">
+                <h3 style="margin:0 0 10px 0; font-size:15px; color:#e5e7eb;">Já tem conta? Entrar no dashboard</h3>
+                <p style="margin:0 0 12px 0; font-size:13px; color:rgba(226,232,240,0.75);">Cole seu <strong>client_id</strong> e <strong>api_key</strong> (você recebeu quando criou a conta).</p>
+                <div class="form-group">
+                    <label>client_id</label>
+                    <input type="text" id="loginClientId" placeholder="trial-...">
+                </div>
+                <div class="form-group">
+                    <label>api_key</label>
+                    <input type="text" id="loginApiKey" placeholder="sk_live_...">
+                </div>
+                <button type="button" class="btn" id="loginBtn">Acessar dashboard</button>
+            </div>
 
             <div class="footer">
                 Já tem uma conta? <a href="./onboarding.html" class="link">Acessar dashboard</a>
@@ -223,18 +237,31 @@
 
                 const result = await response.json();
 
-                if (response.ok && result.success) {
+                if ((response.ok && (result.success || result.ok)) && (result.client_id && result.api_key)) {
                     successDiv.innerHTML = `
                         ✅ Conta criada com sucesso!<br><br>
                         <strong>Sua API Key:</strong><br>
                         <code style="background:#1e2937; padding:8px; border-radius:6px; display:block; margin:12px 0; font-family:monospace;">${result.api_key}</code><br>
                         Copie e guarde esta chave.<br>
-                        <a href="./onboarding.html?client_id=${encodeURIComponent(result.client_id)}&api_key=${encodeURIComponent(result.api_key)}" style="color:#6366f1; text-decoration:none;">→ Ir para o dashboard agora</a>
+                        <a href="./index.html?client_id=${encodeURIComponent(result.client_id)}&api_key=${encodeURIComponent(result.api_key)}" style="color:#6366f1; text-decoration:none;">→ Ir para o dashboard agora</a>
                     `;
                     successDiv.style.display = 'block';
                     form.style.display = 'none';
                 } else {
-                    showError(result.error || 'Erro ao criar conta');
+                    // Tratamento especial: email já existe
+                    if (response.status === 409 && (result.code === "email_exists" || (result.error||"").toLowerCase().includes("cadastrado"))) {
+                        const cid = result.client_id ? String(result.client_id) : "";
+                        showError(`Este email já tem uma conta. ${cid ? "Seu client_id é: " + cid + ". " : ""}Use outro email ou faça login abaixo.`);
+                        // preenche login helper (se existir)
+                        try {
+                            const el = document.getElementById("loginClientId");
+                            if (el && cid) el.value = cid;
+                        } catch(e){}
+                        // exibe bloco login
+                        try { document.getElementById("loginBox").style.display = "block"; } catch(e){}
+                    } else {
+                        showError(result.error || 'Erro ao criar conta');
+                    }
                 }
             } catch (err) {
                 showError('Erro de conexão. Tente novamente.');
@@ -242,6 +269,15 @@
                 submitBtn.disabled = false;
                 loading.style.display = 'none';
             }
+        });
+
+        document.getElementById('loginBtn').addEventListener('click', () => {
+            const cid = (document.getElementById('loginClientId').value || '').trim();
+            const key = (document.getElementById('loginApiKey').value || '').trim();
+            if (!cid || !key) { showError('Informe client_id e api_key para entrar.'); return; }
+            // guarda para facilitar próximas visitas
+            try { localStorage.setItem('LR_CLIENT_ID', cid); localStorage.setItem('LR_API_KEY', key); } catch(e){}
+            window.location.href = `./index.html?client_id=${encodeURIComponent(cid)}&api_key=${encodeURIComponent(key)}`;
         });
 
         function showError(msg) {

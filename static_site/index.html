@@ -112,6 +112,56 @@
 
   
 <script>
+/* === LeadRank Frontend Helper (robusto) === */
+(function(){
+  const qs = new URLSearchParams(window.location.search || "");
+  const storedCid = (() => { try { return localStorage.getItem("LR_CLIENT_ID") || ""; } catch(e){ return ""; }})();
+  const storedKey = (() => { try { return localStorage.getItem("LR_API_KEY") || ""; } catch(e){ return ""; }})();
+  const clientId = (qs.get("client_id") || storedCid || "").trim();
+  const apiKey = (qs.get("api_key") || storedKey || "").trim();
+
+  // Detecta backend: se está no Static Site, chama o Web Service.
+  const defaultBackend = "https://qualificador-leads-i-a.onrender.com";
+  const backendUrl = (window.LR_BACKEND_URL || defaultBackend).replace(/\/$/, "");
+
+  async function lrApi(path, opts){
+    opts = opts || {};
+    const method = (opts.method || "GET").toUpperCase();
+    const headers = new Headers(opts.headers || {});
+    headers.set("Accept", "application/json");
+    if (method !== "GET" && method !== "HEAD") headers.set("Content-Type", "application/json");
+    if (apiKey) headers.set("X-API-KEY", apiKey);
+
+    const url = new URL(backendUrl + path);
+    if (clientId && !url.searchParams.get("client_id")) url.searchParams.set("client_id", clientId);
+
+    const res = await fetch(url.toString(), {
+      method,
+      headers,
+      body: opts.body ? (typeof opts.body === "string" ? opts.body : JSON.stringify(opts.body)) : undefined,
+    });
+
+    const text = await res.text();
+    let json;
+    try { json = text ? JSON.parse(text) : {}; } catch(e){ json = { ok:false, error:text || "Resposta inválida" }; }
+
+    if (!res.ok){
+      const msg = json.error || json.message || ("HTTP " + res.status);
+      const err = new Error(msg);
+      err.status = res.status;
+      err.payload = json;
+      throw err;
+    }
+    return json;
+  }
+
+  window.__lr = { backendUrl, clientId, apiKey, lrApi };
+
+  // Persistência
+  if (clientId) { try { localStorage.setItem("LR_CLIENT_ID", clientId); } catch(e){} }
+  if (apiKey) { try { localStorage.setItem("LR_API_KEY", apiKey); } catch(e){} }
+})();
+
   const BACKEND = (window.BACKEND_URL || "https://qualificador-leads-i-a.onrender.com").replace(/\/$/, "");
   const DEFAULT_DEMO_KEY = 'Leadrank#2026!x9';
 
@@ -213,22 +263,10 @@
 
   // On load: if no stored key and no query param, default is set; still allow change
   window.addEventListener("DOMContentLoaded", () => {
-    // if user explicitly removed key, allow modal via button
-    const btn = document.getElementById("changeKeyBtn");
-    if (btn) btn.addEventListener("click", () => openKeyModal(false));
-
-    const saveBtn = document.getElementById("saveKeyBtn");
-    if (saveBtn) saveBtn.addEventListener("click", saveKeyFromModal);
-
-    const cancelBtn = document.getElementById("cancelKeyBtn");
-    if (cancelBtn) cancelBtn.addEventListener("click", closeKeyModal);
-
-    // Esc closes modal
-    document.addEventListener("keydown", (e) => {
-      if (e.key === "Escape") closeKeyModal();
+      document.getElementById("refreshBtn").addEventListener("click", loadDashboard);
+      loadDashboard();
     });
-  });
-</script>
+  </script>
 
 
   <script>
@@ -321,7 +359,7 @@ async function loadDashboard(){
   }
 }
 
-window.addEventListener("DOMContentLoaded"), () => window.addEventListener("DOMContentLoaded", () => {
+window.addEventListener("DOMContentLoaded", () => {
       document.getElementById("refreshBtn").addEventListener("click", loadDashboard);
       loadDashboard();
     });

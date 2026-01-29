@@ -1,368 +1,289 @@
 <!doctype html>
-<html lang="pt-br">
+<html lang="pt-BR">
 <head>
-  <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>LeadRank — Dashboard</title>
-  
-<style>
-  :root { color-scheme: light; }
-  body { font-family: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Arial; margin: 0; background: #0b0f17; color: #e8eefc; }
-  .container { max-width: 1040px; margin: 0 auto; padding: 28px 18px; }
-  .card { background: rgba(255,255,255,0.06); border: 1px solid rgba(255,255,255,0.10); border-radius: 16px; padding: 18px; box-shadow: 0 12px 40px rgba(0,0,0,0.25); }
-  .row { display: flex; gap: 14px; flex-wrap: wrap; }
-  .grow { flex: 1 1 360px; }
-  h1 { font-size: 34px; margin: 6px 0 10px; }
-  h2 { font-size: 18px; margin: 0 0 12px; opacity: 0.95; }
-  p { opacity: 0.88; line-height: 1.45; }
-  .btn { appearance: none; border: 1px solid rgba(255,255,255,0.14); border-radius: 12px; padding: 10px 14px; cursor: pointer; color: #e8eefc; background: rgba(255,255,255,0.06); }
-  .btn:hover { background: rgba(255,255,255,0.10); }
-  .btn-primary { background: rgba(99, 102, 241, 0.40); border-color: rgba(99, 102, 241, 0.65); }
-  .btn-primary:hover { background: rgba(99, 102, 241, 0.55); }
-  .btn-ghost { background: transparent; }
-  .pill { display: inline-flex; gap: 8px; align-items: center; padding: 6px 10px; border-radius: 999px; border: 1px solid rgba(255,255,255,0.14); background: rgba(255,255,255,0.05); font-size: 12px; opacity: 0.95; }
-  .muted { opacity: 0.75; }
-  .input, textarea { width: 100%; background: rgba(0,0,0,0.25); border: 1px solid rgba(255,255,255,0.14); border-radius: 12px; padding: 10px 12px; color: #e8eefc; outline: none; }
-  textarea { min-height: 110px; resize: vertical; }
-  code { background: rgba(0,0,0,0.35); padding: 2px 6px; border-radius: 8px; border: 1px solid rgba(255,255,255,0.10); }
-  .topbar { display:flex; justify-content: space-between; align-items:center; gap: 12px; margin-bottom: 16px; }
-  .modal.hidden { display: none; }
-  .modal { position: fixed; inset: 0; background: rgba(0,0,0,0.60); display: flex; align-items: center; justify-content: center; padding: 18px; z-index: 50; }
-  .modal-card { width: min(520px, 100%); background: #0f172a; border: 1px solid rgba(255,255,255,0.12); border-radius: 18px; padding: 18px; box-shadow: 0 18px 60px rgba(0,0,0,0.45); }
-  .modal-header { display:flex; justify-content: space-between; align-items:flex-start; gap: 12px; margin-bottom: 12px; }
-  .modal-title { font-size: 18px; font-weight: 700; }
-  .modal-subtitle { font-size: 13px; opacity: 0.8; margin-top: 4px; }
-  .label { font-size: 13px; opacity: 0.85; display:block; margin: 10px 0 6px; }
-  .modal-actions { display:flex; justify-content: flex-end; gap: 10px; margin-top: 14px; }
-  .modal-footnote { margin-top: 10px; font-size: 12px; opacity: 0.75; }
-  .kpi { font-size: 28px; font-weight: 800; margin-top: 8px; }
-  .grid { display:grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 12px; }
-  @media (max-width: 860px) { .grid { grid-template-columns: 1fr; } }
-  .error { color: #fecaca; background: rgba(239,68,68,0.15); border: 1px solid rgba(239,68,68,0.30); padding: 10px 12px; border-radius: 12px; }
-  .ok { color: #bbf7d0; background: rgba(34,197,94,0.12); border: 1px solid rgba(34,197,94,0.28); padding: 10px 12px; border-radius: 12px; }
-</style>
-
-<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+  <meta charset="utf-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <title>LeadRank • Dashboard</title>
+  <style>
+    :root{
+      --bg:#0a0e17; --card:#121826; --text:#e2e8f0; --muted:#94a3b8;
+      --accent:#6366f1; --border:#1e2937; --danger:#ef4444; --ok:#22c55e;
+      --radius:18px; --shadow: 0 18px 60px rgba(0,0,0,.35);
+    }
+    *{box-sizing:border-box}
+    body{
+      margin:0; font-family:system-ui,-apple-system,Segoe UI,Roboto,Ubuntu,Cantarell,"Noto Sans",sans-serif;
+      background: radial-gradient(1100px 700px at 10% -10%, rgba(99,102,241,.30), transparent 55%),
+                  radial-gradient(900px 500px at 100% 10%, rgba(34,197,94,.14), transparent 55%),
+                  var(--bg);
+      color:var(--text);
+    }
+    .top{
+      position:sticky; top:0; z-index:10;
+      background: rgba(10,14,23,.72);
+      backdrop-filter: blur(10px);
+      border-bottom:1px solid var(--border);
+    }
+    .bar{max-width:1100px; margin:0 auto; padding:14px 16px; display:flex; gap:12px; align-items:center; justify-content:space-between;}
+    .brand{display:flex; align-items:center; gap:10px; font-weight:900; letter-spacing:.2px}
+    .pill{font-size:12px; color:var(--muted); padding:6px 10px; border:1px solid var(--border); border-radius:999px; background: rgba(255,255,255,.03);}
+    .container{max-width:1100px; margin:0 auto; padding:20px 16px 40px;}
+    .grid{display:grid; grid-template-columns: 1.2fr .8fr; gap:16px;}
+    @media (max-width:920px){.grid{grid-template-columns:1fr}}
+    .card{background: rgba(18,24,38,.86); border:1px solid var(--border); border-radius: var(--radius); box-shadow: var(--shadow); padding:16px;}
+    h1{margin:0; font-size:18px;}
+    h2{margin:0 0 10px; font-size:14px; color:var(--muted); font-weight:800; text-transform:uppercase; letter-spacing:.09em;}
+    .row{display:grid; grid-template-columns:1fr 1fr; gap:10px;}
+    @media (max-width:520px){.row{grid-template-columns:1fr}}
+    label{display:block; font-size:12px; color:var(--muted); margin:8px 0 6px;}
+    input{
+      width:100%; padding:11px 12px; border-radius: 12px;
+      border:1px solid var(--border); background: rgba(10,14,23,.55); color: var(--text);
+      outline:none;
+    }
+    input:focus{border-color: rgba(99,102,241,.6); box-shadow:0 0 0 4px rgba(99,102,241,.12);}
+    .btn{padding:11px 12px; border-radius: 12px; border:0; cursor:pointer; font-weight:900;}
+    .btn.primary{background: var(--accent); color:#fff;}
+    .btn.ghost{background: rgba(255,255,255,.06); border:1px solid var(--border); color: var(--text);}
+    .btn.small{padding:9px 10px; font-size:13px}
+    .actions{display:flex; gap:10px; flex-wrap:wrap; margin-top:10px;}
+    .kpis{display:grid; grid-template-columns:repeat(3,1fr); gap:10px;}
+    @media (max-width:720px){.kpis{grid-template-columns:1fr}}
+    .kpi{padding:12px; border-radius: 14px; border:1px solid var(--border); background: rgba(255,255,255,.03);}
+    .kpi .v{font-size:28px; font-weight:950; margin-top:4px;}
+    .muted{color:var(--muted)}
+    .msg{display:none; margin-top:10px; padding:12px; border-radius: 12px; border:1px solid var(--border); background: rgba(255,255,255,.03);}
+    .msg.ok{display:block; border-color: rgba(34,197,94,.35); background: rgba(34,197,94,.08);}
+    .msg.err{display:block; border-color: rgba(239,68,68,.35); background: rgba(239,68,68,.08);}
+    table{width:100%; border-collapse: collapse; font-size:13px;}
+    th,td{padding:10px 8px; border-bottom:1px solid var(--border); text-align:left; vertical-align:top;}
+    th{color: var(--muted); font-weight:900; font-size:12px; text-transform:uppercase; letter-spacing:.08em;}
+    .right{text-align:right}
+    a{color:#c7d2fe}
+    code{display:block; padding:10px; background: rgba(10,14,23,.6); border:1px solid var(--border); border-radius: 12px; overflow:auto;}
+  </style>
 </head>
 <body>
-  <div class="container">
-    <div class="topbar">
-      <div class="pill"><a href="./landing.html" style="color:inherit; text-decoration:none;">LeadRank</a> • <span class="muted">Dashboard</span></div>
-      <div style="display:flex; gap:10px; align-items:center;">
-        <button id="changeKeyBtn" class="btn btn-ghost" type="button">DEMO_KEY</button>
-        <a class="btn" href="./onboarding.html">Teste rápido</a>
+  <div class="top">
+    <div class="bar">
+      <div class="brand">LeadRank <span class="pill" id="wsPill">workspace: —</span></div>
+      <div style="display:flex; gap:10px; align-items:center">
+        <a class="pill" href="onboarding.html?mode=login" style="text-decoration:none">Entrar / trocar conta</a>
       </div>
     </div>
+  </div>
 
+  <div class="container">
     <div class="grid">
       <div class="card">
-        <h2>Leads (período)</h2>
-        <div class="kpi" id="kpiLeads">—</div>
-        <p class="muted">Total de leads no período selecionado.</p>
-      </div>
-      <div class="card">
-        <h2>A/B/C</h2>
-        <div class="kpi" id="kpiABC">—</div>
-        <p class="muted">Distribuição por classe.</p>
-      </div>
-      <div class="card">
-        <h2>Top origens</h2>
-        <div class="kpi" id="kpiOrigem">—</div>
-        <p class="muted">Origem com maior volume.</p>
-      </div>
-    </div>
+        <h2>Visão geral</h2>
+        <div class="kpis">
+          <div class="kpi"><div class="muted">Convertidos</div><div class="v" id="kpiConv">—</div></div>
+          <div class="kpi"><div class="muted">Negados</div><div class="v" id="kpiNeg">—</div></div>
+          <div class="kpi"><div class="muted">Pendentes</div><div class="v" id="kpiPend">—</div></div>
+        </div>
 
-    <div style="height:14px"></div>
+        <div class="msg" id="msg"></div>
 
-    <div class="card">
-      <div class="row" style="align-items:center; justify-content:space-between;">
-        <h2 style="margin:0;">Dados do dashboard</h2>
-        <button class="btn btn-primary" id="refreshBtn" type="button">Atualizar</button>
+        <div style="margin-top:14px" class="row">
+          <div class="card" style="padding:14px; box-shadow:none">
+            <h2>Leads quentes de hoje</h2>
+            <div id="hotWrap" class="muted">Carregue o dashboard para ver.</div>
+          </div>
+          <div class="card" style="padding:14px; box-shadow:none">
+            <h2>Top origens (30d)</h2>
+            <div id="origWrap" class="muted">Carregue o dashboard para ver.</div>
+          </div>
+        </div>
+
+        <div style="margin-top:14px" class="card" style="padding:14px">
+          <h2>Últimos leads</h2>
+          <div id="tableWrap" class="muted">Carregue o dashboard para ver.</div>
+        </div>
       </div>
-      <div style="height:12px"></div>
-      <div id="dashError"></div>
-      <div id="dashViz" style="display:grid; gap:12px; margin-bottom:12px;"></div>
-      <pre id="dashRaw" class="card" style="white-space:pre-wrap; overflow:auto;"></pre>
+
+      <div class="card">
+        <h2>Conexão</h2>
+        <div class="row">
+          <div>
+            <label for="clientId">client_id</label>
+            <input id="clientId" placeholder="trial-..." />
+          </div>
+          <div>
+            <label for="apiKey">api_key</label>
+            <input id="apiKey" placeholder="sk_live_..." />
+          </div>
+        </div>
+        <div class="actions">
+          <button class="btn primary" id="btnSave">Salvar</button>
+          <button class="btn ghost" id="btnLoad">Carregar dashboard</button>
+          <button class="btn ghost" id="btnExport">Exportar CSV</button>
+        </div>
+        <p class="muted" style="margin:12px 0 0; font-size:13px">
+          A API Key é usada no header <code style="display:inline; padding:2px 6px">X-API-KEY</code>.
+        </p>
+
+        <div class="card" style="margin-top:14px; padding:14px; box-shadow:none">
+          <h2>Teste rápido</h2>
+          <p class="muted" style="margin:0 0 10px">Envie um lead e veja o score.</p>
+          <button class="btn small ghost" id="btnTest">Enviar lead de teste</button>
+          <div class="msg" id="testMsg"></div>
+        </div>
+      </div>
     </div>
   </div>
 
-  
-<!-- DEMO KEY MODAL -->
-<div id="keyModal" class="modal hidden" role="dialog" aria-modal="true" aria-labelledby="keyModalTitle">
-  <div class="modal-card">
-    <div class="modal-header">
-      <div>
-        <div id="keyModalTitle" class="modal-title">Configurar DEMO_KEY</div>
-        <div id="keyModalHint" class="modal-subtitle">Cole sua DEMO_KEY para autorizar as chamadas à API.</div>
-      </div>
-    </div>
-
-    <label class="label" for="demoKeyInput">DEMO_KEY</label>
-    <input id="demoKeyInput" class="input" type="password" autocomplete="off" spellcheck="false" />
-
-    <div class="modal-actions">
-      <button id="cancelKeyBtn" class="btn btn-ghost" type="button">Cancelar</button>
-      <button id="saveKeyBtn" class="btn btn-primary" type="button">Salvar</button>
-    </div>
-    <div class="modal-footnote">
-      Dica: você também pode abrir com <code>?demo_key=...</code> na URL para configurar automaticamente.
-    </div>
-  </div>
-</div>
-
-  
 <script>
-/* === LeadRank Frontend Helper (robusto) === */
-(function(){
-  const qs = new URLSearchParams(window.location.search || "");
-  const storedCid = (() => { try { return localStorage.getItem("LR_CLIENT_ID") || ""; } catch(e){ return ""; }})();
-  const storedKey = (() => { try { return localStorage.getItem("LR_API_KEY") || ""; } catch(e){ return ""; }})();
-  const clientId = (qs.get("client_id") || storedCid || "").trim();
-  const apiKey = (qs.get("api_key") || storedKey || "").trim();
-
-  // Detecta backend: se está no Static Site, chama o Web Service.
-  const defaultBackend = "https://qualificador-leads-i-a.onrender.com";
-  const backendUrl = (window.LR_BACKEND_URL || defaultBackend).replace(/\/$/, "");
-
-  async function lrApi(path, opts){
-    opts = opts || {};
-    const method = (opts.method || "GET").toUpperCase();
-    const headers = new Headers(opts.headers || {});
-    headers.set("Accept", "application/json");
-    if (method !== "GET" && method !== "HEAD") headers.set("Content-Type", "application/json");
-    if (apiKey) headers.set("X-API-KEY", apiKey);
-
-    const url = new URL(backendUrl + path);
-    if (clientId && !url.searchParams.get("client_id")) url.searchParams.set("client_id", clientId);
-
-    const res = await fetch(url.toString(), {
-      method,
-      headers,
-      body: opts.body ? (typeof opts.body === "string" ? opts.body : JSON.stringify(opts.body)) : undefined,
-    });
-
-    const text = await res.text();
-    let json;
-    try { json = text ? JSON.parse(text) : {}; } catch(e){ json = { ok:false, error:text || "Resposta inválida" }; }
-
-    if (!res.ok){
-      const msg = json.error || json.message || ("HTTP " + res.status);
-      const err = new Error(msg);
-      err.status = res.status;
-      err.payload = json;
-      throw err;
-    }
-    return json;
-  }
-
-  window.__lr = { backendUrl, clientId, apiKey, lrApi };
-
-  // Persistência
-  if (clientId) { try { localStorage.setItem("LR_CLIENT_ID", clientId); } catch(e){} }
-  if (apiKey) { try { localStorage.setItem("LR_API_KEY", apiKey); } catch(e){} }
-})();
-
   const BACKEND = (window.BACKEND_URL || "https://qualificador-leads-i-a.onrender.com").replace(/\/$/, "");
-  const DEFAULT_DEMO_KEY = 'Leadrank#2026!x9';
 
-  function qs(key){
-    try {
-      return new URLSearchParams(location.search).get(key);
-    } catch(e) { return null; }
-  }
-
-  function setStoredDemoKey(v){
-    if (!v) return;
-    localStorage.setItem("DEMO_KEY", String(v).trim());
-  }
-
-  function getStoredDemoKey(){
-    const v = localStorage.getItem("DEMO_KEY");
-    return (v && v.trim()) ? v.trim() : null;
-  }
-
-  function getDemoKey(){
-    // 1) query param wins
-    const qk = qs("demo_key");
-    if (qk && qk.trim()) {
-      setStoredDemoKey(qk);
-      return qk.trim();
-    }
-    // 2) localStorage
-    const sk = getStoredDemoKey();
-    if (sk) return sk;
-    // 3) default (for your internal demo)
-    setStoredDemoKey(DEFAULT_DEMO_KEY);
-    return DEFAULT_DEMO_KEY;
-  }
-
-  function openKeyModal(force=false){
-    const modal = document.getElementById("keyModal");
-    const input = document.getElementById("demoKeyInput");
-    const current = getStoredDemoKey() || DEFAULT_DEMO_KEY || "";
-    input.value = current;
-    modal.classList.remove("hidden");
-    if (force) {
-      const hint = document.getElementById("keyModalHint");
-      if (hint) hint.textContent = "Sua DEMO_KEY mudou/expirou. Digite a nova e salve.";
-    }
-    input.focus();
-    input.select();
-  }
-
-  function closeKeyModal() {
-    document.getElementById("keyModal").classList.add("hidden");
-  }
-
-  function saveKeyFromModal(){
-    const v = (document.getElementById("demoKeyInput").value || "").trim();
-    if (!v) {
-      alert("Informe uma DEMO_KEY válida.");
-      return;
-    }
-    setStoredDemoKey(v);
-    closeKeyModal();
-    // refresh without query param to keep URL clean
-    try {
-      const u = new URL(location.href);
-      u.searchParams.delete("demo_key");
-      history.replaceState(null, "", u.toString());
-    } catch(e) {}
-  }
-
-  async function api(path, opts={}) {
-    const url = BACKEND + path;
-    const demoKey = getDemoKey();
-    const headers = {
-      "Content-Type": "application/json",
-      ...(demoKey ? { "x-demo-key": demoKey } : {}),
-      ...(opts.headers || {})
+  function qs(name){ return new URLSearchParams(location.search).get(name) || ""; }
+  function getAuth(){
+    return {
+      client_id: qs("client_id") || localStorage.getItem("leadrank_client_id") || "",
+      api_key: qs("api_key") || localStorage.getItem("leadrank_api_key") || ""
     };
-    const res = await fetch(url, { ...opts, headers });
-
-    let data = null;
-    try { data = await res.json(); } catch(e) { /* ignore */ }
-
-    if (!res.ok) {
-      const msg = (data && (data.error || data.reason)) ? (data.error || data.reason) : `Erro HTTP ${res.status}`;
-
-      // If DEMO_KEY unauthorized, prompt to re-enter
-      if (res.status === 401 && String(msg).toLowerCase().includes("demo_key")) {
-        localStorage.removeItem("DEMO_KEY");
-        openKeyModal(true);
-      }
-      throw new Error(msg);
+  }
+  function setAuth(client_id, api_key){
+    localStorage.setItem("leadrank_client_id", client_id);
+    localStorage.setItem("leadrank_api_key", api_key);
+    // limpa querystring para não ficar expondo
+    if (qs("client_id") || qs("api_key")) {
+      history.replaceState({}, "", "index.html");
     }
-    return data;
   }
 
-  // Expose helpers
-  window.__leadrank = {
-    api, openKeyModal, saveKeyFromModal, closeKeyModal, getDemoKey
+  window.__lr = {
+    async lrApi(path, {method="GET", body=null, headers={}} = {}){
+      const {client_id, api_key} = getAuth();
+      const url = new URL(BACKEND + path);
+      if (client_id && method === "GET") url.searchParams.set("client_id", client_id);
+
+      const h = {"Content-Type":"application/json", ...headers};
+      if (api_key) h["X-API-KEY"] = api_key;
+
+      const res = await fetch(url.toString(), {
+        method,
+        headers: h,
+        body: body ? JSON.stringify(body) : null
+      });
+      const data = await res.json().catch(() => ({}));
+      if (!res.ok) throw new Error(data.error || data.message || ("HTTP " + res.status));
+      return data;
+    }
   };
 
-  // On load: if no stored key and no query param, default is set; still allow change
-  window.addEventListener("DOMContentLoaded", () => {
-      document.getElementById("refreshBtn").addEventListener("click", loadDashboard);
-      loadDashboard();
-    });
-  </script>
+  const el = (id) => document.getElementById(id);
+  const msg = el("msg");
+  const wsPill = el("wsPill");
 
-
-  <script>
-    function safeStr(x){ return (x === null || x === undefined) ? "" : String(x); }
-    function pickTop(origins){
-      if (!origins || typeof origins !== "object") return "—";
-      let top = null;
-      for (const [k,v] of Object.entries(origins)) {
-        if (top === null || (Number(v)||0) > (Number(top[1])||0)) top = [k, v];
-      }
-      return top ? top[0] : "—";
-    }
-
-    
-async function loadDashboard(){
-  const err = document.getElementById("dashError");
-  const raw = document.getElementById("dashRaw");
-  const viz = document.getElementById("dashViz");
-  err.innerHTML = "";
-  raw.textContent = "";
-  viz.innerHTML = "";
-  try {
-    const data = await window.__lr.lrApi("/dashboard_data", { method: "GET" });
-    raw.textContent = JSON.stringify(data, null, 2);
-
-    // KPIs
-    document.getElementById("kpiLeads").textContent = safeStr(data.total_leads || data.total || data.leads_total || "—");
-    const a = (data.abc && (data.abc.A ?? data.abc.a)) ?? data.A ?? "—";
-    const b = (data.abc && (data.abc.B ?? data.abc.b)) ?? data.B ?? "—";
-    const c = (data.abc && (data.abc.C ?? data.abc.c)) ?? data.C ?? "—";
-    document.getElementById("kpiABC").textContent = `${a} / ${b} / ${c}`;
-    document.getElementById("kpiOrigem").textContent = pickTop(data.origens || data.origins || data.by_origem);
-
-    // ===== Chart: leads por dia (se backend enviar série) =====
-    const series = data.leads_by_day || data.by_day || null;
-    if (series && typeof series === "object") {
-      const labels = Object.keys(series);
-      const values = labels.map(k => Number(series[k]) || 0);
-      const card = document.createElement("div");
-      card.className = "card";
-      card.innerHTML = '<h2>Leads por dia</h2><canvas id="leadsChart" height="120"></canvas>';
-      viz.appendChild(card);
-      const ctx = document.getElementById("leadsChart").getContext("2d");
-      new Chart(ctx, { type: "line", data: { labels, datasets: [{ label: "Leads", data: values }] }, options: { responsive: true }});
-    }
-
-    // ===== Table: últimos leads =====
-    const leads = data.recent_leads || data.leads || data.rows || [];
-    if (Array.isArray(leads) && leads.length) {
-      const tcard = document.createElement("div");
-      tcard.className = "card";
-      const rows = leads.slice(0, 20).map(r => {
-        const score = (r.score ?? Math.round((Number(r.probabilidade)||0)*100));
-        const origem = r.origem || "—";
-        const nome = r.nome || "—";
-        const tel = r.telefone || "—";
-        const created = r.created_at ? String(r.created_at).replace("T"," ").slice(0,19) : "—";
-        const status = (r.virou_cliente === 1 || r.virou_cliente === 1.0) ? "Convertido" : (r.virou_cliente === 0 || r.virou_cliente === 0.0) ? "Negado" : "Pendente";
-        return `<tr>
-          <td>${created}</td>
-          <td>${nome}</td>
-          <td>${tel}</td>
-          <td>${origem}</td>
-          <td style="text-align:right;">${safeStr(score)}</td>
-          <td>${status}</td>
-        </tr>`;
-      }).join("");
-      tcard.innerHTML = `
-        <h2>Últimos leads</h2>
-        <div style="overflow:auto;">
-          <table style="width:100%; border-collapse:collapse; font-size:13px;">
-            <thead>
-              <tr style="text-align:left; opacity:.85;">
-                <th style="padding:8px 6px; border-bottom:1px solid rgba(255,255,255,.12);">Data</th>
-                <th style="padding:8px 6px; border-bottom:1px solid rgba(255,255,255,.12);">Nome</th>
-                <th style="padding:8px 6px; border-bottom:1px solid rgba(255,255,255,.12);">Telefone</th>
-                <th style="padding:8px 6px; border-bottom:1px solid rgba(255,255,255,.12);">Origem</th>
-                <th style="padding:8px 6px; border-bottom:1px solid rgba(255,255,255,.12); text-align:right;">Score</th>
-                <th style="padding:8px 6px; border-bottom:1px solid rgba(255,255,255,.12);">Status</th>
-              </tr>
-            </thead>
-            <tbody>${rows}</tbody>
-          </table>
-        </div>
-      `;
-      viz.appendChild(tcard);
-    }
-  } catch(e) {
-    err.innerHTML = '<div class="error"><b>Erro:</b> ' + String(e.message || e) + '</div>';
+  function setMsg(type, text){
+    msg.className = "msg " + (type || "");
+    msg.style.display = "block";
+    msg.textContent = text;
   }
-}
 
-window.addEventListener("DOMContentLoaded", () => {
-      document.getElementById("refreshBtn").addEventListener("click", loadDashboard);
-      loadDashboard();
-    });
-  </script>
+  function renderList(container, rows, cols){
+    if (!rows || !rows.length){ container.innerHTML = "<div class='muted'>—</div>"; return; }
+    let html = "<table><thead><tr>" + cols.map(c=>`<th>${c.label}</th>`).join("") + "</tr></thead><tbody>";
+    for (const r of rows){
+      html += "<tr>" + cols.map(c=>`<td>${(r[c.key] ?? "—")}</td>`).join("") + "</tr>";
+    }
+    html += "</tbody></table>";
+    container.innerHTML = html;
+  }
+
+  async function loadDashboard(){
+    msg.style.display="none";
+    const {client_id} = getAuth();
+    wsPill.textContent = "workspace: " + (client_id || "—");
+
+    try{
+      const data = await window.__lr.lrApi("/dashboard_data", {method:"GET"});
+
+      el("kpiConv").textContent = data.convertidos ?? "—";
+      el("kpiNeg").textContent = data.negados ?? "—";
+      el("kpiPend").textContent = data.pendentes ?? "—";
+
+      renderList(el("origWrap"), data.top_origens_30d || [], [
+        {key:"origem", label:"Origem"}, {key:"total", label:"Total"}
+      ]);
+
+      renderList(el("hotWrap"), data.hot_leads_today || [], [
+        {key:"nome", label:"Nome"}, {key:"origem", label:"Origem"}, {key:"score", label:"Score"}, {key:"probabilidade", label:"Prob"}
+      ]);
+
+      renderList(el("tableWrap"), data.dados || [], [
+        {key:"created_at", label:"Criado"},
+        {key:"nome", label:"Nome"},
+        {key:"origem", label:"Origem"},
+        {key:"score", label:"Score"},
+        {key:"probabilidade", label:"Prob"},
+        {key:"virou_cliente", label:"Virou?"}
+      ]);
+
+      setMsg("ok", "Dashboard carregado.");
+    }catch(e){
+      setMsg("err", "Erro ao carregar: " + e.message);
+    }
+  }
+
+  el("btnSave").onclick = () => {
+    const client_id = el("clientId").value.trim();
+    const api_key = el("apiKey").value.trim();
+    setAuth(client_id, api_key);
+    wsPill.textContent = "workspace: " + (client_id || "—");
+    setMsg("ok", "Dados salvos.");
+  };
+
+  el("btnLoad").onclick = loadDashboard;
+
+  el("btnExport").onclick = () => {
+    const {client_id, api_key} = getAuth();
+    if (!client_id) return setMsg("err", "Informe o client_id.");
+    // CSV é endpoint GET: passamos client_id na querystring
+    const url = new URL(BACKEND + "/leads_export.csv");
+    url.searchParams.set("client_id", client_id);
+    // api_key é header, não dá pra abrir em nova aba com header.
+    // então, se tiver api_key, avisamos para baixar via fetch (padrão simples).
+    if (api_key){
+      setMsg("err", "Para export com API Key, use o botão (futuramente) ou desative auth por api_key no workspace.");
+      return;
+    }
+    window.location.href = url.toString();
+  };
+
+  el("btnTest").onclick = async () => {
+    const t = el("testMsg");
+    t.className="msg"; t.style.display="none";
+    try{
+      const {client_id} = getAuth();
+      if (!client_id) throw new Error("Informe client_id e api_key.");
+      const data = await window.__lr.lrApi("/prever", {method:"POST", body:{
+        client_id,
+        nome:"Lead Teste",
+        email_lead:"teste@exemplo.com",
+        telefone:"11999990000",
+        origem:"onboarding",
+        tempo_site: 180,
+        paginas_visitadas: 4,
+        clicou_preco: 1
+      }});
+      t.className="msg ok"; t.style.display="block";
+      t.innerHTML = `✅ Lead criado. score=${data.score} prob=${data.probabilidade}`;
+    }catch(e){
+      t.className="msg err"; t.style.display="block";
+      t.textContent = "Erro: " + e.message;
+    }
+  };
+
+  // Init from auth
+  (function init(){
+    const {client_id, api_key} = getAuth();
+    el("clientId").value = client_id;
+    el("apiKey").value = api_key;
+    wsPill.textContent = "workspace: " + (client_id || "—");
+    if (client_id) loadDashboard();
+  })();
+</script>
 </body>
 </html>

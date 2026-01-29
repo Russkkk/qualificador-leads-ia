@@ -1,326 +1,265 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>LeadRank - Experimente Grátis</title>
-    <style>
-        :root {
-            --bg: #0a0e17;
-            --card: #121826;
-            --text: #e2e8f0;
-            --text-muted: #94a3b8;
-            --accent: #6366f1;
-            --accent-hover: #818cf8;
-            --border: #1e2937;
-            --success: #22c55e;
-            --error: #ef4444;
-        }
-
-        body {
-            font-family: system-ui, -apple-system, sans-serif;
-            background: var(--bg);
-            color: var(--text);
-            margin: 0;
-            padding: 0;
-            min-height: 100vh;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-        }
-
-        .container {
-            width: 100%;
-            max-width: 480px;
-            padding: 24px;
-        }
-
-        .card {
-            background: var(--card);
-            border: 1px solid var(--border);
-            border-radius: 16px;
-            padding: 40px 32px;
-            box-shadow: 0 20px 25px -5px rgb(0 0 0 / 0.3);
-        }
-
-        h1 {
-            font-size: 28px;
-            font-weight: 700;
-            margin: 0 0 8px;
-            text-align: center;
-        }
-
-        .subtitle {
-            color: var(--text-muted);
-            text-align: center;
-            margin-bottom: 32px;
-            font-size: 15px;
-        }
-
-        .form-group {
-            margin-bottom: 20px;
-        }
-
-        label {
-            display: block;
-            font-size: 13px;
-            font-weight: 500;
-            margin-bottom: 6px;
-            color: var(--text-muted);
-        }
-
-        input {
-            width: 100%;
-            background: #0f172a;
-            border: 1px solid var(--border);
-            border-radius: 10px;
-            padding: 12px 14px;
-            color: var(--text);
-            font-size: 15px;
-            transition: border 0.2s;
-        }
-
-        input:focus {
-            outline: none;
-            border-color: var(--accent);
-            box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.15);
-        }
-
-        .btn {
-            width: 100%;
-            background: var(--accent);
-            color: white;
-            border: none;
-            padding: 14px;
-            font-size: 16px;
-            font-weight: 600;
-            border-radius: 10px;
-            cursor: pointer;
-            transition: background 0.2s;
-            margin-top: 12px;
-        }
-
-        .btn:hover {
-            background: var(--accent-hover);
-        }
-
-        .btn:disabled {
-            opacity: 0.6;
-            cursor: not-allowed;
-        }
-
-        .success {
-            background: rgba(34, 197, 94, 0.15);
-            border: 1px solid rgba(34, 197, 94, 0.3);
-            color: var(--success);
-            padding: 16px;
-            border-radius: 10px;
-            text-align: center;
-            margin-top: 20px;
-            display: none;
-        }
-
-        .error {
-            background: rgba(239, 68, 68, 0.15);
-            border: 1px solid rgba(239, 68, 68, 0.3);
-            color: var(--error);
-            padding: 14px;
-            border-radius: 10px;
-            margin-top: 12px;
-            display: none;
-        }
-
-        .loading {
-            display: none;
-            text-align: center;
-            padding: 12px;
-        }
-
-        .footer {
-            text-align: center;
-            margin-top: 32px;
-            color: var(--text-muted);
-            font-size: 13px;
-        }
-
-        .link {
-            color: var(--accent);
-            text-decoration: none;
-        }
-    </style>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>LeadRank • Criar conta</title>
+  <style>
+    :root{
+      --bg:#0a0e17; --card:#121826; --text:#e2e8f0; --muted:#94a3b8;
+      --accent:#6366f1; --accent2:#22c55e; --border:#1e2937; --danger:#ef4444;
+      --shadow: 0 18px 60px rgba(0,0,0,.35);
+      --radius: 18px;
+    }
+    *{box-sizing:border-box}
+    body{
+      margin:0; font-family: system-ui,-apple-system,Segoe UI,Roboto,Ubuntu,Cantarell,"Noto Sans",sans-serif;
+      background: radial-gradient(1200px 800px at 10% -10%, rgba(99,102,241,.35), transparent 55%),
+                  radial-gradient(900px 600px at 100% 10%, rgba(34,197,94,.18), transparent 55%),
+                  var(--bg);
+      color:var(--text);
+      min-height:100vh; display:flex; align-items:center; justify-content:center;
+      padding:28px;
+    }
+    .wrap{width:min(980px,100%); display:grid; grid-template-columns: 1.05fr .95fr; gap:22px;}
+    @media (max-width: 860px){ .wrap{grid-template-columns:1fr;}}
+    .hero{
+      padding:28px; border:1px solid var(--border); border-radius: var(--radius);
+      background: linear-gradient(180deg, rgba(255,255,255,.04), rgba(255,255,255,.02));
+      box-shadow: var(--shadow);
+    }
+    .badge{display:inline-flex; align-items:center; gap:10px; padding:8px 12px; border-radius:999px;
+      background: rgba(99,102,241,.12); border:1px solid rgba(99,102,241,.25); color: #c7d2fe;
+      font-weight:600; font-size:13px;}
+    h1{margin:14px 0 10px; font-size:34px; line-height:1.1;}
+    p{margin:0 0 10px; color:var(--muted); line-height:1.55;}
+    .list{margin-top:16px; display:grid; gap:10px;}
+    .li{display:flex; gap:10px; align-items:flex-start; color:var(--text);}
+    .dot{width:10px;height:10px;border-radius:50%; background:rgba(34,197,94,.9); margin-top:6px; flex:0 0 10px;}
+    .card{
+      padding:22px; border:1px solid var(--border); border-radius: var(--radius);
+      background: rgba(18,24,38,.85);
+      box-shadow: var(--shadow);
+    }
+    .tabs{display:flex; gap:10px; margin-bottom:14px;}
+    .tab{
+      flex:1; padding:10px 12px; border-radius: 12px;
+      border:1px solid var(--border); background: rgba(255,255,255,.03);
+      color: var(--muted); font-weight:700; cursor:pointer;
+    }
+    .tab.active{ background: rgba(99,102,241,.18); border-color: rgba(99,102,241,.35); color: var(--text);}
+    label{display:block; font-size:13px; color: var(--muted); margin:10px 0 6px;}
+    input{
+      width:100%; padding:12px 12px; border-radius: 12px;
+      border: 1px solid var(--border); background: rgba(10,14,23,.55);
+      color: var(--text); outline:none;
+    }
+    input:focus{border-color: rgba(99,102,241,.6); box-shadow: 0 0 0 4px rgba(99,102,241,.12);}
+    .row{display:grid; grid-template-columns: 1fr 1fr; gap:10px;}
+    @media (max-width:520px){.row{grid-template-columns:1fr}}
+    .btn{
+      width:100%; padding:12px 14px; margin-top:14px;
+      border-radius: 12px; border: 0; cursor:pointer;
+      background: var(--accent); color:white; font-weight:800;
+    }
+    .btn:hover{filter:brightness(1.06)}
+    .btn.secondary{background: rgba(255,255,255,.08); border:1px solid var(--border); color: var(--text);}
+    .note{font-size:12px; color: var(--muted); margin-top:10px;}
+    .msg{margin-top:14px; padding:12px; border-radius: 12px; border:1px solid var(--border); background: rgba(255,255,255,.03); display:none;}
+    .msg.ok{border-color: rgba(34,197,94,.35); background: rgba(34,197,94,.08); display:block;}
+    .msg.err{border-color: rgba(239,68,68,.35); background: rgba(239,68,68,.08); display:block;}
+    code{display:block; padding:10px; background: rgba(10,14,23,.6); border:1px solid var(--border); border-radius: 12px; overflow:auto;}
+    .small{font-size:12px; color: var(--muted);}
+    a{color:#c7d2fe}
+  </style>
 </head>
 <body>
-    <div class="container">
-        <div class="card">
-            <h1>Comece agora com o LeadRank</h1>
-            <p class="subtitle">Teste grátis por 14 dias. Sem cartão. Crie sua conta em segundos.</p>
+  <div class="wrap">
+    <section class="hero">
+      <span class="badge">⚡ Trial de 14 dias • Setup em 2 minutos</span>
+      <h1>Qualifique leads automaticamente e foque no que dá dinheiro.</h1>
+      <p>O LeadRank calcula probabilidade de compra e organiza seus leads em quente/morno/frio — com dashboard e export para CRM.</p>
+      <div class="list">
+        <div class="li"><span class="dot"></span><div><b>Dashboard pronto</b><br><span class="small">KPIs, origens e leads quentes do dia</span></div></div>
+        <div class="li"><span class="dot"></span><div><b>API Key do seu workspace</b><br><span class="small">Integre com formulário, WhatsApp, chatbot ou site</span></div></div>
+        <div class="li"><span class="dot"></span><div><b>Escala com planos</b><br><span class="small">Controle de uso mensal e upgrade quando precisar</span></div></div>
+      </div>
+      <p class="note">Dica: use um email real pra não perder seu acesso. Você vai fazer login por email + senha.</p>
+    </section>
 
-            <form id="signupForm">
-                <div class="form-group">
-                    <label>Nome completo</label>
-                    <input type="text" id="nome" required placeholder="João Silva">
-                </div>
+    <section class="card">
+      <div class="tabs">
+        <button class="tab active" id="tabSignup" type="button">Criar conta</button>
+        <button class="tab" id="tabLogin" type="button">Entrar</button>
+      </div>
 
-                <div class="form-group">
-                    <label>Email profissional</label>
-                    <input type="email" id="email" required placeholder="joao@empresa.com">
-                </div>
-
-                <div class="form-group">
-                    <label>Empresa / Marca (opcional)</label>
-                    <input type="text" id="empresa" placeholder="Minha Empresa">
-                </div>
-
-                <div class="form-group">
-                    <label>WhatsApp (opcional)</label>
-                    <input type="tel" id="telefone" placeholder="(11) 98765-4321">
-                </div>
-
-                <button type="submit" class="btn" id="submitBtn">Criar conta trial grátis</button>
-            </form>
-
-            <div class="loading" id="loading">Criando sua conta...</div>
-                        <div class="success" id="success"></div>
-            <div class="error" id="error"></div>
-
-            <div class="card" id="loginBox" style="display:none; margin-top:16px; padding:16px; background:#0f172a; border:1px solid rgba(148,163,184,0.15); border-radius:12px;">
-                <h3 style="margin:0 0 10px 0; font-size:15px; color:#e5e7eb;">Já tem conta? Entrar no dashboard</h3>
-                <p style="margin:0 0 12px 0; font-size:13px; color:rgba(226,232,240,0.75);">Cole seu <strong>client_id</strong> e <strong>api_key</strong> (você recebeu quando criou a conta).</p>
-                <div class="form-group">
-                    <label>client_id</label>
-                    <input type="text" id="loginClientId" placeholder="trial-...">
-                </div>
-                <div class="form-group">
-                    <label>api_key</label>
-                    <input type="text" id="loginApiKey" placeholder="sk_live_...">
-                </div>
-                <button type="button" class="btn" id="loginBtn">Acessar dashboard</button>
-            </div>
-
-            <div class="footer">
-                Já tem uma conta? <a href="./onboarding.html" class="link">Acessar dashboard</a>
-            </div>
+      <!-- Signup -->
+      <form id="signupForm">
+        <div class="row">
+          <div>
+            <label for="nome">Seu nome</label>
+            <input id="nome" autocomplete="name" placeholder="Renato Ribeiro" />
+          </div>
+          <div>
+            <label for="empresa">Empresa</label>
+            <input id="empresa" autocomplete="organization" placeholder="Minha Empresa" />
+          </div>
         </div>
-    </div>
 
-    <script>
-        const form = document.getElementById('signupForm');
-        const submitBtn = document.getElementById('submitBtn');
-        const loading = document.getElementById('loading');
-        const successDiv = document.getElementById('success');
-        const errorDiv = document.getElementById('error');
+        <label for="email">Email</label>
+        <input id="email" type="email" autocomplete="email" placeholder="seuemail@empresa.com" required />
 
-        form.addEventListener('submit', async (e) => {
-            e.preventDefault();
+        <div class="row">
+          <div>
+            <label for="telefone">Telefone (opcional)</label>
+            <input id="telefone" autocomplete="tel" placeholder="(11) 99999-9999" />
+          </div>
+          <div>
+            <label for="password">Senha</label>
+            <input id="password" type="password" autocomplete="new-password" placeholder="mín. 6 caracteres" required />
+          </div>
+        </div>
 
-            const nome = document.getElementById('nome').value.trim();
-            const email = document.getElementById('email').value.trim().toLowerCase();
-            const empresa = document.getElementById('empresa').value.trim();
-            const telefone = document.getElementById('telefone').value.trim();
+        <button class="btn" type="submit" id="btnSignup">Criar conta</button>
+        <div class="note">Ao criar, você recebe <b>client_id</b> + <b>api_key</b> e já pode usar o dashboard.</div>
+        <div class="msg" id="signupMsg"></div>
+      </form>
 
-            if (!nome || !email) {
-                showError('Nome e email são obrigatórios');
-                return;
-            }
+      <!-- Login -->
+      <form id="loginForm" style="display:none;">
+        <label for="loginEmail">Email</label>
+        <input id="loginEmail" type="email" autocomplete="email" placeholder="seuemail@empresa.com" required />
 
-            submitBtn.disabled = true;
-            loading.style.display = 'block';
-            errorDiv.style.display = 'none';
-            successDiv.style.display = 'none';
+        <label for="loginPassword">Senha</label>
+        <input id="loginPassword" type="password" autocomplete="current-password" placeholder="sua senha" required />
 
-            try {
-                const response = await fetch((window.BACKEND_URL || 'https://qualificador-leads-i-a.onrender.com').replace(/\/$/, '') + '/signup', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ nome, email, empresa, telefone })
-                });
+        <button class="btn" type="submit" id="btnLogin">Entrar</button>
+        <button class="btn secondary" type="button" id="btnGoSignup">Quero criar conta</button>
 
-                const result = await response.json();
+        <div class="msg" id="loginMsg"></div>
+      </form>
+    </section>
+  </div>
 
-                if ((response.ok && (result.success || result.ok)) && (result.client_id && result.api_key)) {
-                    successDiv.innerHTML = `
-                        ✅ Conta criada com sucesso!<br><br>
-                        <strong>Sua API Key:</strong><br>
-                        <code style="background:#1e2937; padding:8px; border-radius:6px; display:block; margin:12px 0; font-family:monospace;">${result.api_key}</code><br>
-                        Copie e guarde esta chave.<br>
-                        <a href="./index.html?client_id=${encodeURIComponent(result.client_id)}&api_key=${encodeURIComponent(result.api_key)}" style="color:#6366f1; text-decoration:none;">→ Ir para o dashboard agora</a>
-                    `;
-                    successDiv.style.display = 'block';
-                    form.style.display = 'none';
-                } else {
-                    // Tratamento especial: email já existe
-                    if (response.status === 409 && (result.code === "email_exists" || (result.error||"").toLowerCase().includes("cadastrado"))) {
-                        const cid = result.client_id ? String(result.client_id) : "";
-                        showError(`Este email já tem uma conta. ${cid ? "Seu client_id é: " + cid + ". " : ""}Use outro email ou faça login abaixo.`);
-                        // preenche login helper (se existir)
-                        try {
-                            const el = document.getElementById("loginClientId");
-                            if (el && cid) el.value = cid;
-                        } catch(e){}
-                        // exibe bloco login
-                        try { document.getElementById("loginBox").style.display = "block"; } catch(e){}
-                    } else {
-                        showError(result.error || 'Erro ao criar conta');
-                    }
-                }
-            } catch (err) {
-                showError('Erro de conexão. Tente novamente.');
-            } finally {
-                submitBtn.disabled = false;
-                loading.style.display = 'none';
-            }
-        });
-
-        document.getElementById('loginBtn').addEventListener('click', () => {
-            const cid = (document.getElementById('loginClientId').value || '').trim();
-            const key = (document.getElementById('loginApiKey').value || '').trim();
-            if (!cid || !key) { showError('Informe client_id e api_key para entrar.'); return; }
-            // guarda para facilitar próximas visitas
-            try { localStorage.setItem('LR_CLIENT_ID', cid); localStorage.setItem('LR_API_KEY', key); } catch(e){}
-            window.location.href = `./index.html?client_id=${encodeURIComponent(cid)}&api_key=${encodeURIComponent(key)}`;
-        });
-
-        function showError(msg) {
-            errorDiv.textContent = msg;
-            errorDiv.style.display = 'block';
-        }
-    </script>
 <script>
-  // ===== LeadRank auth helper (client_id + api_key) =====
-  const LR_BACKEND = (window.BACKEND_URL || "https://qualificador-leads-i-a.onrender.com").replace(/\/$/, "");
-  function qs(k){ try { return new URLSearchParams(location.search).get(k); } catch(e){ return null; } }
+  const BACKEND = (window.BACKEND_URL || "https://qualificador-leads-i-a.onrender.com").replace(/\/$/, "");
 
-  function setWorkspace(clientId, apiKey){
-    if (clientId) localStorage.setItem("LR_CLIENT_ID", String(clientId).trim());
-    if (apiKey) localStorage.setItem("LR_API_KEY", String(apiKey).trim());
+  const tabSignup = document.getElementById("tabSignup");
+  const tabLogin = document.getElementById("tabLogin");
+  const signupForm = document.getElementById("signupForm");
+  const loginForm = document.getElementById("loginForm");
+  const signupMsg = document.getElementById("signupMsg");
+  const loginMsg = document.getElementById("loginMsg");
+
+  function showSignup(){
+    tabSignup.classList.add("active"); tabLogin.classList.remove("active");
+    signupForm.style.display = "block"; loginForm.style.display = "none";
+    signupMsg.className = "msg"; signupMsg.style.display="none";
+    loginMsg.className = "msg"; loginMsg.style.display="none";
   }
-  function getWorkspace(){
-    const client_id = (localStorage.getItem("LR_CLIENT_ID")||"").trim();
-    const api_key = (localStorage.getItem("LR_API_KEY")||"").trim();
-    return { client_id: client_id || null, api_key: api_key || null };
+  function showLogin(prefillEmail=""){
+    tabLogin.classList.add("active"); tabSignup.classList.remove("active");
+    signupForm.style.display = "none"; loginForm.style.display = "block";
+    if (prefillEmail) document.getElementById("loginEmail").value = prefillEmail;
+    signupMsg.className = "msg"; signupMsg.style.display="none";
+    loginMsg.className = "msg"; loginMsg.style.display="none";
   }
-  function bootWorkspaceFromQuery(){
-    const cid = qs("client_id");
-    const key = qs("api_key") || qs("demo_key"); // compat
-    if (cid || key) setWorkspace(cid, key);
+  tabSignup.onclick = showSignup;
+  tabLogin.onclick = () => showLogin();
+
+  document.getElementById("btnGoSignup").onclick = showSignup;
+
+  function persistAuth(client_id, api_key){
+    localStorage.setItem("leadrank_client_id", client_id);
+    localStorage.setItem("leadrank_api_key", api_key);
   }
-  async function lrApi(path, opts={}){
-    const ws = getWorkspace();
-    if (!ws.client_id) throw new Error("client_id ausente. Faça signup (trial) ou informe o client_id.");
-    const url = LR_BACKEND + path + (path.includes("?") ? "&" : "?") + "client_id=" + encodeURIComponent(ws.client_id);
-    const headers = {
-      "Content-Type": "application/json",
-      ...(ws.api_key ? { "X-API-KEY": ws.api_key } : {}),
-      ...(opts.headers || {})
+
+  function renderCreds(whereEl, data){
+    whereEl.innerHTML = `
+      ✅ <b>Pronto!</b><br><br>
+      <div class="small">Guarde estes dados:</div>
+      <div style="margin-top:10px"><b>client_id</b></div>
+      <code>${data.client_id}</code>
+      <div style="margin-top:10px"><b>api_key</b></div>
+      <code>${data.api_key}</code>
+      <div class="note">Você será redirecionado para o dashboard.</div>
+    `;
+  }
+
+  async function postJSON(path, payload){
+    const res = await fetch(BACKEND + path, {
+      method: "POST",
+      headers: {"Content-Type":"application/json"},
+      body: JSON.stringify(payload)
+    });
+    const data = await res.json().catch(() => ({}));
+    return {res, data};
+  }
+
+  signupForm.addEventListener("submit", async (e) => {
+    e.preventDefault();
+    signupMsg.className = "msg"; signupMsg.style.display="none";
+
+    const payload = {
+      nome: document.getElementById("nome").value.trim(),
+      empresa: document.getElementById("empresa").value.trim(),
+      email: document.getElementById("email").value.trim().toLowerCase(),
+      telefone: document.getElementById("telefone").value.trim(),
+      password: document.getElementById("password").value
     };
-    const res = await fetch(url, { ...opts, headers });
-    let data = null;
-    try { data = await res.json(); } catch(e) {}
-    if (!res.ok) throw new Error((data && (data.error||data.reason)) ? (data.error||data.reason) : ("Erro HTTP " + res.status));
-    return data;
-  }
-  window.__lr = { LR_BACKEND, setWorkspace, getWorkspace, bootWorkspaceFromQuery, lrApi };
-  bootWorkspaceFromQuery();
+
+    const {res, data} = await postJSON("/signup", payload);
+
+    if (res.ok && (data.success || data.ok)) {
+      persistAuth(data.client_id, data.api_key);
+      signupMsg.className = "msg ok"; signupMsg.style.display="block";
+      renderCreds(signupMsg, data);
+      setTimeout(() => {
+        window.location.href = `index.html?client_id=${encodeURIComponent(data.client_id)}&api_key=${encodeURIComponent(data.api_key)}`;
+      }, 900);
+      return;
+    }
+
+    // Email já existe -> direciona pro login
+    if (res.status === 409 && (data.code === "email_exists" || (data.error||"").toLowerCase().includes("cadastrado"))) {
+      signupMsg.className = "msg err"; signupMsg.style.display="block";
+      signupMsg.innerHTML = `⚠️ ${data.error || "Email já cadastrado."}<br><br>Vamos entrar com sua senha.`;
+      showLogin(payload.email);
+      return;
+    }
+
+    signupMsg.className = "msg err"; signupMsg.style.display="block";
+    signupMsg.textContent = "Erro: " + (data.error || data.message || "não foi possível criar a conta.");
+  });
+
+  loginForm.addEventListener("submit", async (e) => {
+    e.preventDefault();
+    loginMsg.className = "msg"; loginMsg.style.display="none";
+
+    const payload = {
+      email: document.getElementById("loginEmail").value.trim().toLowerCase(),
+      password: document.getElementById("loginPassword").value
+    };
+
+    const {res, data} = await postJSON("/login", payload);
+
+    if (res.ok && (data.success || data.ok)) {
+      persistAuth(data.client_id, data.api_key);
+      loginMsg.className = "msg ok"; loginMsg.style.display="block";
+      renderCreds(loginMsg, data);
+      setTimeout(() => {
+        window.location.href = `index.html?client_id=${encodeURIComponent(data.client_id)}&api_key=${encodeURIComponent(data.api_key)}`;
+      }, 600);
+      return;
+    }
+
+    loginMsg.className = "msg err"; loginMsg.style.display="block";
+    loginMsg.textContent = "Erro: " + (data.error || data.message || "falha no login.");
+  });
+
+  // Se vier com ?mode=login, abre login
+  const params = new URLSearchParams(location.search);
+  if (params.get("mode") === "login") showLogin(params.get("email")||"");
 </script>
 </body>
 </html>

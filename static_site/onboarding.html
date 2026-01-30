@@ -221,17 +221,13 @@
                     body: JSON.stringify({ nome, email, empresa, telefone })
                 });
 
-                let result = {};
-            try { result = await response.json(); } catch (e) { result = { error: 'Resposta inválida do servidor' }; }
+                const result = await response.json();
 
-                if (response.status === 409) {
-                errorDiv.style.display = 'block';
-                errorDiv.innerText = (result.error || 'Email já cadastrado.') + ' — use outro email ou faça login.';
-            } else if (response.ok && result.success) {
-                    successDiv.innerHTML = `
-                        ✅ Conta criada com sucesso!<br><br>
-                        <strong>Sua API Key:</strong><br>
-                        <code style="background:#1e2937; padding:8px; border-radius:6px; display:block; margin:12px 0; font-family:monospace;">${result.api_key}</code><br>
+                if (response.ok && (result.success || result.ok)) {
+                // salva credenciais e segue para o dashboard
+                saveAuthAndRedirect(result);
+                return;
+            }</code><br>
                         Copie e guarde esta chave.<br>
                         <a href="./onboarding.html?client_id=${encodeURIComponent(result.client_id)}&api_key=${encodeURIComponent(result.api_key)}" style="color:#6366f1; text-decoration:none;">→ Ir para o dashboard agora</a>
                     `;
@@ -289,6 +285,22 @@
   }
   window.__lr = { LR_BACKEND, setWorkspace, getWorkspace, bootWorkspaceFromQuery, lrApi };
   bootWorkspaceFromQuery();
+</script>
+
+<script>
+function saveAuthAndRedirect(payload){
+  try{
+    const clientId = payload.client_id || payload.clientId;
+    const apiKey = payload.api_key || payload.apiKey;
+    if(clientId) localStorage.setItem('client_id', clientId);
+    if(apiKey) localStorage.setItem('api_key', apiKey);
+    // redireciona para dashboard
+    window.location.href = `index.html?client_id=${encodeURIComponent(clientId||'')}&api_key=${encodeURIComponent(apiKey||'')}`;
+  }catch(e){
+    // fallback: só redireciona
+    window.location.href = 'index.html';
+  }
+}
 </script>
 </body>
 </html>

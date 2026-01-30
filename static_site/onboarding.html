@@ -190,117 +190,84 @@
     </div>
 
     <script>
-        const form = document.getElementById('signupForm');
-        const submitBtn = document.getElementById('submitBtn');
-        const loading = document.getElementById('loading');
-        const successDiv = document.getElementById('success');
-        const errorDiv = document.getElementById('error');
+      // Backend URL (Render Web Service)
+      const BACKEND = (window.BACKEND_URL || "https://qualificador-leads-i-a.onrender.com").replace(/\/$/, "");
 
-        form.addEventListener('submit', async (e) => {
-            e.preventDefault();
+      const form = document.getElementById("signupForm");
+      const submitBtn = document.getElementById("submitBtn");
+      const loading = document.getElementById("loading");
+      const successDiv = document.getElementById("success");
+      const errorDiv = document.getElementById("error");
 
-            const nome = document.getElementById('nome').value.trim();
-            const email = document.getElementById('email').value.trim().toLowerCase();
-            const empresa = document.getElementById('empresa').value.trim();
-            const telefone = document.getElementById('telefone').value.trim();
-
-            if (!nome || !email) {
-                showError('Nome e email são obrigatórios');
-                return;
-            }
-
-            submitBtn.disabled = true;
-            loading.style.display = 'block';
-            errorDiv.style.display = 'none';
-            successDiv.style.display = 'none';
-
-            try {
-                const response = await fetch((window.BACKEND_URL || 'https://qualificador-leads-i-a.onrender.com').replace(/\/$/, '') + '/signup', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ nome, email, empresa, telefone })
-                });
-
-                const result = await response.json();
-
-                if (response.ok && (result.success || result.ok)) {
-                // salva credenciais e segue para o dashboard
-                saveAuthAndRedirect(result);
-                return;
-            }</code><br>
-                        Copie e guarde esta chave.<br>
-                        <a href="./onboarding.html?client_id=${encodeURIComponent(result.client_id)}&api_key=${encodeURIComponent(result.api_key)}" style="color:#6366f1; text-decoration:none;">→ Ir para o dashboard agora</a>
-                    `;
-                    successDiv.style.display = 'block';
-                    form.style.display = 'none';
-                } else {
-                    showError(result.error || 'Erro ao criar conta');
-                }
-            } catch (err) {
-                showError('Erro de conexão. Tente novamente.');
-            } finally {
-                submitBtn.disabled = false;
-                loading.style.display = 'none';
-            }
-        });
-
-        function showError(msg) {
-            errorDiv.textContent = msg;
-            errorDiv.style.display = 'block';
+      function setAuth(clientId, apiKey){
+        if (clientId) {
+          localStorage.setItem("leadrank_client_id", clientId);
+          localStorage.setItem("client_id", clientId);
+          localStorage.setItem("LR_CLIENT_ID", clientId);
         }
+        if (apiKey) {
+          localStorage.setItem("leadrank_api_key", apiKey);
+          localStorage.setItem("api_key", apiKey);
+          localStorage.setItem("LR_API_KEY", apiKey);
+        }
+      }
+
+      function redirectToDashboard(clientId, apiKey){
+        // mantém querystring só no primeiro acesso e depois o dashboard limpa
+        window.location.href = `index.html?client_id=${encodeURIComponent(clientId||"")}&api_key=${encodeURIComponent(apiKey||"")}`;
+      }
+
+      function showError(msg){
+        errorDiv.textContent = msg;
+        errorDiv.style.display = "block";
+      }
+
+      form.addEventListener("submit", async (e) => {
+        e.preventDefault();
+
+        const nome = document.getElementById("nome").value.trim();
+        const email = document.getElementById("email").value.trim().toLowerCase();
+        const empresa = document.getElementById("empresa").value.trim();
+        const telefone = document.getElementById("telefone").value.trim();
+
+        if (!nome || !email){
+          showError("Nome e email são obrigatórios");
+          return;
+        }
+
+        submitBtn.disabled = true;
+        loading.style.display = "block";
+        errorDiv.style.display = "none";
+        successDiv.style.display = "none";
+
+        try{
+          const res = await fetch(BACKEND + "/signup", {
+            method: "POST",
+            headers: {"Content-Type":"application/json"},
+            body: JSON.stringify({ nome, email, empresa, telefone })
+          });
+          const data = await res.json().catch(()=>({}));
+
+          if (!res.ok){
+            throw new Error(data.error || data.message || ("Erro HTTP " + res.status));
+          }
+
+          const clientId = data.client_id;
+          const apiKey = data.api_key;
+
+          setAuth(clientId, apiKey);
+
+          successDiv.innerHTML = `✅ Conta criada! Redirecionando para o dashboard...`;
+          successDiv.style.display = "block";
+
+          setTimeout(() => redirectToDashboard(clientId, apiKey), 600);
+        }catch(err){
+          showError(err.message || "Erro de conexão. Tente novamente.");
+        }finally{
+          submitBtn.disabled = false;
+          loading.style.display = "none";
+        }
+      });
     </script>
-<script>
-  // ===== LeadRank auth helper (client_id + api_key) =====
-  const LR_BACKEND = (window.BACKEND_URL || "https://qualificador-leads-i-a.onrender.com").replace(/\/$/, "");
-  function qs(k){ try { return new URLSearchParams(location.search).get(k); } catch(e){ return null; } }
-
-  function setWorkspace(clientId, apiKey){
-    if (clientId) localStorage.setItem("LR_CLIENT_ID", String(clientId).trim());
-    if (apiKey) localStorage.setItem("LR_API_KEY", String(apiKey).trim());
-  }
-  function getWorkspace(){
-    const client_id = (localStorage.getItem("LR_CLIENT_ID")||"").trim();
-    const api_key = (localStorage.getItem("LR_API_KEY")||"").trim();
-    return { client_id: client_id || null, api_key: api_key || null };
-  }
-  function bootWorkspaceFromQuery(){
-    const cid = qs("client_id");
-    const key = qs("api_key") || qs("demo_key"); // compat
-    if (cid || key) setWorkspace(cid, key);
-  }
-  async function lrApi(path, opts={}){
-    const ws = getWorkspace();
-    if (!ws.client_id) throw new Error("client_id ausente. Faça signup (trial) ou informe o client_id.");
-    const url = LR_BACKEND + path + (path.includes("?") ? "&" : "?") + "client_id=" + encodeURIComponent(ws.client_id);
-    const headers = {
-      "Content-Type": "application/json",
-      ...(ws.api_key ? { "X-API-KEY": ws.api_key } : {}),
-      ...(opts.headers || {})
-    };
-    const res = await fetch(url, { ...opts, headers });
-    let data = null;
-    try { data = await res.json(); } catch(e) {}
-    if (!res.ok) throw new Error((data && (data.error||data.reason)) ? (data.error||data.reason) : ("Erro HTTP " + res.status));
-    return data;
-  }
-  window.__lr = { LR_BACKEND, setWorkspace, getWorkspace, bootWorkspaceFromQuery, lrApi };
-  bootWorkspaceFromQuery();
-</script>
-
-<script>
-function saveAuthAndRedirect(payload){
-  try{
-    const clientId = payload.client_id || payload.clientId;
-    const apiKey = payload.api_key || payload.apiKey;
-    if(clientId) localStorage.setItem('client_id', clientId);
-    if(apiKey) localStorage.setItem('api_key', apiKey);
-    // redireciona para dashboard
-    window.location.href = `index.html?client_id=${encodeURIComponent(clientId||'')}&api_key=${encodeURIComponent(apiKey||'')}`;
-  }catch(e){
-    // fallback: só redireciona
-    window.location.href = 'index.html';
-  }
-}
-</script>
-</body>
+  </body>
 </html>

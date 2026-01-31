@@ -16,6 +16,8 @@ import random
 import string
 import secrets
 import hashlib
+import logging
+import traceback
 from datetime import datetime, timezone, timedelta
 from typing import Any, Dict, List, Optional, Tuple
 
@@ -23,6 +25,7 @@ from werkzeug.security import generate_password_hash, check_password_hash
 
 from flask import Flask, request, jsonify, Response
 from flask_cors import CORS
+from werkzeug.exceptions import HTTPException
 
 import psycopg
 from psycopg.rows import dict_row
@@ -85,6 +88,13 @@ _DEMO_RL_MAX = 5
 # =========================
 app = Flask(__name__)
 CORS(app, resources={r"/*": {"origins": ALLOWED_ORIGINS}})
+logging.basicConfig(level=os.getenv("LOG_LEVEL", "INFO").upper())
+
+
+def _log_exception(message: str) -> str:
+    trace = traceback.format_exc()
+    logging.exception(message)
+    return trace
 
 
 # =========================
@@ -180,6 +190,25 @@ def _json_err(msg: str, code: int = 400, **extra):
     payload = {"ok": False, "error": msg}
     payload.update(extra)
     return _resp(payload, code)
+
+
+@app.errorhandler(Exception)
+def handle_exception(err: Exception):
+    if isinstance(err, HTTPException):
+        return _json_err(
+            err.description,
+            err.code or 500,
+            code="http_error",
+            error_type=err.__class__.__name__,
+        )
+    trace = _log_exception("Unhandled exception")
+    return _json_err(
+        "Erro interno do servidor",
+        500,
+        code="internal_error",
+        error_type=err.__class__.__name__,
+        trace=trace,
+    )
 
 def _safe_int(x: Any, default: int = 0) -> int:
     try:
@@ -369,7 +398,10 @@ def _ensure_schema():
                 cur.execute("ALTER TABLE clients ADD COLUMN IF NOT EXISTS nome TEXT;")
                 cur.execute("ALTER TABLE clients ADD COLUMN IF NOT EXISTS email TEXT;")
                 cur.execute("ALTER TABLE clients ADD COLUMN IF NOT EXISTS empresa TEXT;")
+                cur.execute("ALTER TABLE clients ADD COLUMN IF NOT EXISTS telefone TEXT;")
                 cur.execute("ALTER TABLE clients ADD COLUMN IF NOT EXISTS valid_until TIMESTAMPTZ;")
+                cur.execute("ALTER TABLE clients ADD COLUMN IF NOT EXISTS password_hash TEXT;")
+                cur.execute("ALTER TABLE clients ADD COLUMN IF NOT EXISTS last_login_at TIMESTAMPTZ;")
 
                 # bancos antigos podem ter api_key NOT NULL -> drop
                 try:
@@ -768,7 +800,7 @@ def signup():
     conn = _db()
     try:
         with conn:
-            with conn.cursor() as cur:
+            with conn.cursor(row_factory=dict_row) as cur:
                 cur.execute("SELECT client_id FROM clients WHERE email=%s", (email,))
                 row = cur.fetchone()
                 if row:
@@ -807,7 +839,14 @@ def signup():
             "message": "Conta trial criada com sucesso!"
         })
     except Exception as e:
-        return jsonify({"ok": False, "success": False, "error": str(e)}), 500
+        trace = _log_exception("signup failed")
+        return jsonify({
+            "ok": False,
+            "success": False,
+            "error": "Erro interno ao criar conta",
+            "detail": str(e),
+            "trace": trace,
+        }), 500
     finally:
         conn.close()
 
@@ -828,7 +867,7 @@ def login():
     conn = _db()
     try:
         with conn:
-            with conn.cursor() as cur:
+            with conn.cursor(row_factory=dict_row) as cur:
                 cur.execute("SELECT client_id, api_key, password_hash, plan, status, valid_until FROM clients WHERE email=%s", (email,))
                 row = cur.fetchone()
                 if not row:
@@ -851,7 +890,7 @@ def login():
         return jsonify({
             "ok": True,
             "success": True,
-            "client_id": row['client_id'],
+            "client_id": row.get("client_id"),
             "api_key": api_key,
             "plan": (row.get('plan') or 'trial'),
             "status": (row.get('status') or 'active'),
@@ -859,7 +898,14 @@ def login():
             "message": "Login realizado com sucesso."
         })
     except Exception as e:
-        return jsonify({"ok": False, "success": False, "error": str(e)}), 500
+        trace = _log_exception("login failed")
+        return jsonify({
+            "ok": False,
+            "success": False,
+            "error": "Erro interno ao realizar login",
+            "detail": str(e),
+            "trace": trace,
+        }), 500
     finally:
         conn.close()
 
@@ -1570,6 +1616,101 @@ def seed_demo():
                     )
                     inserted += 1
         return _json_ok({"client_id": client_id, "inserted": inserted, "converted": conv, "denied": neg, "pending": inserted - conv - neg})
+    finally:
+        conn.close()
+
+
+@app.post("/seed_test_leads")
+def seed_test_leads():
+    """Gera leads de teste para um client_id autenticado."""
+    data = request.get_json(silent=True) or {}
+    client_id = (data.get("client_id") or "").strip()
+    n = max(1, min(_safe_int(data.get("count"), 10), 50))
+
+    if not client_id:
+        return _json_err("client_id obrigatório", 400)
+
+    ok_auth, client_row, msg = _require_client_auth(client_id)
+    if not ok_auth:
+        return _json_err(msg, 403, code="auth_required")
+
+    plan = (client_row.get("plan") or "trial").lower()
+    cat = PLAN_CATALOG.get(plan, PLAN_CATALOG["trial"])
+    used = int(client_row.get("leads_used_month") or 0)
+    limit = int(cat.get("lead_limit_month") or 0)
+    if limit > 0 and used + n > limit:
+        return _json_err(
+            "Limite mensal atingido. Faça upgrade para continuar.",
+            402,
+            code="plan_limit",
+            plan=plan,
+            used=used,
+            limit=limit,
+            price_brl_month=cat.get("price_brl_month"),
+            setup_fee_brl=cat.get("setup_fee_brl", 0),
+        )
+
+    inserted = 0
+    conv = 0
+    neg = 0
+    conn = _db()
+    try:
+        with conn:
+            with conn.cursor() as cur:
+                for _ in range(n):
+                    tempo_site = random.randint(15, 420)
+                    paginas = random.randint(1, 10)
+                    clicou_preco = random.choice([0, 1])
+
+                    base = 0.08
+                    base += min(tempo_site / 450, 0.25)
+                    base += min(paginas / 12, 0.25)
+                    base += 0.22 if clicou_preco else 0.0
+                    prob = max(0.03, min(0.97, base + random.uniform(-0.05, 0.05)))
+
+                    label_vc = random.choices([None, 1.0, 0.0], weights=[0.45, 0.30, 0.25])[0]
+                    if label_vc == 1.0:
+                        conv += 1
+                    elif label_vc == 0.0:
+                        neg += 1
+
+                    nome = "Teste " + "".join(random.choice(string.ascii_uppercase) for _ in range(4))
+                    email = "teste@leadrank.local"
+                    telefone = "11999990000"
+                    payload = {
+                        "nome": nome,
+                        "email": email,
+                        "telefone": telefone,
+                        "tempo_site": tempo_site,
+                        "paginas_visitadas": paginas,
+                        "clicou_preco": clicou_preco,
+                    }
+
+                    cur.execute(
+                        """
+                        INSERT INTO leads
+                          (client_id, nome, email_lead, telefone, tempo_site, paginas_visitadas, clicou_preco,
+                           payload, probabilidade, virou_cliente, created_at, updated_at)
+                        VALUES
+                          (%s,%s,%s,%s,%s,%s,%s,%s::jsonb,%s,%s,NOW(),NOW())
+                        """,
+                        (client_id, nome, email, telefone, tempo_site, paginas, clicou_preco, json.dumps(payload), float(prob), label_vc),
+                    )
+                    inserted += 1
+
+            with conn.cursor() as cur:
+                cur.execute(
+                    "UPDATE clients SET leads_used_month = leads_used_month + %s, updated_at=NOW() WHERE client_id=%s",
+                    (inserted, client_id),
+                )
+
+        return _json_ok({
+            "client_id": client_id,
+            "inserted": inserted,
+            "converted": conv,
+            "denied": neg,
+            "pending": inserted - conv - neg,
+        })
     finally:
         conn.close()
 

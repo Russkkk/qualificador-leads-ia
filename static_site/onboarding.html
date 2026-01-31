@@ -1,78 +1,218 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>LeadRank • Experimente Grátis</title>
-  <link rel="stylesheet" href="styles.css" />
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>LeadRank - Experimente Grátis</title>
+    <style>
+        :root {
+            --bg: #0a0e17;
+            --card: #121826;
+            --text: #e2e8f0;
+            --text-muted: #94a3b8;
+            --accent: #6366f1;
+            --accent-hover: #818cf8;
+            --border: #1e2937;
+            --success: #22c55e;
+            --error: #ef4444;
+        }
+
+        body {
+            font-family: system-ui, -apple-system, sans-serif;
+            background: var(--bg);
+            color: var(--text);
+            margin: 0;
+            padding: 0;
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .container {
+            width: 100%;
+            max-width: 480px;
+            padding: 24px;
+        }
+
+        .card {
+            background: var(--card);
+            border: 1px solid var(--border);
+            border-radius: 16px;
+            padding: 40px 32px;
+            box-shadow: 0 20px 25px -5px rgb(0 0 0 / 0.3);
+        }
+
+        h1 {
+            font-size: 28px;
+            font-weight: 700;
+            margin: 0 0 8px;
+            text-align: center;
+        }
+
+        .subtitle {
+            color: var(--text-muted);
+            text-align: center;
+            margin-bottom: 32px;
+            font-size: 15px;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        label {
+            display: block;
+            font-size: 13px;
+            font-weight: 500;
+            margin-bottom: 6px;
+            color: var(--text-muted);
+        }
+
+        input {
+            width: 100%;
+            background: #0f172a;
+            border: 1px solid var(--border);
+            border-radius: 10px;
+            padding: 12px 14px;
+            color: var(--text);
+            font-size: 15px;
+            transition: border 0.2s;
+        }
+
+        input:focus {
+            outline: none;
+            border-color: var(--accent);
+            box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.15);
+        }
+
+        .btn {
+            width: 100%;
+            background: var(--accent);
+            color: white;
+            border: none;
+            padding: 14px;
+            font-size: 16px;
+            font-weight: 600;
+            border-radius: 10px;
+            cursor: pointer;
+            transition: background 0.2s;
+            margin-top: 12px;
+        }
+
+        .btn:hover {
+            background: var(--accent-hover);
+        }
+
+        .btn:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+        }
+
+        .success {
+            background: rgba(34, 197, 94, 0.15);
+            border: 1px solid rgba(34, 197, 94, 0.3);
+            color: var(--success);
+            padding: 16px;
+            border-radius: 10px;
+            text-align: center;
+            margin-top: 20px;
+            display: none;
+        }
+
+        .error {
+            background: rgba(239, 68, 68, 0.15);
+            border: 1px solid rgba(239, 68, 68, 0.3);
+            color: var(--error);
+            padding: 14px;
+            border-radius: 10px;
+            margin-top: 12px;
+            display: none;
+        }
+
+        .loading {
+            display: none;
+            text-align: center;
+            padding: 12px;
+        }
+
+        .footer {
+            text-align: center;
+            margin-top: 32px;
+            color: var(--text-muted);
+            font-size: 13px;
+        }
+
+        .link {
+            color: var(--accent);
+            text-decoration: none;
+        }
+    </style>
 </head>
 <body>
-  <div class="page">
-    <header class="site-header">
-      <a class="brand" href="landing.html">
-        <span class="brand__logo">LR</span>
-        <span class="brand__text">LeadRank</span>
-      </a>
-      <nav class="site-nav">
-        <a href="landing.html">Início</a>
-        <a href="pricing.html">Planos</a>
-        <a href="onboarding.html" aria-current="page">Criar conta</a>
-        <a href="login.html">Entrar</a>
-      </nav>
-      <a class="btn btn--ghost" href="index.html">Acessar dashboard</a>
-    </header>
+    <div class="container">
+        <div class="card">
+            <h1>Comece agora com o LeadRank</h1>
+            <p class="subtitle">Teste grátis por 14 dias. Sem cartão. Crie sua conta em segundos.</p>
 
-    <main>
-      <section class="auth">
-        <div class="auth__copy">
-          <p class="eyebrow" id="authEyebrow">Experimente grátis</p>
-          <h1 id="authTitle">Comece agora com o LeadRank</h1>
-          <p class="subtitle" id="authSubtitle">
-            Teste por 14 dias. Sem cartão. Crie sua conta em segundos e receba suas credenciais de integração.
-          </p>
-          <div class="auth__steps" id="authSteps">
-            <div>
-              <span class="step">1</span>
-              <p>Crie sua conta e receba client_id e api_key.</p>
+            <form id="signupForm">
+                <div class="form-group">
+                    <label>Nome completo</label>
+                    <input type="text" id="nome" required placeholder="João Silva">
+                </div>
+
+                <div class="form-group">
+                    <label>Email profissional</label>
+                    <input type="email" id="email" required placeholder="joao@empresa.com">
+                </div>
+
+                <div class="form-group">
+                    <label>Empresa / Marca (opcional)</label>
+                    <input type="text" id="empresa" placeholder="Minha Empresa">
+                </div>
+
+                <div class="form-group">
+                    <label>WhatsApp (opcional)</label>
+                    <input type="tel" id="telefone" placeholder="(11) 98765-4321">
+                </div>
+
+                
+
+                <div class="form-group">
+                    <label>Senha</label>
+                    <input type="password" id="password" required minlength="6" placeholder="Mínimo 6 caracteres">
+                </div>
+
+                <button type="submit" class="btn" id="submitBtn">Criar conta trial grátis</button>
+            </form>
+
+
+<form id="loginForm" style="display:none">
+    <div class="form-group">
+        <label>Email</label>
+        <input type="email" id="login_email" required placeholder="joao@empresa.com">
+    </div>
+    <div class="form-group">
+        <label>Senha</label>
+        <input type="password" id="login_password" required placeholder="Sua senha">
+    </div>
+    <button type="submit" class="btn" id="loginBtn">Entrar</button>
+</form>
+
+            <div class="loading" id="loading">Criando sua conta...</div>
+            <div class="success" id="success"></div>
+            <div class="error" id="error"></div>
+
+            <div class="footer">
+                Já tem uma conta? <a href="onboarding.html?mode=login" class="link">Entrar</a>
             </div>
-            <div>
-              <span class="step">2</span>
-              <p>Envie leads via API ou use o dashboard.</p>
-            </div>
-            <div>
-              <span class="step">3</span>
-              <p>Monitore taxas de conversão e prioridades.</p>
-            </div>
-          </div>
         </div>
+    </div>
 
-        <div class="auth__card">
-          <form id="signupForm" class="form">
-            <h2>Criar conta gratuita</h2>
-            <label>
-              Nome completo
-              <input type="text" id="nome" required placeholder="João Silva" />
-            </label>
-            <label>
-              Email profissional
-              <input type="email" id="email" required placeholder="joao@empresa.com" />
-            </label>
-            <label>
-              Empresa / Marca (opcional)
-              <input type="text" id="empresa" placeholder="Minha Empresa" />
-            </label>
-            <label>
-              WhatsApp (opcional)
-              <input type="tel" id="telefone" placeholder="(11) 98765-4321" />
-            </label>
-            <label>
-              Senha
-              <input type="password" id="password" required minlength="6" placeholder="Mínimo 6 caracteres" />
-            </label>
-            <button type="submit" class="btn btn--block" id="submitBtn">Criar conta trial grátis</button>
-          </form>
+    <script>
+      // Backend URL (Render Web Service)
+      const BACKEND = (window.BACKEND_URL || "https://qualificador-leads-i-a.onrender.com").replace(/\/$/, "");
 
-<<<<<<< HEAD
       function nextUrl(defaultUrl) {
         const n = new URLSearchParams(location.search).get('next') || '';
         return n ? n : defaultUrl;
@@ -84,140 +224,117 @@
       const loading = document.getElementById("loading");
       const successDiv = document.getElementById("success");
       const errorDiv = document.getElementById("error");
-=======
-          <form id="loginForm" class="form" style="display:none">
-            <h2>Entrar no LeadRank</h2>
-            <label>
-              Email
-              <input type="email" id="login_email" required placeholder="joao@empresa.com" />
-            </label>
-            <label>
-              Senha
-              <input type="password" id="login_password" required placeholder="Sua senha" />
-            </label>
-            <button type="submit" class="btn btn--block" id="loginBtn">Entrar</button>
-          </form>
->>>>>>> a499fc724a57883aa191ff6bfccd1a6d313b40cd
 
-          <div class="alert" id="loading">Processando sua solicitação...</div>
-          <div class="alert" id="success"></div>
-          <div class="alert" id="error"></div>
 
-          <p class="form__hint">
-            Já tem uma conta? <a href="onboarding.html?mode=login">Entre por aqui</a>.
-          </p>
-        </div>
-      </section>
-    </main>
+const qs = (k) => new URLSearchParams(location.search).get(k) || "";
+const mode = (qs("mode") || "signup").toLowerCase();
+const loginForm = document.getElementById("loginForm");
+const loginBtn = document.getElementById("loginBtn");
 
-    <footer class="site-footer">
-      <span>© 2024 LeadRank. Todos os direitos reservados.</span>
-      <div class="footer__links">
-        <a href="landing.html">Início</a>
-        <a href="pricing.html">Planos</a>
-        <a href="login.html">Entrar</a>
-      </div>
-    </footer>
-  </div>
+// alterna tela
+if (mode === "login") {
+  document.querySelector("h1").textContent = "Entrar no LeadRank";
+  document.querySelector(".subtitle").textContent = "Acesse seu dashboard com email e senha.";
+  form.style.display = "none";
+  loginForm.style.display = "block";
+}
 
-  <script>
-    const BACKEND = (window.BACKEND_URL || "https://qualificador-leads-i-a.onrender.com").replace(/\/$/, "");
+      function setAuth(clientId, apiKey){
+        if (clientId) {
+          localStorage.setItem("leadrank_client_id", clientId);
+          localStorage.setItem("client_id", clientId);
+          localStorage.setItem("LR_CLIENT_ID", clientId);
+        }
+        if (apiKey) {
+          localStorage.setItem("leadrank_api_key", apiKey);
+          localStorage.setItem("api_key", apiKey);
+          localStorage.setItem("LR_API_KEY", apiKey);
+        }
+      }
 
-<<<<<<< HEAD
       function redirectToDashboard(clientId, apiKey){
         // mantém querystring só no primeiro acesso e depois o dashboard limpa
         window.location.href = nextUrl(`index.html?client_id=${encodeURIComponent(clientId||"")}&api_key=${encodeURIComponent(apiKey||"")}`);
       }
-=======
-    const form = document.getElementById("signupForm");
-    const submitBtn = document.getElementById("submitBtn");
-    const loading = document.getElementById("loading");
-    const successDiv = document.getElementById("success");
-    const errorDiv = document.getElementById("error");
->>>>>>> a499fc724a57883aa191ff6bfccd1a6d313b40cd
 
-    const qs = (k) => new URLSearchParams(location.search).get(k) || "";
-    const mode = (qs("mode") || "signup").toLowerCase();
-    const loginForm = document.getElementById("loginForm");
-    const loginBtn = document.getElementById("loginBtn");
-
-    const authTitle = document.getElementById("authTitle");
-    const authSubtitle = document.getElementById("authSubtitle");
-    const authEyebrow = document.getElementById("authEyebrow");
-    const authSteps = document.getElementById("authSteps");
-
-    if (mode === "login") {
-      authTitle.textContent = "Entrar no LeadRank";
-      authSubtitle.textContent = "Acesse seu dashboard com email e senha.";
-      authEyebrow.textContent = "Acesso seguro";
-      if (authSteps) authSteps.style.display = "none";
-      form.style.display = "none";
-      loginForm.style.display = "grid";
-    }
-
-    function setAuth(clientId, apiKey) {
-      if (clientId) {
-        localStorage.setItem("leadrank_client_id", clientId);
-        localStorage.setItem("client_id", clientId);
-        localStorage.setItem("LR_CLIENT_ID", clientId);
+      function showError(msg){
+        errorDiv.textContent = msg;
+        errorDiv.style.display = "block";
       }
-      if (apiKey) {
-        localStorage.setItem("leadrank_api_key", apiKey);
-        localStorage.setItem("api_key", apiKey);
-        localStorage.setItem("LR_API_KEY", apiKey);
+
+      
+if (loginForm){
+  loginForm.addEventListener("submit", async (e) => {
+    e.preventDefault();
+    const email = document.getElementById("login_email").value.trim().toLowerCase();
+    const password = document.getElementById("login_password").value.trim();
+
+    if (!email || !password){
+      showError("Email e senha são obrigatórios");
+      return;
+    }
+
+    loginBtn.disabled = true;
+    loading.style.display = "block";
+    errorDiv.style.display = "none";
+    successDiv.style.display = "none";
+
+    try{
+      const res = await fetch(BACKEND + "/login", {
+        method: "POST",
+        headers: {"Content-Type":"application/json"},
+        body: JSON.stringify({ email, password })
+      });
+      const data = await res.json().catch(()=>({}));
+
+      if (!res.ok){
+        throw new Error(data.error || data.message || ("Erro HTTP " + res.status));
       }
-    }
 
-    function redirectToDashboard(clientId, apiKey) {
-      window.location.href = `index.html?client_id=${encodeURIComponent(clientId || "")}&api_key=${encodeURIComponent(apiKey || "")}`;
-    }
+      const clientId = data.client_id;
+      const apiKey = data.api_key;
 
-    function showError(msg) {
-      errorDiv.textContent = msg;
-      errorDiv.className = "alert alert--error";
-    }
+      setAuth(clientId, apiKey);
 
-    function showLoading(msg) {
-      loading.textContent = msg;
-      loading.className = "alert";
-      loading.style.display = "block";
-    }
+      successDiv.innerHTML = `✅ Login feito! Redirecionando...`;
+      successDiv.style.display = "block";
 
-    function showSuccess(msg) {
-      successDiv.textContent = msg;
-      successDiv.className = "alert alert--success";
-    }
-
-    function resetAlerts() {
+      setTimeout(() => redirectToDashboard(clientId, apiKey), 400);
+    }catch(err){
+      showError(err.message || "Erro de conexão. Tente novamente.");
+    }finally{
+      loginBtn.disabled = false;
       loading.style.display = "none";
-      successDiv.className = "alert";
-      errorDiv.className = "alert";
     }
-
-    if (loginForm) {
-      loginForm.addEventListener("submit", async (e) => {
+  });
+}
+      form.addEventListener("submit", async (e) => {
         e.preventDefault();
-        const email = document.getElementById("login_email").value.trim().toLowerCase();
-        const password = document.getElementById("login_password").value.trim();
 
-        if (!email || !password) {
-          showError("Email e senha são obrigatórios.");
+        const nome = document.getElementById("nome").value.trim();
+        const email = document.getElementById("email").value.trim().toLowerCase();
+        const empresa = document.getElementById("empresa").value.trim();
+        const telefone = document.getElementById("telefone").value.trim();
+
+        if (!nome || !email){
+          showError("Nome e email são obrigatórios");
           return;
         }
 
-        loginBtn.disabled = true;
-        resetAlerts();
-        showLoading("Validando credenciais...");
+        submitBtn.disabled = true;
+        loading.style.display = "block";
+        errorDiv.style.display = "none";
+        successDiv.style.display = "none";
 
-        try {
-          const res = await fetch(BACKEND + "/login", {
+        try{
+          const res = await fetch(BACKEND + "/signup", {
             method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({ email, password })
+            headers: {"Content-Type":"application/json"},
+            body: JSON.stringify({ nome, email, empresa, telefone, password })
           });
-          const data = await res.json().catch(() => ({}));
+          const data = await res.json().catch(()=>({}));
 
-          if (!res.ok) {
+          if (!res.ok){
             throw new Error(data.error || data.message || ("Erro HTTP " + res.status));
           }
 
@@ -225,66 +342,18 @@
           const apiKey = data.api_key;
 
           setAuth(clientId, apiKey);
-          resetAlerts();
-          showSuccess("Login realizado. Redirecionando...");
 
-          setTimeout(() => redirectToDashboard(clientId, apiKey), 400);
-        } catch (err) {
-          resetAlerts();
+          successDiv.innerHTML = `✅ Conta criada! Redirecionando para o dashboard...`;
+          successDiv.style.display = "block";
+
+          setTimeout(() => redirectToDashboard(clientId, apiKey), 600);
+        }catch(err){
           showError(err.message || "Erro de conexão. Tente novamente.");
-        } finally {
-          loginBtn.disabled = false;
+        }finally{
+          submitBtn.disabled = false;
           loading.style.display = "none";
         }
       });
-    }
-
-    form.addEventListener("submit", async (e) => {
-      e.preventDefault();
-
-      const nome = document.getElementById("nome").value.trim();
-      const email = document.getElementById("email").value.trim().toLowerCase();
-      const empresa = document.getElementById("empresa").value.trim();
-      const telefone = document.getElementById("telefone").value.trim();
-      const password = document.getElementById("password").value.trim();
-
-      if (!nome || !email) {
-        showError("Nome e email são obrigatórios.");
-        return;
-      }
-
-      submitBtn.disabled = true;
-      resetAlerts();
-      showLoading("Criando sua conta...");
-
-      try {
-        const res = await fetch(BACKEND + "/signup", {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ nome, email, empresa, telefone, password })
-        });
-        const data = await res.json().catch(() => ({}));
-
-        if (!res.ok) {
-          throw new Error(data.error || data.message || ("Erro HTTP " + res.status));
-        }
-
-        const clientId = data.client_id;
-        const apiKey = data.api_key;
-
-        setAuth(clientId, apiKey);
-        resetAlerts();
-        showSuccess("Conta criada com sucesso. Redirecionando para o dashboard...");
-
-        setTimeout(() => redirectToDashboard(clientId, apiKey), 600);
-      } catch (err) {
-        resetAlerts();
-        showError(err.message || "Erro de conexão. Tente novamente.");
-      } finally {
-        submitBtn.disabled = false;
-        loading.style.display = "none";
-      }
-    });
-  </script>
-</body>
+    </script>
+  </body>
 </html>

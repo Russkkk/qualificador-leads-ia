@@ -118,7 +118,6 @@
     </footer>
   </div>
 
-<<<<<<< HEAD
   <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js">
 
 document.addEventListener('DOMContentLoaded', () => { try { if (goToUpgradeIfRequested()) return; } catch(e){} });
@@ -128,8 +127,8 @@ document.addEventListener('DOMContentLoaded', () => { try { if (goToUpgradeIfReq
     const BACKEND = (window.BACKEND_URL || "https://qualificador-leads-i-a.onrender.com").replace(/\/$/, "");
 // === Kiwify checkout links (substitua pelos seus links) ===
 const KIWIFY_CHECKOUT = {
-  starter: (window.KIWIFY_CHECKOUT_STARTER || "").trim(), // ex: "https://pay.kiwify.com.br/SEU_LINK"
-  pro: (window.KIWIFY_CHECKOUT_PRO || "").trim()
+  starter: "https://pay.kiwify.com.br/Vq17ohp",
+  pro: "https://pay.kiwify.com.br/xBAB8TZ"
 };
 
 function buildKiwifyUrl(base, { client_id, plan }) {
@@ -166,12 +165,6 @@ function goToUpgradeIfRequested() {
   return true;
 }
 
-=======
-  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
-  <script>
-    const BACKEND = (window.BACKEND_URL || "https://qualificador-leads-i-a.onrender.com").replace(/\/$/, "");
-
->>>>>>> a499fc724a57883aa191ff6bfccd1a6d313b40cd
     function qs(name) {
       return new URLSearchParams(location.search).get(name) || "";
     }

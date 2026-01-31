@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Lead Rank | Entrar</title>
+    <link rel="stylesheet" href="styles.css" />
+  </head>
+  <body>
+    <div class="page">
+      <header class="site-header">
+        <a class="brand" href="index.html">
+          <span class="brand__logo">LR</span>
+          <span class="brand__text">Lead Rank</span>
+        </a>
+        <nav class="site-nav">
+          <a href="index.html">Início</a>
+          <a href="onboarding.html">Criar conta</a>
+          <a href="login.html" aria-current="page">Entrar</a>
+        </nav>
+        <a class="btn btn--ghost" href="onboarding.html">Criar conta</a>
+      </header>
+
+      <main>
+        <section class="auth">
+          <div class="auth__copy">
+            <p class="eyebrow">Bem-vindo de volta</p>
+            <h1>Acesse seu painel e acompanhe seus leads em tempo real.</h1>
+            <p class="subtitle">
+              Visualize rapidamente quais oportunidades estão prontas para fechar e quem precisa de
+              atenção imediata.
+            </p>
+            <div class="auth__metrics">
+              <div>
+                <strong>+1.200</strong>
+                <span>empresas usando Lead Rank</span>
+              </div>
+              <div>
+                <strong>4.9/5</strong>
+                <span>satisfação média</span>
+              </div>
+            </div>
+          </div>
+          <div class="auth__card">
+            <form class="form" action="/login" method="POST">
+              <h2>Entrar na plataforma</h2>
+              <label>
+                Email
+                <input name="email" type="email" placeholder="seu@email.com" required />
+              </label>
+              <label>
+                Senha
+                <input name="password" type="password" placeholder="Sua senha" required />
+              </label>
+              <button class="btn btn--block" type="submit">Acessar dashboard</button>
+              <p class="form__hint">Esqueceu sua senha? Entre em contato com o suporte.</p>
+            </form>
+          </div>
+        </section>
+      </main>
+
+      <footer class="site-footer">
+        <span>© 2024 Lead Rank. Todos os direitos reservados.</span>
+        <div class="footer__links">
+          <a href="index.html">Início</a>
+          <a href="onboarding.html">Criar conta</a>
+        </div>
+      </footer>
+    </div>
+  </body>
+</html>

@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Lead Rank | Criar Conta</title>
+    <link rel="stylesheet" href="styles.css" />
+  </head>
+  <body>
+    <div class="page">
+      <header class="site-header">
+        <a class="brand" href="index.html">
+          <span class="brand__logo">LR</span>
+          <span class="brand__text">Lead Rank</span>
+        </a>
+        <nav class="site-nav">
+          <a href="index.html">Início</a>
+          <a href="onboarding.html" aria-current="page">Criar conta</a>
+          <a href="login.html">Entrar</a>
+        </nav>
+        <a class="btn btn--ghost" href="login.html">Já tenho acesso</a>
+      </header>
+
+      <main>
+        <section class="auth">
+          <div class="auth__copy">
+            <p class="eyebrow">Primeiros passos</p>
+            <h1>Crie sua conta e comece a qualificar leads hoje mesmo.</h1>
+            <p class="subtitle">
+              Configure seu workspace, adicione sua equipe e acompanhe resultados em tempo real.
+            </p>
+            <div class="auth__steps">
+              <div>
+                <span class="step">1</span>
+                <p>Informe seus dados principais.</p>
+              </div>
+              <div>
+                <span class="step">2</span>
+                <p>Conecte seu CRM e canais de entrada.</p>
+              </div>
+              <div>
+                <span class="step">3</span>
+                <p>Acompanhe o ranking de leads e feche negócios.</p>
+              </div>
+            </div>
+          </div>
+          <div class="auth__card">
+            <form class="form" action="/criar_cliente" method="POST">
+              <h2>Criar acesso</h2>
+              <label>
+                Nome completo
+                <input name="name" placeholder="Seu nome" required />
+              </label>
+              <label>
+                Email corporativo
+                <input name="email" type="email" placeholder="seu@email.com" required />
+              </label>
+              <label>
+                Senha
+                <input name="password" type="password" placeholder="Crie uma senha forte" required />
+              </label>
+              <label>
+                Tamanho da equipe
+                <select name="team_size" required>
+                  <option value="">Selecione</option>
+                  <option value="1-5">1-5 pessoas</option>
+                  <option value="6-15">6-15 pessoas</option>
+                  <option value="16-50">16-50 pessoas</option>
+                  <option value="50+">50+ pessoas</option>
+                </select>
+              </label>
+              <button class="btn btn--block" type="submit">Criar conta gratuita</button>
+              <p class="form__hint">
+                Ao criar a conta você concorda com nossos termos e política de privacidade.
+              </p>
+            </form>
+          </div>
+        </section>
+      </main>
+
+      <footer class="site-footer">
+        <span>Precisa de ajuda? Fale com a gente em suporte@leadrank.com</span>
+        <div class="footer__links">
+          <a href="index.html">Início</a>
+          <a href="login.html">Entrar</a>
+        </div>
+      </footer>
+    </div>
+  </body>
+</html>

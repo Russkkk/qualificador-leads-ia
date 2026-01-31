@@ -87,6 +87,7 @@ app = Flask(__name__)
 CORS(app, resources={r"/*": {"origins": ALLOWED_ORIGINS}})
 
 
+<<<<<<< HEAD
 @app.before_request
 def _handle_preflight_options():
     # Alguns browsers enviam preflight (OPTIONS) para qualquer POST/JSON.
@@ -96,6 +97,8 @@ def _handle_preflight_options():
 
 
 
+=======
+>>>>>>> 4ba018133c05831a4cf5e540cf3f0bfb1ecdffae
 # =========================
 # Utils
 # =========================
@@ -837,7 +840,11 @@ def login():
     conn = _db()
     try:
         with conn:
+<<<<<<< HEAD
             with conn.cursor(row_factory=dict_row) as cur:
+=======
+            with conn.cursor() as cur:
+>>>>>>> 4ba018133c05831a4cf5e540cf3f0bfb1ecdffae
                 cur.execute("SELECT client_id, api_key, password_hash, plan, status, valid_until FROM clients WHERE email=%s", (email,))
                 row = cur.fetchone()
                 if not row:
@@ -1459,6 +1466,7 @@ def leads_export_csv():
     )
 
 
+<<<<<<< HEAD
 
 @app.route("/seed_test_leads", methods=["POST", "OPTIONS"])
 def seed_test_leads():
@@ -1539,6 +1547,8 @@ def seed_test_leads():
     finally:
         conn.close()
 
+=======
+>>>>>>> 4ba018133c05831a4cf5e540cf3f0bfb1ecdffae
 @app.post("/demo_public")
 def demo_public():
     """Demo pública controlada (SEM DEMO_KEY) com rate-limit por IP/mês."""

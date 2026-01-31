@@ -43,19 +43,20 @@
             </div>
           </div>
           <div class="auth__card">
-            <form class="form" action="/login" method="POST">
+            <form class="form" id="loginForm">
               <h2>Entrar na plataforma</h2>
               <label>
                 Email
-                <input name="email" type="email" placeholder="seu@email.com" required />
+                <input name="email" id="loginEmail" type="email" placeholder="seu@email.com" required />
               </label>
               <label>
                 Senha
-                <input name="password" type="password" placeholder="Sua senha" required />
+                <input name="password" id="loginPassword" type="password" placeholder="Sua senha" required />
               </label>
               <button class="btn btn--block" type="submit">Acessar dashboard</button>
               <p class="form__hint">Esqueceu sua senha? Entre em contato com o suporte.</p>
             </form>
+            <div class="alert" id="loginError"></div>
           </div>
         </section>
       </main>
@@ -69,5 +70,54 @@
         </div>
       </footer>
     </div>
+    <script>
+      const loginForm = document.getElementById("loginForm");
+      const loginError = document.getElementById("loginError");
+
+      loginForm.addEventListener("submit", async (event) => {
+        event.preventDefault();
+        loginError.className = "alert";
+        loginError.style.display = "none";
+
+        const email = document.getElementById("loginEmail").value.trim().toLowerCase();
+        const password = document.getElementById("loginPassword").value.trim();
+
+        if (!email || !password) {
+          loginError.textContent = "Email e senha são obrigatórios.";
+          loginError.className = "alert alert--error";
+          return;
+        }
+
+        try {
+          const res = await fetch("/login", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ email, password })
+          });
+          const data = await res.json().catch(() => ({}));
+          if (!res.ok) {
+            throw new Error(data.error || data.message || "Falha ao entrar.");
+          }
+
+          const clientId = data.client_id || "";
+          const apiKey = data.api_key || "";
+          if (clientId) {
+            localStorage.setItem("leadrank_client_id", clientId);
+            localStorage.setItem("client_id", clientId);
+            localStorage.setItem("LR_CLIENT_ID", clientId);
+          }
+          if (apiKey) {
+            localStorage.setItem("leadrank_api_key", apiKey);
+            localStorage.setItem("api_key", apiKey);
+            localStorage.setItem("LR_API_KEY", apiKey);
+          }
+
+          window.location.href = `index.html?client_id=${encodeURIComponent(clientId)}&api_key=${encodeURIComponent(apiKey)}`;
+        } catch (err) {
+          loginError.textContent = err.message || "Erro de conexão. Tente novamente.";
+          loginError.className = "alert alert--error";
+        }
+      });
+    </script>
   </body>
 </html>

@@ -86,21 +86,22 @@
         <div class="msg" id="msg"></div>
 
         <div style="margin-top:14px" class="row">
-          <div class="card" style="padding:14px; box-shadow:none">
-            <h2>Leads quentes de hoje</h2>
-            <div id="hotWrap" class="muted">Carregue o dashboard para ver.</div>
-          </div>
-          <div class="card" style="padding:14px; box-shadow:none">
-            <h2>Top origens (30d)</h2>
-            <div id="origWrap" class="muted">Carregue o dashboard para ver.</div>
-          </div>
-        </div>
+  <div class="card" style="padding:14px; box-shadow:none">
+    <h2>Temperatura dos leads</h2>
+    <p class="muted" style="margin:0 0 10px">Quentes • Mornos • Frios • Pendentes</p>
+    <div style="position:relative; height:240px"><canvas id="funnelChart"></canvas></div>
+  </div>
+  <div class="card" style="padding:14px; box-shadow:none">
+    <h2>Status do pipeline</h2>
+    <p class="muted" style="margin:0 0 10px">Convertidos • Negados • Pendentes</p>
+    <div style="position:relative; height:240px"><canvas id="statusChart"></canvas></div>
+  </div>
+</div>
 
-        <div style="margin-top:14px" class="card" style="padding:14px">
-          <h2>Últimos leads</h2>
-          <div id="tableWrap" class="muted">Carregue o dashboard para ver.</div>
-        </div>
-      </div>
+<div style="margin-top:14px" class="card" style="padding:14px">
+  <h2>Resumo</h2>
+  <div class="muted" id="summaryWrap">Carregue o dashboard para ver.</div>
+</div>
 
       <div class="card">
         <h2>Conexão</h2>
@@ -135,6 +136,7 @@
     </div>
   </div>
 
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
 <script>
   const BACKEND = (window.BACKEND_URL || "https://qualificador-leads-i-a.onrender.com").replace(/\/$/, "");
 
@@ -198,40 +200,91 @@
     container.innerHTML = html;
   }
 
-  async function loadDashboard(){
-    msg.style.display="none";
-    const {client_id} = getAuth();
-    wsPill.textContent = "workspace: " + (client_id || "—");
+  let __funnelChart = null;
+let __statusChart = null;
 
-    try{
-      const data = await window.__lr.lrApi("/dashboard_data", {method:"GET"});
+function renderCharts(f){
+  const hot = Number(f.hot || 0);
+  const warm = Number(f.warm || 0);
+  const cold = Number(f.cold || 0);
+  const pend = Number(f.pendentes || 0);
 
-      el("kpiConv").textContent = data.convertidos ?? "—";
-      el("kpiNeg").textContent = data.negados ?? "—";
-      el("kpiPend").textContent = data.pendentes ?? "—";
+  const conv = Number(f.convertidos || 0);
+  const neg = Number(f.negados || 0);
 
-      renderList(el("origWrap"), data.top_origens_30d || [], [
-        {key:"origem", label:"Origem"}, {key:"total", label:"Total"}
-      ]);
+  const ctx1 = document.getElementById("funnelChart");
+  const ctx2 = document.getElementById("statusChart");
 
-      renderList(el("hotWrap"), data.hot_leads_today || [], [
-        {key:"nome", label:"Nome"}, {key:"origem", label:"Origem"}, {key:"score", label:"Score"}, {key:"probabilidade", label:"Prob"}
-      ]);
+  if (window.Chart){
+    if (__funnelChart) __funnelChart.destroy();
+    if (__statusChart) __statusChart.destroy();
 
-      renderList(el("tableWrap"), data.dados || [], [
-        {key:"created_at", label:"Criado"},
-        {key:"nome", label:"Nome"},
-        {key:"origem", label:"Origem"},
-        {key:"score", label:"Score"},
-        {key:"probabilidade", label:"Prob"},
-        {key:"virou_cliente", label:"Virou?"}
-      ]);
+    __funnelChart = new Chart(ctx1, {
+      type: "bar",
+      data: {
+        labels: ["Quentes", "Mornos", "Frios", "Pendentes"],
+        datasets: [{ label: "Leads", data: [hot, warm, cold, pend] }]
+      },
+      options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        plugins: { legend: { display: false } },
+        scales: { y: { beginAtZero: true, ticks: { precision: 0 } } }
+      }
+    });
 
-      setMsg("ok", "Dashboard carregado.");
-    }catch(e){
-      setMsg("err", "Erro ao carregar: " + e.message);
-    }
+    __statusChart = new Chart(ctx2, {
+      type: "doughnut",
+      data: {
+        labels: ["Convertidos", "Negados", "Pendentes"],
+        datasets: [{ data: [conv, neg, pend] }]
+      },
+      options: { responsive: true, maintainAspectRatio: false }
+    });
   }
+}
+
+function renderSummary(f){
+  const total = Number(f.total || 0);
+  const rate = Number(f.conversion_rate_labeled || 0);
+  const ratePct = (rate*100).toFixed(1) + "%";
+  const html = `
+    <div class="kpis" style="margin-top:8px">
+      <div class="kpi"><div class="muted">Total de leads</div><div class="v">${total}</div></div>
+      <div class="kpi"><div class="muted">Quentes</div><div class="v">${Number(f.hot||0)}</div></div>
+      <div class="kpi"><div class="muted">Taxa (labeled)</div><div class="v">${ratePct}</div></div>
+    </div>
+    <p class="muted" style="margin:10px 0 0; font-size:13px">
+      *Taxa calculada apenas em leads com status (convertido/negado). Pendentes não entram no denominador.
+    </p>
+  `;
+  const wrap = el("summaryWrap");
+  if (wrap) wrap.innerHTML = html;
+}
+
+async function loadDashboard(){
+  msg.style.display="none";
+  const {client_id} = getAuth();
+  wsPill.textContent = "workspace: " + (client_id || "—");
+
+  try{
+    // endpoint já traz hot/warm/cold + convertidos/negados/pendentes
+    const f = await window.__lr.lrApi("/funnels", {method:"GET"});
+
+    el("kpiConv").textContent = f.convertidos ?? "—";
+    el("kpiNeg").textContent = f.negados ?? "—";
+    el("kpiPend").textContent = f.pendentes ?? "—";
+
+    renderCharts(f);
+    renderSummary(f);
+
+    setMsg("ok", "Dashboard carregado.");
+  }catch(e){
+    setMsg("err", "Erro ao carregar: " + e.message);
+  }
+}
+
+// events  }
 
   el("btnSave").onclick = () => {
     const client_id = el("clientId").value.trim();

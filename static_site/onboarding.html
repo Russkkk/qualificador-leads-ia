@@ -213,6 +213,12 @@
       // Backend URL (Render Web Service)
       const BACKEND = (window.BACKEND_URL || "https://qualificador-leads-i-a.onrender.com").replace(/\/$/, "");
 
+      function nextUrl(defaultUrl) {
+        const n = new URLSearchParams(location.search).get('next') || '';
+        return n ? n : defaultUrl;
+      }
+
+
       const form = document.getElementById("signupForm");
       const submitBtn = document.getElementById("submitBtn");
       const loading = document.getElementById("loading");
@@ -248,7 +254,7 @@ if (mode === "login") {
 
       function redirectToDashboard(clientId, apiKey){
         // mantém querystring só no primeiro acesso e depois o dashboard limpa
-        window.location.href = `index.html?client_id=${encodeURIComponent(clientId||"")}&api_key=${encodeURIComponent(apiKey||"")}`;
+        window.location.href = nextUrl(`index.html?client_id=${encodeURIComponent(clientId||"")}&api_key=${encodeURIComponent(apiKey||"")}`);
       }
 
       function showError(msg){

@@ -1,79 +1,83 @@
 <!doctype html>
 <html lang="pt-BR">
 <head>
-<meta charset="utf-8"/>
-<meta name="viewport" content="width=device-width, initial-scale=1"/>
-<title>LeadRank • Planos</title>
-<style>
-:root{--bg:#0a0e17;--card:#121826;--text:#e2e8f0;--muted:#94a3b8;--accent:#6366f1;--border:#1e2937;--radius:18px;--shadow:0 18px 60px rgba(0,0,0,.35);}
-*{box-sizing:border-box}
-body{margin:0;font-family:system-ui,-apple-system,Segoe UI,Roboto,Ubuntu,Cantarell,"Noto Sans",sans-serif;
-background: radial-gradient(1100px 700px at 10% -10%, rgba(99,102,241,.30), transparent 55%), var(--bg);
-color:var(--text);}
-header{max-width:1100px;margin:0 auto;padding:22px 16px;display:flex;align-items:center;justify-content:space-between;}
-.brand{font-weight:950}
-a{color:#c7d2fe;text-decoration:none;font-weight:800}
-.container{max-width:1100px;margin:0 auto;padding:10px 16px 40px;}
-h1{margin:12px 0 6px;font-size:34px}
-p{margin:0 0 14px;color:var(--muted);line-height:1.6}
-.grid{display:grid;grid-template-columns:repeat(3,1fr);gap:14px}
-@media(max-width:900px){.grid{grid-template-columns:1fr}}
-.card{background:rgba(18,24,38,.86);border:1px solid var(--border);border-radius:var(--radius);box-shadow:var(--shadow);padding:18px;}
-.tag{display:inline-flex;padding:6px 10px;border-radius:999px;border:1px solid var(--border);background:rgba(255,255,255,.03);color:var(--muted);font-size:12px;font-weight:900}
-.price{font-size:34px;font-weight:950;margin:10px 0}
-ul{margin:10px 0 0;padding-left:18px;color:var(--muted)}
-.btn{display:block;text-align:center;margin-top:14px;padding:12px 14px;border-radius:12px;border:0;background:var(--accent);color:#fff;font-weight:950}
-.btn.ghost{background:rgba(255,255,255,.06);border:1px solid var(--border);color:var(--text)}
-small{color:var(--muted)}
-</style>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>LeadRank • Planos</title>
+  <link rel="stylesheet" href="styles.css" />
 </head>
 <body>
-<header>
-  <div class="brand">LeadRank</div>
-  <div><a href="landing.html">Home</a> · <a href="onboarding.html">Começar</a></div>
-</header>
+  <div class="page">
+    <header class="site-header">
+      <a class="brand" href="landing.html">
+        <span class="brand__logo">LR</span>
+        <span class="brand__text">LeadRank</span>
+      </a>
+      <nav class="site-nav">
+        <a href="landing.html">Início</a>
+        <a href="pricing.html" aria-current="page">Planos</a>
+        <a href="onboarding.html">Criar conta</a>
+        <a href="login.html">Entrar</a>
+      </nav>
+      <a class="btn btn--ghost" href="index.html">Acessar dashboard</a>
+    </header>
 
-<div class="container">
-  <h1>Planos</h1>
-  <p>Comece no trial. Quando fizer sentido, faça upgrade.</p>
+    <main>
+      <section class="pricing">
+        <p class="eyebrow">Planos flexíveis para cada fase</p>
+        <h1>Escolha o plano ideal para o seu volume de leads</h1>
+        <p class="subtitle">
+          Comece no trial e evolua conforme a operação cresce. Todos os planos incluem métricas em tempo real e
+          integração via API.
+        </p>
 
-  <div class="grid">
-    <div class="card">
-      <span class="tag">Trial • 14 dias</span>
-      <div class="price">R$ 0</div>
-      <small>Para validar o produto</small>
-      <ul>
-        <li>Até 100 leads/mês</li>
-        <li>Dashboard e export CSV</li>
-        <li>API Key do workspace</li>
-      </ul>
-      <a class="btn" href="onboarding.html">Começar grátis</a>
-    </div>
+        <div class="pricing__grid">
+          <article class="card">
+            <span class="pricing__tag">Trial • 14 dias</span>
+            <div class="pricing__price">R$ 0</div>
+            <p class="subtitle">Valide o produto com o time comercial.</p>
+            <ul class="pricing__list">
+              <li>Até 100 leads por mês</li>
+              <li>Dashboard completo</li>
+              <li>Exportação CSV</li>
+            </ul>
+            <a class="btn btn--block" href="onboarding.html">Começar grátis</a>
+          </article>
 
-    <div class="card">
-      <span class="tag">Starter</span>
-      <div class="price">R$ 79</div>
-      <small>Para operação constante</small>
-      <ul>
-        <li>Até 1.000 leads/mês</li>
-        <li>Insights + funil</li>
-        <li>Suporte padrão</li>
-      </ul>
-      <a class="btn ghost" href="onboarding.html?mode=login">Entrar e ativar</a>
-    </div>
+          <article class="card">
+            <span class="pricing__tag">Starter</span>
+            <div class="pricing__price">R$ 79</div>
+            <p class="subtitle">Operação contínua com suporte padrão.</p>
+            <ul class="pricing__list">
+              <li>Até 1.000 leads por mês</li>
+              <li>Insights por origem</li>
+              <li>Relatórios rápidos</li>
+            </ul>
+            <a class="btn btn--ghost btn--block" href="index.html?upgrade=starter">Ativar agora</a>
+          </article>
 
-    <div class="card">
-      <span class="tag">Pro</span>
-      <div class="price">R$ 179</div>
-      <small>Para times e tráfego</small>
-      <ul>
-        <li>Até 5.000 leads/mês</li>
-        <li>Integrações e automações</li>
-        <li>Suporte prioritário</li>
-      </ul>
-      <a class="btn ghost" href="onboarding.html?mode=login">Entrar e ativar</a>
-    </div>
+          <article class="card">
+            <span class="pricing__tag">Pro</span>
+            <div class="pricing__price">R$ 179</div>
+            <p class="subtitle">Times com alto volume e integrações.</p>
+            <ul class="pricing__list">
+              <li>Até 5.000 leads por mês</li>
+              <li>Automação e integrações</li>
+              <li>Suporte prioritário</li>
+            </ul>
+            <a class="btn btn--ghost btn--block" href="index.html?upgrade=pro">Ativar agora</a>
+          </article>
+        </div>
+      </section>
+    </main>
+
+    <footer class="site-footer">
+      <span>© 2024 LeadRank. Todos os direitos reservados.</span>
+      <div class="footer__links">
+        <a href="landing.html">Início</a>
+        <a href="onboarding.html">Criar conta</a>
+      </div>
+    </footer>
   </div>
-</div>
 </body>
 </html>

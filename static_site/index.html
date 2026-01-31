@@ -1,365 +1,407 @@
 <!doctype html>
 <html lang="pt-BR">
 <head>
-  <meta charset="utf-8"/>
-  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>LeadRank • Dashboard</title>
-  <style>
-    :root{
-      --bg:#0a0e17; --card:#121826; --text:#e2e8f0; --muted:#94a3b8;
-      --accent:#6366f1; --border:#1e2937; --danger:#ef4444; --ok:#22c55e;
-      --radius:18px; --shadow: 0 18px 60px rgba(0,0,0,.35);
-    }
-    *{box-sizing:border-box}
-    body{
-      margin:0; font-family:system-ui,-apple-system,Segoe UI,Roboto,Ubuntu,Cantarell,"Noto Sans",sans-serif;
-      background: radial-gradient(1100px 700px at 10% -10%, rgba(99,102,241,.30), transparent 55%),
-                  radial-gradient(900px 500px at 100% 10%, rgba(34,197,94,.14), transparent 55%),
-                  var(--bg);
-      color:var(--text);
-    }
-    .top{
-      position:sticky; top:0; z-index:10;
-      background: rgba(10,14,23,.72);
-      backdrop-filter: blur(10px);
-      border-bottom:1px solid var(--border);
-    }
-    .bar{max-width:1100px; margin:0 auto; padding:14px 16px; display:flex; gap:12px; align-items:center; justify-content:space-between;}
-    .brand{display:flex; align-items:center; gap:10px; font-weight:900; letter-spacing:.2px}
-    .pill{font-size:12px; color:var(--muted); padding:6px 10px; border:1px solid var(--border); border-radius:999px; background: rgba(255,255,255,.03);}
-    .container{max-width:1100px; margin:0 auto; padding:20px 16px 40px;}
-    .grid{display:grid; grid-template-columns: 1.2fr .8fr; gap:16px;}
-    @media (max-width:920px){.grid{grid-template-columns:1fr}}
-    .card{background: rgba(18,24,38,.86); border:1px solid var(--border); border-radius: var(--radius); box-shadow: var(--shadow); padding:16px;}
-    h1{margin:0; font-size:18px;}
-    h2{margin:0 0 10px; font-size:14px; color:var(--muted); font-weight:800; text-transform:uppercase; letter-spacing:.09em;}
-    .row{display:grid; grid-template-columns:1fr 1fr; gap:10px;}
-    @media (max-width:520px){.row{grid-template-columns:1fr}}
-    label{display:block; font-size:12px; color:var(--muted); margin:8px 0 6px;}
-    input{
-      width:100%; padding:11px 12px; border-radius: 12px;
-      border:1px solid var(--border); background: rgba(10,14,23,.55); color: var(--text);
-      outline:none;
-    }
-    input:focus{border-color: rgba(99,102,241,.6); box-shadow:0 0 0 4px rgba(99,102,241,.12);}
-    .btn{padding:11px 12px; border-radius: 12px; border:0; cursor:pointer; font-weight:900;}
-    .btn.primary{background: var(--accent); color:#fff;}
-    .btn.ghost{background: rgba(255,255,255,.06); border:1px solid var(--border); color: var(--text);}
-    .btn.small{padding:9px 10px; font-size:13px}
-    .actions{display:flex; gap:10px; flex-wrap:wrap; margin-top:10px;}
-    .kpis{display:grid; grid-template-columns:repeat(3,1fr); gap:10px;}
-    @media (max-width:720px){.kpis{grid-template-columns:1fr}}
-    .kpi{padding:12px; border-radius: 14px; border:1px solid var(--border); background: rgba(255,255,255,.03);}
-    .kpi .v{font-size:28px; font-weight:950; margin-top:4px;}
-    .muted{color:var(--muted)}
-    .msg{display:none; margin-top:10px; padding:12px; border-radius: 12px; border:1px solid var(--border); background: rgba(255,255,255,.03);}
-    .msg.ok{display:block; border-color: rgba(34,197,94,.35); background: rgba(34,197,94,.08);}
-    .msg.err{display:block; border-color: rgba(239,68,68,.35); background: rgba(239,68,68,.08);}
-    table{width:100%; border-collapse: collapse; font-size:13px;}
-    th,td{padding:10px 8px; border-bottom:1px solid var(--border); text-align:left; vertical-align:top;}
-    th{color: var(--muted); font-weight:900; font-size:12px; text-transform:uppercase; letter-spacing:.08em;}
-    .right{text-align:right}
-    a{color:#c7d2fe}
-    code{display:block; padding:10px; background: rgba(10,14,23,.6); border:1px solid var(--border); border-radius: 12px; overflow:auto;}
-  </style>
+  <link rel="stylesheet" href="styles.css" />
 </head>
 <body>
-  <div class="top">
-    <div class="bar">
-      <div class="brand">LeadRank <span class="pill" id="wsPill">workspace: —</span></div>
-      <div style="display:flex; gap:10px; align-items:center">
-        <a class="pill" href="onboarding.html?mode=login" style="text-decoration:none">Entrar / trocar conta</a>
-      </div>
-    </div>
-  </div>
+  <div class="page">
+    <header class="site-header">
+      <a class="brand" href="landing.html">
+        <span class="brand__logo">LR</span>
+        <span class="brand__text">LeadRank</span>
+      </a>
+      <nav class="site-nav">
+        <a href="landing.html">Início</a>
+        <a href="pricing.html">Planos</a>
+        <a href="onboarding.html">Criar conta</a>
+        <a href="login.html">Entrar</a>
+      </nav>
+      <a class="btn btn--ghost" href="onboarding.html?mode=login">Trocar conta</a>
+    </header>
 
-  <div class="container">
-    <div class="grid">
-      <div class="card">
-        <h2>Visão geral</h2>
-        <div class="kpis">
-          <div class="kpi"><div class="muted">Convertidos</div><div class="v" id="kpiConv">—</div></div>
-          <div class="kpi"><div class="muted">Negados</div><div class="v" id="kpiNeg">—</div></div>
-          <div class="kpi"><div class="muted">Pendentes</div><div class="v" id="kpiPend">—</div></div>
-        </div>
-
-        <div class="msg" id="msg"></div>
-
-        <div style="margin-top:14px" class="row">
-  <div class="card" style="padding:14px; box-shadow:none">
-    <h2>Temperatura dos leads</h2>
-    <p class="muted" style="margin:0 0 10px">Quentes • Mornos • Frios • Pendentes</p>
-    <div style="position:relative; height:240px"><canvas id="funnelChart"></canvas></div>
-  </div>
-  <div class="card" style="padding:14px; box-shadow:none">
-    <h2>Status do pipeline</h2>
-    <p class="muted" style="margin:0 0 10px">Convertidos • Negados • Pendentes</p>
-    <div style="position:relative; height:240px"><canvas id="statusChart"></canvas></div>
-  </div>
-</div>
-
-<div style="margin-top:14px" class="card" style="padding:14px">
-  <h2>Resumo</h2>
-  <div class="muted" id="summaryWrap">Carregue o dashboard para ver.</div>
-</div>
-
-      <div class="card">
-        <h2>Conexão</h2>
-        <div class="row">
+    <main>
+      <section class="dashboard">
+        <div class="dashboard__header">
           <div>
-            <label for="clientId">client_id</label>
-            <input id="clientId" placeholder="trial-..." />
+            <p class="eyebrow">Dashboard</p>
+            <h1 class="dashboard__title">Visão geral do funil</h1>
+            <p class="subtitle">Acompanhe o desempenho dos leads e ajuste prioridades rapidamente.</p>
           </div>
-          <div>
-            <label for="apiKey">api_key</label>
-            <input id="apiKey" placeholder="sk_live_..." />
-          </div>
+          <div class="pill pill--muted" id="wsPill">workspace: —</div>
         </div>
-        <div class="actions">
-          <button class="btn primary" id="btnSave">Salvar</button>
-          <button class="btn ghost" id="btnLoad">Carregar dashboard</button>
-          <button class="btn ghost" id="btnExport">Exportar CSV</button>
-        </div>
-        <p class="muted" style="margin:12px 0 0; font-size:13px">
-          A API Key é usada no header <code style="display:inline; padding:2px 6px">X-API-KEY</code>.
-        </p>
 
-        <div class="card" style="margin-top:14px; padding:14px; box-shadow:none">
-          <h2>Teste rápido</h2>
-          <p class="muted" style="margin:0 0 10px">Envie um lead e veja o score.</p>
-          <button class="btn small ghost" id="btnTest">Enviar 1 lead de teste</button>
-          <button class="btn primary" id="btnSeed10" style="margin-top:10px; width:100%; box-shadow:0 10px 30px rgba(99,102,241,.35)">🚀 Gerar 10 leads de teste (recomendado)</button>
-          <p class="muted" style="margin:10px 0 0; font-size:13px">Isso ajuda a IA calibrar melhor o score/probabilidade.</p>
-          <div class="msg" id="testMsg"></div>
+        <div class="dashboard__grid">
+          <div class="card">
+            <h2>Indicadores principais</h2>
+            <div class="dashboard__kpis">
+              <div class="kpi">
+                <div class="text-muted">Convertidos</div>
+                <div class="kpi__value" id="kpiConv">—</div>
+              </div>
+              <div class="kpi">
+                <div class="text-muted">Negados</div>
+                <div class="kpi__value" id="kpiNeg">—</div>
+              </div>
+              <div class="kpi">
+                <div class="text-muted">Pendentes</div>
+                <div class="kpi__value" id="kpiPend">—</div>
+              </div>
+            </div>
+
+            <div class="alert" id="msg"></div>
+
+            <div class="dashboard__charts">
+              <div class="card card--soft">
+                <h3>Temperatura dos leads</h3>
+                <p class="text-muted">Quentes, mornos, frios e pendentes.</p>
+                <div class="dashboard__chart"><canvas id="funnelChart"></canvas></div>
+              </div>
+              <div class="card card--soft">
+                <h3>Status do pipeline</h3>
+                <p class="text-muted">Convertidos, negados e pendentes.</p>
+                <div class="dashboard__chart"><canvas id="statusChart"></canvas></div>
+              </div>
+            </div>
+
+            <div class="card card--soft" style="margin-top:16px">
+              <h3>Resumo</h3>
+              <div class="text-muted" id="summaryWrap">Carregue o dashboard para ver.</div>
+            </div>
+          </div>
+
+          <div class="card">
+            <h2>Conexão</h2>
+            <form class="form" onsubmit="return false;">
+              <label for="clientId">
+                client_id
+                <input id="clientId" placeholder="trial-..." />
+              </label>
+              <label for="apiKey">
+                api_key
+                <input id="apiKey" placeholder="sk_live_..." />
+              </label>
+              <div class="button-group">
+                <button class="btn btn--small" type="button" id="btnSave">Salvar</button>
+                <button class="btn btn--ghost btn--small" type="button" id="btnLoad">Carregar dashboard</button>
+                <button class="btn btn--ghost btn--small" type="button" id="btnExport">Exportar CSV</button>
+              </div>
+              <p class="form__hint">
+                A API Key é usada no header <code>X-API-KEY</code>.
+              </p>
+            </form>
+
+            <div class="card card--soft" style="margin-top:16px">
+              <h3>Teste rápido</h3>
+              <p class="text-muted">Envie um lead e veja o score calculado.</p>
+              <div class="button-group" style="margin-top:12px">
+                <button class="btn btn--ghost btn--small" id="btnTest">Enviar 1 lead de teste</button>
+                <button class="btn btn--small" id="btnSeed10">Gerar 10 leads de teste</button>
+              </div>
+              <p class="text-muted" style="margin-top:12px">Isso ajuda a IA calibrar melhor score e probabilidade.</p>
+              <div class="alert" id="testMsg"></div>
+            </div>
+          </div>
         </div>
+      </section>
+    </main>
+
+    <footer class="site-footer">
+      <span>© 2024 LeadRank. Todos os direitos reservados.</span>
+      <div class="footer__links">
+        <a href="landing.html">Início</a>
+        <a href="pricing.html">Planos</a>
+        <a href="onboarding.html">Criar conta</a>
       </div>
-    </div>
+    </footer>
   </div>
 
-<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
-<script>
-  const BACKEND = (window.BACKEND_URL || "https://qualificador-leads-i-a.onrender.com").replace(/\/$/, "");
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js">
 
-  function qs(name){ return new URLSearchParams(location.search).get(name) || ""; }
-  function getAuth(){
-    return {
-      client_id: qs("client_id") || localStorage.getItem("leadrank_client_id") || localStorage.getItem("client_id") || localStorage.getItem("LR_CLIENT_ID") || "",
-      api_key: qs("api_key") || localStorage.getItem("leadrank_api_key") || localStorage.getItem("api_key") || localStorage.getItem("LR_API_KEY") || ""
-    };
-  }
-  function setAuth(client_id, api_key){
-    localStorage.setItem("leadrank_client_id", client_id);
-    localStorage.setItem("leadrank_api_key", api_key);
-    localStorage.setItem("client_id", client_id);
-    localStorage.setItem("api_key", api_key);
-    localStorage.setItem("LR_CLIENT_ID", client_id);
-    localStorage.setItem("LR_API_KEY", api_key);
-    // limpa querystring para não ficar expondo
-    if (qs("client_id") || qs("api_key")) {
-      history.replaceState({}, "", "index.html");
-    }
-  }
+document.addEventListener('DOMContentLoaded', () => { try { if (goToUpgradeIfRequested()) return; } catch(e){} });
 
-  window.__lr = {
-    async lrApi(path, {method="GET", body=null, headers={}} = {}){
-      const {client_id, api_key} = getAuth();
-      const url = new URL(BACKEND + path);
-      if (client_id && method === "GET") url.searchParams.set("client_id", client_id);
-
-      const h = {"Content-Type":"application/json", ...headers};
-      if (api_key) h["X-API-KEY"] = api_key;
-
-      const res = await fetch(url.toString(), {
-        method,
-        headers: h,
-        body: body ? JSON.stringify(body) : null
-      });
-      const data = await res.json().catch(() => ({}));
-      if (!res.ok) throw new Error(data.error || data.message || ("HTTP " + res.status));
-      return data;
-    }
-  };
-
-  const el = (id) => document.getElementById(id);
-  const msg = el("msg");
-  const wsPill = el("wsPill");
-
-  function setMsg(type, text){
-    msg.className = "msg " + (type || "");
-    msg.style.display = "block";
-    msg.textContent = text;
-  }
-
-  function renderList(container, rows, cols){
-    if (!rows || !rows.length){ container.innerHTML = "<div class='muted'>—</div>"; return; }
-    let html = "<table><thead><tr>" + cols.map(c=>`<th>${c.label}</th>`).join("") + "</tr></thead><tbody>";
-    for (const r of rows){
-      html += "<tr>" + cols.map(c=>`<td>${(r[c.key] ?? "—")}</td>`).join("") + "</tr>";
-    }
-    html += "</tbody></table>";
-    container.innerHTML = html;
-  }
-
-  let __funnelChart = null;
-let __statusChart = null;
-
-function renderCharts(f){
-  const hot = Number(f.hot || 0);
-  const warm = Number(f.warm || 0);
-  const cold = Number(f.cold || 0);
-  const pend = Number(f.pendentes || 0);
-
-  const conv = Number(f.convertidos || 0);
-  const neg = Number(f.negados || 0);
-
-  const ctx1 = document.getElementById("funnelChart");
-  const ctx2 = document.getElementById("statusChart");
-
-  if (window.Chart){
-    if (__funnelChart) __funnelChart.destroy();
-    if (__statusChart) __statusChart.destroy();
-
-    __funnelChart = new Chart(ctx1, {
-      type: "bar",
-      data: {
-        labels: ["Quentes", "Mornos", "Frios", "Pendentes"],
-        datasets: [{ label: "Leads", data: [hot, warm, cold, pend] }]
-      },
-      options: {
-        responsive: true,
-        maintainAspectRatio: false,
-        plugins: { legend: { display: false } },
-        scales: { y: { beginAtZero: true, ticks: { precision: 0 } } }
-      }
-    });
-
-    __statusChart = new Chart(ctx2, {
-      type: "doughnut",
-      data: {
-        labels: ["Convertidos", "Negados", "Pendentes"],
-        datasets: [{ data: [conv, neg, pend] }]
-      },
-      options: { responsive: true, maintainAspectRatio: false }
-    });
-  }
-}
-
-function renderSummary(f){
-  const total = Number(f.total || 0);
-  const rate = Number(f.conversion_rate_labeled || 0);
-  const ratePct = (rate*100).toFixed(1) + "%";
-  const html = `
-    <div class="kpis" style="margin-top:8px">
-      <div class="kpi"><div class="muted">Total de leads</div><div class="v">${total}</div></div>
-      <div class="kpi"><div class="muted">Quentes</div><div class="v">${Number(f.hot||0)}</div></div>
-      <div class="kpi"><div class="muted">Taxa (labeled)</div><div class="v">${ratePct}</div></div>
-    </div>
-    <p class="muted" style="margin:10px 0 0; font-size:13px">
-      *Taxa calculada apenas em leads com status (convertido/negado). Pendentes não entram no denominador.
-    </p>
-  `;
-  const wrap = el("summaryWrap");
-  if (wrap) wrap.innerHTML = html;
-}
-
-async function loadDashboard(){
-  msg.style.display="none";
-  const {client_id} = getAuth();
-  wsPill.textContent = "workspace: " + (client_id || "—");
-
-  try{
-    // endpoint já traz hot/warm/cold + convertidos/negados/pendentes
-    const f = await window.__lr.lrApi("/funnels", {method:"GET"});
-
-    el("kpiConv").textContent = f.convertidos ?? "—";
-    el("kpiNeg").textContent = f.negados ?? "—";
-    el("kpiPend").textContent = f.pendentes ?? "—";
-
-    renderCharts(f);
-    renderSummary(f);
-
-    setMsg("ok", "Dashboard carregado.");
-  }catch(e){
-    setMsg("err", "Erro ao carregar: " + e.message);
-  }
-}
-
-// events  }
-
-  el("btnSave").onclick = () => {
-    const client_id = el("clientId").value.trim();
-    const api_key = el("apiKey").value.trim();
-    setAuth(client_id, api_key);
-    wsPill.textContent = "workspace: " + (client_id || "—");
-    setMsg("ok", "Dados salvos.");
-  };
-
-  el("btnLoad").onclick = loadDashboard;
-
-  el("btnExport").onclick = () => {
-    const {client_id, api_key} = getAuth();
-    if (!client_id) return setMsg("err", "Informe o client_id.");
-    // CSV é endpoint GET: passamos client_id na querystring
-    const url = new URL(BACKEND + "/leads_export.csv");
-    url.searchParams.set("client_id", client_id);
-    // api_key é header, não dá pra abrir em nova aba com header.
-    // então, se tiver api_key, avisamos para baixar via fetch (padrão simples).
-    if (api_key){
-      setMsg("err", "Para export com API Key, use o botão (futuramente) ou desative auth por api_key no workspace.");
-      return;
-    }
-    window.location.href = url.toString();
-  };
-
-  el("btnTest").onclick = async () => {
-    const t = el("testMsg");
-    t.className="msg"; t.style.display="none";
-    try{
-      const {client_id} = getAuth();
-      if (!client_id) throw new Error("Informe client_id e api_key.");
-      const data = await window.__lr.lrApi("/prever", {method:"POST", body:{
-        client_id,
-        nome:"Lead Teste",
-        email_lead:"teste@exemplo.com",
-        telefone:"11999990000",
-        origem:"onboarding",
-        tempo_site: 180,
-        paginas_visitadas: 4,
-        clicou_preco: 1
-      }});
-      t.className="msg ok"; t.style.display="block";
-      t.innerHTML = `✅ Lead criado. score=${data.score} prob=${data.probabilidade}`;
-    }catch(e){
-      t.className="msg err"; t.style.display="block";
-      t.textContent = "Erro: " + e.message;
-    }
-  };
-
-  el("btnSeed10").onclick = async () => {
-    const t = el("testMsg");
-    t.className="msg"; t.style.display="none";
-    try{
-      const {client_id} = getAuth();
-      if (!client_id) throw new Error("Informe client_id e api_key.");
-      const data = await window.__lr.lrApi("/seed_test_leads", {method:"POST", body:{ client_id, count: 10 }});
-      t.className="msg ok"; t.style.display="block";
-      t.innerHTML = `✅ ${data.inserted || 0} leads criados. Recarregando dashboard...`;
-      await loadDashboard();
-    }catch(e){
-      t.className="msg err"; t.style.display="block";
-      t.textContent = "Erro: " + e.message;
-    }
-  };
-
-
-  // Init from auth
-  (function init(){
-    const {client_id, api_key} = getAuth();
-    el("clientId").value = client_id;
-    el("apiKey").value = api_key;
-    wsPill.textContent = "workspace: " + (client_id || "—");
-    if (client_id) loadDashboard();
-  })();
 </script>
+  <script>
+    const BACKEND = (window.BACKEND_URL || "https://qualificador-leads-i-a.onrender.com").replace(/\/$/, "");
+// === Kiwify checkout links (substitua pelos seus links) ===
+const KIWIFY_CHECKOUT = {
+  starter: (window.KIWIFY_CHECKOUT_STARTER || "").trim(), // ex: "https://pay.kiwify.com.br/SEU_LINK"
+  pro: (window.KIWIFY_CHECKOUT_PRO || "").trim()
+};
+
+function buildKiwifyUrl(base, { client_id, plan }) {
+  if (!base) return "";
+  const u = new URL(base);
+  // s1/s2: parâmetros simples para identificar o comprador no seu sistema
+  u.searchParams.set("s1", client_id || "");
+  u.searchParams.set("s2", plan || "");
+  // UTMs (opcional)
+  if (!u.searchParams.get("utm_source")) u.searchParams.set("utm_source", "website");
+  if (!u.searchParams.get("utm_medium")) u.searchParams.set("utm_medium", "checkout");
+  if (!u.searchParams.get("utm_campaign")) u.searchParams.set("utm_campaign", "pricing");
+  return u.toString();
+}
+
+function goToUpgradeIfRequested() {
+  const plan = (qs("upgrade") || "").toLowerCase();
+  if (!plan) return false;
+
+  const { client_id, api_key } = getAuth();
+  if (!client_id || !api_key) {
+    const next = `index.html?upgrade=${encodeURIComponent(plan)}`;
+    window.location.href = `onboarding.html?mode=login&next=${encodeURIComponent(next)}`;
+    return true;
+  }
+
+  const base = KIWIFY_CHECKOUT[plan] || "";
+  const url = buildKiwifyUrl(base, { client_id, plan });
+  if (!url) {
+    alert("Checkout ainda não configurado: defina KIWIFY_CHECKOUT_STARTER/PRO ou edite o index.html com seus links da Kiwify.");
+    return true;
+  }
+  window.location.href = url;
+  return true;
+}
+
+    function qs(name) {
+      return new URLSearchParams(location.search).get(name) || "";
+    }
+    function getAuth() {
+      return {
+        client_id: qs("client_id") || localStorage.getItem("leadrank_client_id") || localStorage.getItem("client_id") || localStorage.getItem("LR_CLIENT_ID") || "",
+        api_key: qs("api_key") || localStorage.getItem("leadrank_api_key") || localStorage.getItem("api_key") || localStorage.getItem("LR_API_KEY") || ""
+      };
+    }
+    function setAuth(client_id, api_key) {
+      localStorage.setItem("leadrank_client_id", client_id);
+      localStorage.setItem("leadrank_api_key", api_key);
+      localStorage.setItem("client_id", client_id);
+      localStorage.setItem("api_key", api_key);
+      localStorage.setItem("LR_CLIENT_ID", client_id);
+      localStorage.setItem("LR_API_KEY", api_key);
+      if (qs("client_id") || qs("api_key")) {
+        history.replaceState({}, "", "index.html");
+      }
+    }
+
+    window.__lr = {
+      async lrApi(path, { method = "GET", body = null, headers = {} } = {}) {
+        const { client_id, api_key } = getAuth();
+        const url = new URL(BACKEND + path);
+        if (client_id && method === "GET") url.searchParams.set("client_id", client_id);
+
+        const h = { "Content-Type": "application/json", ...headers };
+        if (api_key) h["X-API-KEY"] = api_key;
+
+        const res = await fetch(url.toString(), {
+          method,
+          headers: h,
+          body: body ? JSON.stringify(body) : null
+        });
+        const data = await res.json().catch(() => ({}));
+        if (!res.ok) throw new Error(data.error || data.message || ("HTTP " + res.status));
+        return data;
+      }
+    };
+
+    const el = (id) => document.getElementById(id);
+    const msg = el("msg");
+    const wsPill = el("wsPill");
+
+    function setMsg(type, text) {
+      msg.className = "alert" + (type ? " " + type : "");
+      msg.style.display = "block";
+      msg.textContent = text;
+    }
+
+    function renderList(container, rows, cols) {
+      if (!rows || !rows.length) {
+        container.innerHTML = "<div class='text-muted'>—</div>";
+        return;
+      }
+      let html = "<table class='data-table'><thead><tr>" + cols.map((c) => `<th>${c.label}</th>`).join("") + "</tr></thead><tbody>";
+      for (const r of rows) {
+        html += "<tr>" + cols.map((c) => `<td>${r[c.key] ?? "—"}</td>`).join("") + "</tr>";
+      }
+      html += "</tbody></table>";
+      container.innerHTML = html;
+    }
+
+    let __funnelChart = null;
+    let __statusChart = null;
+
+    function renderCharts(f) {
+      const hot = Number(f.hot || 0);
+      const warm = Number(f.warm || 0);
+      const cold = Number(f.cold || 0);
+      const pend = Number(f.pendentes || 0);
+
+      const conv = Number(f.convertidos || 0);
+      const neg = Number(f.negados || 0);
+
+      const ctx1 = document.getElementById("funnelChart");
+      const ctx2 = document.getElementById("statusChart");
+
+      if (window.Chart) {
+        if (__funnelChart) __funnelChart.destroy();
+        if (__statusChart) __statusChart.destroy();
+
+        __funnelChart = new Chart(ctx1, {
+          type: "bar",
+          data: {
+            labels: ["Quentes", "Mornos", "Frios", "Pendentes"],
+            datasets: [{ label: "Leads", data: [hot, warm, cold, pend] }]
+          },
+          options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: { legend: { display: false } },
+            scales: { y: { beginAtZero: true, ticks: { precision: 0 } } }
+          }
+        });
+
+        __statusChart = new Chart(ctx2, {
+          type: "doughnut",
+          data: {
+            labels: ["Convertidos", "Negados", "Pendentes"],
+            datasets: [{ data: [conv, neg, pend] }]
+          },
+          options: { responsive: true, maintainAspectRatio: false }
+        });
+      }
+    }
+
+    function renderSummary(f) {
+      const total = Number(f.total || 0);
+      const rate = Number(f.conversion_rate_labeled || 0);
+      const ratePct = (rate * 100).toFixed(1) + "%";
+      const html = `
+        <div class="dashboard__kpis" style="margin-top:12px">
+          <div class="kpi">
+            <div class="text-muted">Total de leads</div>
+            <div class="kpi__value">${total}</div>
+          </div>
+          <div class="kpi">
+            <div class="text-muted">Quentes</div>
+            <div class="kpi__value">${Number(f.hot || 0)}</div>
+          </div>
+          <div class="kpi">
+            <div class="text-muted">Taxa (labeled)</div>
+            <div class="kpi__value">${ratePct}</div>
+          </div>
+        </div>
+        <p class="text-muted" style="margin-top:12px">
+          Taxa calculada apenas em leads com status (convertido/negado). Pendentes não entram no denominador.
+        </p>
+      `;
+      const wrap = el("summaryWrap");
+      if (wrap) wrap.innerHTML = html;
+    }
+
+    async function loadDashboard() {
+      msg.style.display = "none";
+      const { client_id } = getAuth();
+      wsPill.textContent = "workspace: " + (client_id || "—");
+
+      try {
+        const f = await window.__lr.lrApi("/funnels", { method: "GET" });
+
+        el("kpiConv").textContent = f.convertidos ?? "—";
+        el("kpiNeg").textContent = f.negados ?? "—";
+        el("kpiPend").textContent = f.pendentes ?? "—";
+
+        renderCharts(f);
+        renderSummary(f);
+
+        setMsg("alert--success", "Dashboard carregado.");
+      } catch (e) {
+        setMsg("alert--error", "Erro ao carregar: " + e.message);
+      }
+    }
+
+    el("btnSave").onclick = () => {
+      const client_id = el("clientId").value.trim();
+      const api_key = el("apiKey").value.trim();
+      setAuth(client_id, api_key);
+      wsPill.textContent = "workspace: " + (client_id || "—");
+      setMsg("alert--success", "Dados salvos.");
+    };
+
+    el("btnLoad").onclick = loadDashboard;
+
+    el("btnExport").onclick = () => {
+      const { client_id, api_key } = getAuth();
+      if (!client_id) return setMsg("alert--error", "Informe o client_id.");
+      const url = new URL(BACKEND + "/leads_export.csv");
+      url.searchParams.set("client_id", client_id);
+      if (api_key) {
+        setMsg("alert--error", "Para exportar com API Key, faça o download via API ou desative a exigência.");
+        return;
+      }
+      window.location.href = url.toString();
+    };
+
+    el("btnTest").onclick = async () => {
+      const t = el("testMsg");
+      t.className = "alert";
+      t.style.display = "none";
+      try {
+        const { client_id } = getAuth();
+        if (!client_id) throw new Error("Informe client_id e api_key.");
+        const data = await window.__lr.lrApi("/prever", {
+          method: "POST",
+          body: {
+            client_id,
+            nome: "Lead Teste",
+            email_lead: "teste@exemplo.com",
+            telefone: "11999990000",
+            origem: "onboarding",
+            tempo_site: 180,
+            paginas_visitadas: 4,
+            clicou_preco: 1
+          }
+        });
+        t.className = "alert alert--success";
+        t.style.display = "block";
+        t.textContent = `Lead criado. score=${data.score} prob=${data.probabilidade}`;
+      } catch (e) {
+        t.className = "alert alert--error";
+        t.style.display = "block";
+        t.textContent = "Erro: " + e.message;
+      }
+    };
+
+    el("btnSeed10").onclick = async () => {
+      const t = el("testMsg");
+      t.className = "alert";
+      t.style.display = "none";
+      try {
+        const { client_id } = getAuth();
+        if (!client_id) throw new Error("Informe client_id e api_key.");
+        const data = await window.__lr.lrApi("/seed_test_leads", {
+          method: "POST",
+          body: { client_id, count: 10 }
+        });
+        t.className = "alert alert--success";
+        t.style.display = "block";
+        t.textContent = `${data.inserted || 0} leads criados. Recarregando dashboard...`;
+        await loadDashboard();
+      } catch (e) {
+        t.className = "alert alert--error";
+        t.style.display = "block";
+        t.textContent = "Erro: " + e.message;
+      }
+    };
+
+    (function init() {
+      const { client_id, api_key } = getAuth();
+      el("clientId").value = client_id;
+      el("apiKey").value = api_key;
+      wsPill.textContent = "workspace: " + (client_id || "—");
+      if (client_id) loadDashboard();
+    })();
+  </script>
 </body>
 </html>

@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>LeadRank | Entrar</title>
+    <link rel="stylesheet" href="styles.css" />
+  </head>
+  <body>
+    <div class="page">
+      <header class="site-header">
+        <a class="brand" href="landing.html">
+          <span class="brand__logo">LR</span>
+          <span class="brand__text">LeadRank</span>
+        </a>
+        <nav class="site-nav">
+          <a href="landing.html">Início</a>
+          <a href="pricing.html">Planos</a>
+          <a href="onboarding.html">Criar conta</a>
+          <a href="login.html" aria-current="page">Entrar</a>
+        </nav>
+        <a class="btn btn--ghost" href="index.html">Acessar dashboard</a>
+      </header>
+
+      <main>
+        <section class="auth">
+          <div class="auth__copy">
+            <p class="eyebrow">Bem-vindo de volta</p>
+            <h1>Acesse seu painel e acompanhe seus leads em tempo real.</h1>
+            <p class="subtitle">
+              Visualize rapidamente quais oportunidades estão prontas para fechar e quem precisa de
+              atenção imediata.
+            </p>
+            <div class="auth__metrics">
+              <div>
+                <strong>+1.200</strong>
+                <span>empresas usando LeadRank</span>
+              </div>
+              <div>
+                <strong>4.9/5</strong>
+                <span>satisfação média</span>
+              </div>
+            </div>
+          </div>
+          <div class="auth__card">
+            <form class="form" id="loginForm">
+              <h2>Entrar na plataforma</h2>
+              <label>
+                Email
+                <input name="email" id="loginEmail" type="email" placeholder="seu@email.com" required />
+              </label>
+              <label>
+                Senha
+                <input name="password" id="loginPassword" type="password" placeholder="Sua senha" required />
+              </label>
+              <button class="btn btn--block" type="submit">Acessar dashboard</button>
+              <p class="form__hint">Esqueceu sua senha? Entre em contato com o suporte.</p>
+            </form>
+            <div class="alert" id="loginError"></div>
+          </div>
+        </section>
+      </main>
+
+      <footer class="site-footer">
+        <span>© 2024 LeadRank. Todos os direitos reservados.</span>
+        <div class="footer__links">
+          <a href="landing.html">Início</a>
+          <a href="pricing.html">Planos</a>
+          <a href="onboarding.html">Criar conta</a>
+        </div>
+      </footer>
+    </div>
+    <script>
+      const loginForm = document.getElementById("loginForm");
+      const loginError = document.getElementById("loginError");
+
+      loginForm.addEventListener("submit", async (event) => {
+        event.preventDefault();
+        loginError.className = "alert";
+        loginError.style.display = "none";
+
+        const email = document.getElementById("loginEmail").value.trim().toLowerCase();
+        const password = document.getElementById("loginPassword").value.trim();
+
+        if (!email || !password) {
+          loginError.textContent = "Email e senha são obrigatórios.";
+          loginError.className = "alert alert--error";
+          return;
+        }
+
+        try {
+          const res = await fetch("/login", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ email, password })
+          });
+          const data = await res.json().catch(() => ({}));
+          if (!res.ok) {
+            throw new Error(data.error || data.message || "Falha ao entrar.");
+          }
+
+          const clientId = data.client_id || "";
+          const apiKey = data.api_key || "";
+          if (clientId) {
+            localStorage.setItem("leadrank_client_id", clientId);
+            localStorage.setItem("client_id", clientId);
+            localStorage.setItem("LR_CLIENT_ID", clientId);
+          }
+          if (apiKey) {
+            localStorage.setItem("leadrank_api_key", apiKey);
+            localStorage.setItem("api_key", apiKey);
+            localStorage.setItem("LR_API_KEY", apiKey);
+          }
+
+          const next = new URLSearchParams(location.search).get('next') || '';
+          window.location.href = next || `index.html?client_id=${encodeURIComponent(clientId)}&api_key=${encodeURIComponent(apiKey)}`;
+        } catch (err) {
+          loginError.textContent = err.message || "Erro de conexão. Tente novamente.";
+          loginError.className = "alert alert--error";
+        }
+      });
+    </script>
+  </body>
+</html>

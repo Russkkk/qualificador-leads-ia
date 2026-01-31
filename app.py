@@ -16,6 +16,8 @@ import random
 import string
 import secrets
 import hashlib
+import logging
+import traceback
 from datetime import datetime, timezone, timedelta
 from typing import Any, Dict, List, Optional, Tuple
 
@@ -23,6 +25,7 @@ from werkzeug.security import generate_password_hash, check_password_hash
 
 from flask import Flask, request, jsonify, Response
 from flask_cors import CORS
+from werkzeug.exceptions import HTTPException
 
 import psycopg
 from psycopg.rows import dict_row
@@ -85,6 +88,13 @@ _DEMO_RL_MAX = 5
 # =========================
 app = Flask(__name__)
 CORS(app, resources={r"/*": {"origins": ALLOWED_ORIGINS}})
+logging.basicConfig(level=os.getenv("LOG_LEVEL", "INFO").upper())
+
+
+def _log_exception(message: str) -> str:
+    trace = traceback.format_exc()
+    logging.exception(message)
+    return trace
 
 
 # =========================
@@ -180,6 +190,25 @@ def _json_err(msg: str, code: int = 400, **extra):
     payload = {"ok": False, "error": msg}
     payload.update(extra)
     return _resp(payload, code)
+
+
+@app.errorhandler(Exception)
+def handle_exception(err: Exception):
+    if isinstance(err, HTTPException):
+        return _json_err(
+            err.description,
+            err.code or 500,
+            code="http_error",
+            error_type=err.__class__.__name__,
+        )
+    trace = _log_exception("Unhandled exception")
+    return _json_err(
+        "Erro interno do servidor",
+        500,
+        code="internal_error",
+        error_type=err.__class__.__name__,
+        trace=trace,
+    )
 
 def _safe_int(x: Any, default: int = 0) -> int:
     try:
@@ -369,7 +398,10 @@ def _ensure_schema():
                 cur.execute("ALTER TABLE clients ADD COLUMN IF NOT EXISTS nome TEXT;")
                 cur.execute("ALTER TABLE clients ADD COLUMN IF NOT EXISTS email TEXT;")
                 cur.execute("ALTER TABLE clients ADD COLUMN IF NOT EXISTS empresa TEXT;")
+                cur.execute("ALTER TABLE clients ADD COLUMN IF NOT EXISTS telefone TEXT;")
                 cur.execute("ALTER TABLE clients ADD COLUMN IF NOT EXISTS valid_until TIMESTAMPTZ;")
+                cur.execute("ALTER TABLE clients ADD COLUMN IF NOT EXISTS password_hash TEXT;")
+                cur.execute("ALTER TABLE clients ADD COLUMN IF NOT EXISTS last_login_at TIMESTAMPTZ;")
 
                 # bancos antigos podem ter api_key NOT NULL -> drop
                 try:
@@ -768,7 +800,7 @@ def signup():
     conn = _db()
     try:
         with conn:
-            with conn.cursor() as cur:
+            with conn.cursor(row_factory=dict_row) as cur:
                 cur.execute("SELECT client_id FROM clients WHERE email=%s", (email,))
                 row = cur.fetchone()
                 if row:
@@ -807,7 +839,14 @@ def signup():
             "message": "Conta trial criada com sucesso!"
         })
     except Exception as e:
-        return jsonify({"ok": False, "success": False, "error": str(e)}), 500
+        trace = _log_exception("signup failed")
+        return jsonify({
+            "ok": False,
+            "success": False,
+            "error": "Erro interno ao criar conta",
+            "detail": str(e),
+            "trace": trace,
+        }), 500
     finally:
         conn.close()
 
@@ -828,7 +867,7 @@ def login():
     conn = _db()
     try:
         with conn:
-            with conn.cursor() as cur:
+            with conn.cursor(row_factory=dict_row) as cur:
                 cur.execute("SELECT client_id, api_key, password_hash, plan, status, valid_until FROM clients WHERE email=%s", (email,))
                 row = cur.fetchone()
                 if not row:
@@ -851,7 +890,7 @@ def login():
         return jsonify({
             "ok": True,
             "success": True,
-            "client_id": row['client_id'],
+            "client_id": row.get("client_id"),
             "api_key": api_key,
             "plan": (row.get('plan') or 'trial'),
             "status": (row.get('status') or 'active'),
@@ -859,7 +898,14 @@ def login():
             "message": "Login realizado com sucesso."
         })
     except Exception as e:
-        return jsonify({"ok": False, "success": False, "error": str(e)}), 500
+        trace = _log_exception("login failed")
+        return jsonify({
+            "ok": False,
+            "success": False,
+            "error": "Erro interno ao realizar login",
+            "detail": str(e),
+            "trace": trace,
+        }), 500
     finally:
         conn.close()
 

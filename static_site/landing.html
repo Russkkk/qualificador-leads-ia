@@ -1,72 +1,112 @@
 <!doctype html>
 <html lang="pt-BR">
 <head>
-<meta charset="utf-8"/>
-<meta name="viewport" content="width=device-width, initial-scale=1"/>
-<title>LeadRank • Qualificador de Leads com IA</title>
-<style>
-:root{--bg:#0a0e17;--card:#121826;--text:#e2e8f0;--muted:#94a3b8;--accent:#6366f1;--border:#1e2937;--ok:#22c55e;--radius:18px;--shadow:0 18px 60px rgba(0,0,0,.35);}
-*{box-sizing:border-box}
-body{margin:0;font-family:system-ui,-apple-system,Segoe UI,Roboto,Ubuntu,Cantarell,"Noto Sans",sans-serif;
-background: radial-gradient(1200px 800px at 10% -10%, rgba(99,102,241,.35), transparent 55%),
-radial-gradient(900px 600px at 100% 10%, rgba(34,197,94,.16), transparent 55%), var(--bg);
-color:var(--text);}
-header{max-width:1100px;margin:0 auto;padding:22px 16px;display:flex;align-items:center;justify-content:space-between;}
-.brand{font-weight:950;letter-spacing:.2px}
-.nav a{color:#c7d2fe;text-decoration:none;margin-left:14px;font-weight:800}
-.hero{max-width:1100px;margin:0 auto;padding:24px 16px 12px;display:grid;grid-template-columns:1.05fr .95fr;gap:18px;align-items:center;}
-@media(max-width:900px){.hero{grid-template-columns:1fr}}
-.card{background:rgba(18,24,38,.86);border:1px solid var(--border);border-radius:var(--radius);box-shadow:var(--shadow);padding:20px;}
-.badge{display:inline-flex;gap:10px;align-items:center;padding:8px 12px;border-radius:999px;background:rgba(99,102,241,.12);border:1px solid rgba(99,102,241,.25);color:#c7d2fe;font-weight:800;font-size:13px;}
-h1{margin:12px 0 10px;font-size:44px;line-height:1.05}
-p{margin:0 0 10px;color:var(--muted);line-height:1.6}
-.cta{display:flex;gap:10px;flex-wrap:wrap;margin-top:14px}
-.btn{padding:12px 14px;border-radius:12px;border:0;cursor:pointer;font-weight:950}
-.btn.primary{background:var(--accent);color:#fff}
-.btn.ghost{background:rgba(255,255,255,.06);border:1px solid var(--border);color:var(--text)}
-.grid{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-top:14px}
-@media(max-width:900px){.grid{grid-template-columns:1fr}}
-.k{border:1px solid var(--border);border-radius:14px;background:rgba(255,255,255,.03);padding:14px}
-.k b{display:block;margin-bottom:4px}
-footer{max-width:1100px;margin:0 auto;padding:22px 16px;color:var(--muted);font-size:13px}
-</style>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>LeadRank • Qualificador de Leads com IA</title>
+  <link rel="stylesheet" href="styles.css" />
 </head>
 <body>
-<header>
-  <div class="brand">LeadRank</div>
-  <div class="nav">
-    <a href="pricing.html">Preços</a>
-    <a href="onboarding.html?mode=login">Entrar</a>
-  </div>
-</header>
+  <div class="page">
+    <header class="site-header">
+      <a class="brand" href="landing.html">
+        <span class="brand__logo">LR</span>
+        <span class="brand__text">LeadRank</span>
+      </a>
+      <nav class="site-nav">
+        <a href="landing.html" aria-current="page">Início</a>
+        <a href="pricing.html">Planos</a>
+        <a href="onboarding.html">Criar conta</a>
+        <a href="login.html">Entrar</a>
+      </nav>
+      <a class="btn btn--ghost" href="index.html">Acessar dashboard</a>
+    </header>
 
-<section class="hero">
-  <div>
-    <span class="badge">⚡ Qualificação automática • Dashboard • Export CSV</span>
-    <h1>Mais vendas com menos esforço.</h1>
-    <p>Receba leads, calcule probabilidade e priorize quem tem mais chance de comprar. Ideal para tráfego pago, landing pages e times comerciais.</p>
-    <div class="cta">
-      <a class="btn primary" href="onboarding.html">Começar grátis (14 dias)</a>
-      <a class="btn ghost" href="pricing.html">Ver planos</a>
-    </div>
-    <div class="grid">
-      <div class="k"><b>Score + Probabilidade</b><span style="color:var(--muted)">Rank do lead em segundos</span></div>
-      <div class="k"><b>Leads quentes do dia</b><span style="color:var(--muted)">Atue no timing certo</span></div>
-      <div class="k"><b>Pronto pra integrar</b><span style="color:var(--muted)">API + export CSV</span></div>
-    </div>
-  </div>
+    <main>
+      <section class="hero">
+        <div>
+          <p class="eyebrow">Qualificação automática e priorização de leads</p>
+          <h1>Mais conversões com decisões orientadas por dados.</h1>
+          <p class="subtitle">
+            Centralize leads, calcule probabilidade de fechamento e direcione o time comercial para as
+            melhores oportunidades em tempo real.
+          </p>
+          <div class="hero__actions">
+            <a class="btn" href="onboarding.html">Começar grátis por 14 dias</a>
+            <a class="btn btn--ghost" href="pricing.html">Ver planos</a>
+          </div>
+          <div class="hero__stats">
+            <div>
+              <strong>Score + Probabilidade</strong>
+              <span>Ranking claro para priorização imediata</span>
+            </div>
+            <div>
+              <strong>Insights em tempo real</strong>
+              <span>Acompanhe origem, estágio e comportamento</span>
+            </div>
+            <div>
+              <strong>API pronta para integrar</strong>
+              <span>Integre ao CRM e automatize fluxos</span>
+            </div>
+          </div>
+        </div>
+        <div class="card">
+          <div class="card__header">
+            <h2>Como funciona</h2>
+            <span class="pill pill--muted">Fluxo simplificado</span>
+          </div>
+          <ul class="list">
+            <li>
+              <span>1. Crie sua conta e receba credenciais</span>
+              <span class="pill pill--success">Setup</span>
+            </li>
+            <li>
+              <span>2. Envie leads via API ou dashboard</span>
+              <span class="pill pill--success">Integração</span>
+            </li>
+            <li>
+              <span>3. Monitore métricas e aumente conversões</span>
+              <span class="pill pill--success">Performance</span>
+            </li>
+          </ul>
+          <p class="subtitle">Sem cartão de crédito para iniciar. Ative o plano ideal quando estiver pronto.</p>
+        </div>
+      </section>
 
-  <div class="card">
-    <h2 style="margin:0 0 10px;color:var(--muted);font-size:14px;letter-spacing:.09em;text-transform:uppercase">Como funciona</h2>
-    <p><b>1)</b> Crie sua conta e receba <b>client_id</b> + <b>api_key</b>.</p>
-    <p><b>2)</b> Envie leads via API (ou teste pelo dashboard).</p>
-    <p><b>3)</b> Acompanhe métricas, origens e leads prioritários.</p>
-    <p style="margin-top:12px;color:#c7d2fe"><b>✅ Sem cartão para começar.</b></p>
-  </div>
-</section>
+      <section class="features">
+        <h2>Operação comercial mais previsível</h2>
+        <div class="features__grid">
+          <article class="feature">
+            <h3>Visão 360º do funil</h3>
+            <p>Concentre dados de origem, páginas visitadas e tempo de interesse em um painel único.</p>
+          </article>
+          <article class="feature">
+            <h3>Priorize quem está pronto</h3>
+            <p>Use a pontuação para orientar a equipe e reduzir o tempo de resposta.</p>
+          </article>
+          <article class="feature">
+            <h3>Exportações rápidas</h3>
+            <p>Envie dados para planilhas, BI ou CRM sem processos manuais demorados.</p>
+          </article>
+        </div>
+      </section>
 
-<footer>
-  © LeadRank • Qualificador de Leads IA
-</footer>
+      <section class="cta">
+        <div>
+          <h2>Pronto para acelerar suas vendas?</h2>
+          <p class="subtitle">Crie sua conta e comece o trial com suporte para integração imediata.</p>
+        </div>
+        <a class="btn" href="onboarding.html">Criar conta gratuita</a>
+      </section>
+    </main>
+
+    <footer class="site-footer">
+      <span>© 2024 LeadRank. Todos os direitos reservados.</span>
+      <div class="footer__links">
+        <a href="pricing.html">Planos</a>
+        <a href="onboarding.html">Criar conta</a>
+      </div>
+    </footer>
+  </div>
 </body>
 </html>

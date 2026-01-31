@@ -118,6 +118,7 @@
     </footer>
   </div>
 
+<<<<<<< HEAD
   <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js">
 
 document.addEventListener('DOMContentLoaded', () => { try { if (goToUpgradeIfRequested()) return; } catch(e){} });
@@ -165,6 +166,12 @@ function goToUpgradeIfRequested() {
   return true;
 }
 
+=======
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+  <script>
+    const BACKEND = (window.BACKEND_URL || "https://qualificador-leads-i-a.onrender.com").replace(/\/$/, "");
+
+>>>>>>> a499fc724a57883aa191ff6bfccd1a6d313b40cd
     function qs(name) {
       return new URLSearchParams(location.search).get(name) || "";
     }

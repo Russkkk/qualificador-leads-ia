@@ -112,8 +112,12 @@
             localStorage.setItem("LR_API_KEY", apiKey);
           }
 
+<<<<<<< HEAD
           const next = new URLSearchParams(location.search).get('next') || '';
           window.location.href = next || `index.html?client_id=${encodeURIComponent(clientId)}&api_key=${encodeURIComponent(apiKey)}`;
+=======
+          window.location.href = `index.html?client_id=${encodeURIComponent(clientId)}&api_key=${encodeURIComponent(apiKey)}`;
+>>>>>>> a499fc724a57883aa191ff6bfccd1a6d313b40cd
         } catch (err) {
           loginError.textContent = err.message || "Erro de conexão. Tente novamente.";
           loginError.className = "alert alert--error";

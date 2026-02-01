@@ -71,6 +71,7 @@
       </footer>
     </div>
     <script>
+      const BACKEND = (window.BACKEND_URL || "https://qualificador-leads-i-a.onrender.com").replace(/\/$/, "");
       const loginForm = document.getElementById("loginForm");
       const loginError = document.getElementById("loginError");
 
@@ -89,7 +90,7 @@
         }
 
         try {
-          const res = await fetch("/login", {
+          const res = await fetch(BACKEND + "/login", {
             method: "POST",
             headers: { "Content-Type": "application/json" },
             body: JSON.stringify({ email, password })

@@ -103,6 +103,47 @@
               <p class="text-muted" style="margin-top:12px">Isso ajuda a IA calibrar melhor score e probabilidade.</p>
               <div class="alert" id="testMsg"></div>
             </div>
+
+            <div class="card card--soft" style="margin-top:16px">
+              <h3>Enviar lead real</h3>
+              <p class="text-muted">Use esse formulário para registrar leads reais do seu time.</p>
+              <form class="form" id="realLeadForm">
+                <label for="realNome">
+                  Nome
+                  <input id="realNome" placeholder="Maria Oliveira" />
+                </label>
+                <label for="realEmail">
+                  Email
+                  <input id="realEmail" type="email" placeholder="maria@empresa.com" />
+                </label>
+                <label for="realTelefone">
+                  Telefone
+                  <input id="realTelefone" placeholder="(11) 90000-0000" />
+                </label>
+                <label for="realOrigem">
+                  Origem
+                  <input id="realOrigem" placeholder="formulario-site" />
+                </label>
+                <label for="realTempo">
+                  Tempo no site (segundos)
+                  <input id="realTempo" type="number" min="0" placeholder="120" />
+                </label>
+                <label for="realPaginas">
+                  Páginas visitadas
+                  <input id="realPaginas" type="number" min="0" placeholder="4" />
+                </label>
+                <label for="realPreco">
+                  Clicou em preço?
+                  <select id="realPreco">
+                    <option value="0">Não</option>
+                    <option value="1">Sim</option>
+                  </select>
+                </label>
+                <button class="btn btn--block" type="submit">Registrar lead real</button>
+              </form>
+              <p class="form__hint">Dica: use o mesmo client_id e api_key para integrar o envio direto pelo seu CRM.</p>
+              <div class="alert" id="realLeadMsg"></div>
+            </div>
           </div>
         </div>
       </section>
@@ -118,11 +159,7 @@
     </footer>
   </div>
 
-  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js">
-
-document.addEventListener('DOMContentLoaded', () => { try { if (goToUpgradeIfRequested()) return; } catch(e){} });
-
-</script>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
   <script>
     const BACKEND = (window.BACKEND_URL || "https://qualificador-leads-i-a.onrender.com").replace(/\/$/, "");
 // === Kiwify checkout links (substitua pelos seus links) ===
@@ -395,6 +432,49 @@ function goToUpgradeIfRequested() {
       }
     };
 
+    const realLeadForm = el("realLeadForm");
+    if (realLeadForm) {
+      realLeadForm.addEventListener("submit", async (event) => {
+        event.preventDefault();
+        const m = el("realLeadMsg");
+        m.className = "alert";
+        m.style.display = "none";
+        try {
+          const { client_id } = getAuth();
+          if (!client_id) throw new Error("Informe client_id e api_key.");
+          const nome = el("realNome").value.trim();
+          const email = el("realEmail").value.trim();
+          const telefone = el("realTelefone").value.trim();
+          const origem = el("realOrigem").value.trim();
+          const tempo_site = Number(el("realTempo").value || 0);
+          const paginas_visitadas = Number(el("realPaginas").value || 0);
+          const clicou_preco = Number(el("realPreco").value || 0);
+
+          const data = await window.__lr.lrApi("/prever", {
+            method: "POST",
+            body: {
+              client_id,
+              nome,
+              email_lead: email,
+              telefone,
+              origem,
+              tempo_site,
+              paginas_visitadas,
+              clicou_preco
+            }
+          });
+          m.className = "alert alert--success";
+          m.style.display = "block";
+          m.textContent = `Lead real registrado. score=${data.score} prob=${data.probabilidade}`;
+          await loadDashboard();
+        } catch (e) {
+          m.className = "alert alert--error";
+          m.style.display = "block";
+          m.textContent = "Erro: " + e.message;
+        }
+      });
+    }
+
     (function init() {
       const { client_id, api_key } = getAuth();
       el("clientId").value = client_id;
@@ -402,6 +482,14 @@ function goToUpgradeIfRequested() {
       wsPill.textContent = "workspace: " + (client_id || "—");
       if (client_id) loadDashboard();
     })();
+
+    document.addEventListener("DOMContentLoaded", () => {
+      try {
+        if (goToUpgradeIfRequested()) return;
+      } catch (e) {
+        // noop
+      }
+    });
   </script>
 </body>
 </html>

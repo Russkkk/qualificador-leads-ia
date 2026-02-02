@@ -188,31 +188,17 @@ def _hot_leads_today(client_id: str, limit: int = 20):
 
 def _lead_temperature(probabilidade: Optional[float], score: Optional[int]) -> str:
     prob = _safe_float(probabilidade, None)
- codex/implementar-resumo-do-dia-com-leads-xeeucz
-
- codex/implementar-resumo-do-dia-com-leads-948o9u
-
- codex/implementar-resumo-do-dia-com-leads-vmr4y6
- main
- main
     score_val = _safe_int(score, 0) if score is not None else None
     if prob is None and score_val is None:
         return "unknown"
     if (prob is not None and prob >= 0.70) or score_val >= 70:
         return "hot"
     if (prob is not None and 0.40 <= prob < 0.70) or (score_val is not None and 40 <= score_val < 70):
- codex/implementar-resumo-do-dia-com-leads-xeeucz
-
- codex/implementar-resumo-do-dia-com-leads-948o9u
-
-
+    
     score_val = _safe_int(score, 0)
     if (prob is not None and prob >= 0.70) or score_val >= 70:
         return "hot"
     if (prob is not None and prob >= 0.35) or score_val >= 35:
- main
- main
- main
         return "warm"
     return "cold"
 
@@ -2162,32 +2148,17 @@ def acao_do_dia():
                                 AND ((probabilidade IS NOT NULL AND probabilidade >= 0.70) OR (score IS NOT NULL AND score >= 70))
                                THEN 1 ELSE 0 END) AS hot_today,
                       SUM(CASE WHEN created_at >= %s AND created_at <= %s
- codex/implementar-resumo-do-dia-com-leads-xeeucz
-
- codex/implementar-resumo-do-dia-com-leads-948o9u
-
- codex/implementar-resumo-do-dia-com-leads-vmr4y6
- main
- main
                                 AND ((probabilidade IS NOT NULL AND probabilidade >= 0.40 AND probabilidade < 0.70)
                                      OR (score IS NOT NULL AND score >= 40 AND score < 70))
                                THEN 1 ELSE 0 END) AS warm_today,
                       SUM(CASE WHEN created_at >= %s AND created_at <= %s
                                 AND ((probabilidade IS NOT NULL AND probabilidade < 0.40)
                                      OR (score IS NOT NULL AND score < 40))
- codex/implementar-resumo-do-dia-com-leads-xeeucz
-
- codex/implementar-resumo-do-dia-com-leads-948o9u
-
-
                                 AND ((probabilidade IS NOT NULL AND probabilidade >= 0.35 AND probabilidade < 0.70)
                                      OR (score IS NOT NULL AND score >= 35 AND score < 70))
                                THEN 1 ELSE 0 END) AS warm_today,
                       SUM(CASE WHEN created_at >= %s AND created_at <= %s
                                 AND ((probabilidade IS NOT NULL AND probabilidade < 0.35) OR (score IS NOT NULL AND score < 35))
-
- main
- main
                                THEN 1 ELSE 0 END) AS cold_today,
                       SUM(CASE WHEN updated_at >= %s AND updated_at <= %s AND virou_cliente = 1 THEN 1 ELSE 0 END) AS converted_today
                     FROM leads
@@ -2200,15 +2171,9 @@ def acao_do_dia():
                 cur.execute(
                     """
                     SELECT id, nome, telefone, email_lead, origem,
- codex/implementar-resumo-do-dia-com-leads-xeeucz
                            score, probabilidade, created_at, virou_cliente
-
- codex/implementar-resumo-do-dia-com-leads-948o9u
                            score, probabilidade, created_at, virou_cliente
-
                            score, probabilidade, created_at
- main
- main
                     FROM leads
                     WHERE client_id=%s
                     ORDER BY COALESCE(probabilidade, score / 100.0) DESC NULLS LAST,
@@ -2221,21 +2186,14 @@ def acao_do_dia():
 
         payload_items = []
         for item in items:
- codex/implementar-resumo-do-dia-com-leads-xeeucz
-
- codex/implementar-resumo-do-dia-com-leads-948o9u
- main
+ 
             status = "pendente"
             if item.get("virou_cliente") == 1:
                 status = "convertido"
             elif item.get("virou_cliente") == 0:
                 status = "negado"
 
- codex/implementar-resumo-do-dia-com-leads-xeeucz
-
-
- main
- main
+ 
             payload_items.append({
                 "id": int(item.get("id") or 0),
                 "nome": item.get("nome"),
@@ -2245,14 +2203,8 @@ def acao_do_dia():
                 "score": _safe_int(item.get("score"), 0) if item.get("score") is not None else None,
                 "probabilidade": _safe_float(item.get("probabilidade"), None),
                 "temperatura": _lead_temperature(item.get("probabilidade"), item.get("score")),
- codex/implementar-resumo-do-dia-com-leads-xeeucz
                 "status": status,
-
- codex/implementar-resumo-do-dia-com-leads-948o9u
                 "status": status,
-
- main
- main
                 "created_at": _iso(item.get("created_at")),
             })
 

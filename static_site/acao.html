@@ -1,0 +1,328 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>LeadRank • Ação do dia</title>
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+  <div class="page">
+    <header class="site-header">
+      <a class="brand" href="landing.html">
+        <span class="brand__logo">LR</span>
+        <span class="brand__text">LeadRank</span>
+      </a>
+      <nav class="site-nav">
+        <a href="acao.html">Ação do dia</a>
+        <a href="index.html">Dashboard</a>
+        <a href="pricing.html">Planos</a>
+      </nav>
+      <a class="btn btn--ghost" href="onboarding.html?mode=login">Trocar conta</a>
+    </header>
+
+    <main>
+      <section class="dashboard">
+        <div class="card daily-hero">
+          <div class="daily-hero__header">
+            <div>
+              <p class="eyebrow">Resumo do dia</p>
+              <h1 class="daily-hero__title">🔥 Ação do dia</h1>
+              <p class="subtitle">Esses são os leads com maior chance de fechar agora.</p>
+            </div>
+            <div class="pill pill--muted" id="wsPill">workspace: —</div>
+          </div>
+          <div class="daily-hero__grid">
+            <div class="daily-card daily-card--hot">
+              <div class="daily-card__top">
+                <span class="daily-card__icon">🔥</span>
+                <div>
+                  <p class="daily-card__label">Quentes</p>
+                  <p class="daily-card__value" id="dailyHotCount">—</p>
+                </div>
+              </div>
+              <p class="text-muted">Ligue primeiro</p>
+            </div>
+            <div class="daily-card daily-card--warm">
+              <div class="daily-card__top">
+                <span class="daily-card__icon">🟡</span>
+                <div>
+                  <p class="daily-card__label">Mornos</p>
+                  <p class="daily-card__value" id="dailyWarmCount">—</p>
+                </div>
+              </div>
+              <p class="text-muted">Acompanhe hoje</p>
+            </div>
+            <div class="daily-card daily-card--cold">
+              <div class="daily-card__top">
+                <span class="daily-card__icon">❄️</span>
+                <div>
+                  <p class="daily-card__label">Frios</p>
+                  <p class="daily-card__value" id="dailyColdCount">—</p>
+                </div>
+              </div>
+              <p class="text-muted">Nutrir / automação</p>
+            </div>
+            <div class="daily-card daily-card--success">
+              <div class="daily-card__top">
+                <span class="daily-card__icon">✅</span>
+                <div>
+                  <p class="daily-card__label">Convertidos hoje</p>
+                  <p class="daily-card__value" id="dailyConvertedCount">—</p>
+                </div>
+              </div>
+              <p class="text-muted">Feedback do time</p>
+            </div>
+          </div>
+        </div>
+
+        <div class="card action-list" data-state="loading">
+          <div class="action-list__header">
+            <h2>📞 Leads para agir agora</h2>
+          </div>
+          <div class="action-list__bar">
+            <div class="chip-group" role="tablist" aria-label="Filtro rápido">
+              <button class="chip chip--active" type="button" data-filter="hot">🔥 Quentes</button>
+              <button class="chip" type="button" data-filter="warm">🟡 Mornos</button>
+              <button class="chip" type="button" data-filter="cold">❄️ Frios</button>
+              <button class="chip" type="button" data-filter="pendente">⏳ Pendentes</button>
+              <button class="chip" type="button" data-filter="convertido">✅ Convertidos</button>
+              <button class="chip" type="button" data-filter="negado">❌ Negados</button>
+            </div>
+            <div class="action-list__controls">
+              <label class="search">
+                <span class="sr-only">Buscar por nome, telefone, origem</span>
+                <input type="search" id="leadSearch" placeholder="Buscar por nome, telefone, origem" />
+              </label>
+              <button class="btn btn--ghost btn--small" type="button" id="btnExport">Exportar CSV</button>
+            </div>
+          </div>
+          <div class="action-list__body">
+            <div class="action-state action-state--loading">
+              <div class="skeleton-grid">
+                <div class="skeleton-card">
+                  <div class="skeleton-line skeleton-line--lg"></div>
+                  <div class="skeleton-line"></div>
+                  <div class="skeleton-pill"></div>
+                </div>
+                <div class="skeleton-card">
+                  <div class="skeleton-line skeleton-line--lg"></div>
+                  <div class="skeleton-line"></div>
+                  <div class="skeleton-pill"></div>
+                </div>
+              </div>
+              <div class="skeleton-table">
+                <div class="skeleton-line skeleton-line--md"></div>
+                <div class="skeleton-line"></div>
+                <div class="skeleton-line"></div>
+              </div>
+            </div>
+            <div class="action-state action-state--empty">
+              <p class="empty-state__title">Você ainda não tem leads suficientes para priorizar.</p>
+              <p class="text-muted">Comece gerando leads de teste ou conecte seu CRM para liberar a priorização diária.</p>
+              <div class="action-list__cta">
+                <a class="btn btn--small" href="index.html#btnSeed10">Gerar 10 leads de teste</a>
+                <a class="btn btn--ghost btn--small" href="onboarding.html#integracao" target="_blank" rel="noreferrer">Ver como integrar</a>
+              </div>
+            </div>
+            <div class="action-state action-state--error">
+              <p class="empty-state__title">Não conseguimos carregar seus leads. Confira sua conexão ou chave de integração.</p>
+              <button class="btn btn--small" type="button" id="btnRetry">Tentar novamente</button>
+            </div>
+            <div class="action-state action-state--ready">
+              <div class="action-list__insights">
+                <p>Leads quentes = maiores chances de fechar agora.</p>
+                <p>Marque o resultado do contato. O LeadRank aprende com seu time.</p>
+                <p>Quanto mais feedback, melhor a priorização.</p>
+              </div>
+              <div class="action-list__table" id="leadsTableWrap"></div>
+            </div>
+          </div>
+          <div class="alert" id="actionMsg"></div>
+        </div>
+      </section>
+    </main>
+
+    <footer class="site-footer">
+      <span>© 2024 LeadRank. Todos os direitos reservados.</span>
+      <div class="footer__links">
+        <a href="landing.html">Início</a>
+        <a href="pricing.html">Planos</a>
+        <a href="onboarding.html">Criar conta</a>
+      </div>
+    </footer>
+  </div>
+
+  <script>
+    const BACKEND = (window.BACKEND_URL || "https://qualificador-leads-i-a.onrender.com").replace(/\/$/, "");
+
+    const el = (id) => document.getElementById(id);
+    const msg = el("actionMsg");
+    const wsPill = el("wsPill");
+    const leadsTableWrap = el("leadsTableWrap");
+    const searchInput = el("leadSearch");
+    const chips = Array.from(document.querySelectorAll("[data-filter]"));
+    const actionList = document.querySelector(".action-list");
+    let allItems = [];
+    let activeFilter = "hot";
+
+    function setMsg(type, text) {
+      msg.className = "alert" + (type ? " " + type : "");
+      msg.style.display = "block";
+      msg.textContent = text;
+    }
+
+    function setActionState(state) {
+      if (!actionList) return;
+      actionList.dataset.state = state;
+    }
+
+    function qs(name) {
+      return new URLSearchParams(location.search).get(name) || "";
+    }
+
+    function getAuth() {
+      return {
+        client_id: qs("client_id") || localStorage.getItem("leadrank_client_id") || localStorage.getItem("client_id") || localStorage.getItem("LR_CLIENT_ID") || "",
+        api_key: qs("api_key") || localStorage.getItem("leadrank_api_key") || localStorage.getItem("api_key") || localStorage.getItem("LR_API_KEY") || "",
+      };
+    }
+
+    async function api(path) {
+      const { client_id, api_key } = getAuth();
+      const url = new URL(BACKEND + path);
+      url.searchParams.set("client_id", client_id);
+      const headers = {};
+      if (api_key) headers["X-API-KEY"] = api_key;
+      const res = await fetch(url.toString(), { headers });
+      const data = await res.json().catch(() => ({}));
+      if (!res.ok) throw new Error(data.error || data.message || ("HTTP " + res.status));
+      return data;
+    }
+
+    function renderHero(summary) {
+      el("dailyHotCount").textContent = summary.hot ?? 0;
+      el("dailyWarmCount").textContent = summary.warm ?? 0;
+      el("dailyColdCount").textContent = summary.cold ?? 0;
+      el("dailyConvertedCount").textContent = summary.converted_today ?? 0;
+    }
+
+    function normalizeText(value) {
+      return (value || "").toString().toLowerCase();
+    }
+
+    function applyFilters() {
+      const term = normalizeText(searchInput.value);
+      const filtered = allItems.filter((item) => {
+        const temperature = item.temperatura || "unknown";
+        const status = item.status || "pendente";
+        const matchesFilter = ["hot", "warm", "cold"].includes(activeFilter)
+          ? temperature === activeFilter
+          : status === activeFilter;
+        if (!matchesFilter) return false;
+        if (!term) return true;
+        return [item.nome, item.telefone, item.origem].some((field) => normalizeText(field).includes(term));
+      });
+      renderTable(filtered);
+    }
+
+    function renderTable(items) {
+      if (!items.length) {
+        leadsTableWrap.innerHTML = "<div class='text-muted'>Nenhum lead encontrado com os filtros atuais.</div>";
+        return;
+      }
+      const rows = items.map((item) => {
+        const prob = item.probabilidade != null ? Math.round(item.probabilidade * 100) + "%" : "—";
+        const score = item.score != null ? item.score : "—";
+        return `
+          <tr>
+            <td>${item.nome || "—"}</td>
+            <td>${item.telefone || "—"}</td>
+            <td>${item.origem || "—"}</td>
+            <td>${score}</td>
+            <td>${prob}</td>
+            <td>${item.temperatura || "pendente"}</td>
+            <td>${item.status || "pendente"}</td>
+            <td>${item.created_at ? new Date(item.created_at).toLocaleDateString("pt-BR") : "—"}</td>
+          </tr>
+        `;
+      }).join("");
+
+      leadsTableWrap.innerHTML = `
+        <table class="data-table">
+          <thead>
+            <tr>
+              <th>Nome</th>
+              <th>Telefone</th>
+              <th>Origem</th>
+              <th>Score</th>
+              <th>Probabilidade</th>
+              <th>Temperatura</th>
+              <th>Status</th>
+              <th>Data</th>
+            </tr>
+          </thead>
+          <tbody>${rows}</tbody>
+        </table>
+      `;
+    }
+
+    function setActiveChip(filter) {
+      activeFilter = filter;
+      chips.forEach((chip) => {
+        chip.classList.toggle("chip--active", chip.dataset.filter === filter);
+      });
+      applyFilters();
+    }
+
+    chips.forEach((chip) => {
+      chip.addEventListener("click", () => setActiveChip(chip.dataset.filter));
+    });
+
+    searchInput.addEventListener("input", () => applyFilters());
+
+    el("btnRetry").onclick = () => loadAction();
+
+    el("btnExport").onclick = () => {
+      const { client_id, api_key } = getAuth();
+      if (!client_id) return setMsg("alert--error", "Informe o client_id.");
+      const url = new URL(BACKEND + "/leads_export.csv");
+      url.searchParams.set("client_id", client_id);
+      if (api_key) {
+        setMsg("alert--error", "Para exportar com API Key, faça o download via API ou desative a exigência.");
+        return;
+      }
+      window.location.href = url.toString();
+    };
+
+    async function loadAction() {
+      msg.style.display = "none";
+      setActionState("loading");
+      const { client_id } = getAuth();
+      wsPill.textContent = "workspace: " + (client_id || "—");
+      if (!client_id) {
+        setActionState("error");
+        setMsg("alert--error", "Informe seu client_id para carregar.");
+        return;
+      }
+      try {
+        const data = await api("/acao_do_dia");
+        renderHero(data.summary || {});
+        allItems = data.items || [];
+        if (!allItems.length) {
+          setActionState("empty");
+        } else {
+          setActionState("ready");
+          setActiveChip(activeFilter);
+        }
+        setMsg("alert--success", "Ação do dia carregada.");
+      } catch (err) {
+        setActionState("error");
+        setMsg("alert--error", "Não conseguimos carregar seus leads. Confira sua conexão ou chave de integração.");
+      }
+    }
+
+    loadAction();
+  </script>
+</body>
+</html>

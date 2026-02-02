@@ -24,6 +24,61 @@
 
     <main>
       <section class="dashboard">
+        <div class="card daily-hero">
+          <div class="daily-hero__header">
+            <div>
+              <p class="eyebrow">Resumo do dia</p>
+              <h1 class="daily-hero__title">🔥 Ação do dia</h1>
+              <p class="subtitle">Esses são os leads com maior chance de fechar agora.</p>
+            </div>
+          </div>
+          <div class="daily-hero__grid">
+            <div class="daily-card daily-card--hot">
+              <div class="daily-card__top">
+                <span class="daily-card__icon">🔥</span>
+                <div>
+                  <p class="daily-card__label">Quentes</p>
+                  <p class="daily-card__value" id="dailyHotCount">—</p>
+                </div>
+              </div>
+              <p class="text-muted">Ligue primeiro</p>
+              <button class="btn btn--small" type="button">Ver quentes</button>
+            </div>
+            <div class="daily-card daily-card--warm">
+              <div class="daily-card__top">
+                <span class="daily-card__icon">🟡</span>
+                <div>
+                  <p class="daily-card__label">Mornos</p>
+                  <p class="daily-card__value" id="dailyWarmCount">—</p>
+                </div>
+              </div>
+              <p class="text-muted">Acompanhe hoje</p>
+              <button class="btn btn--small btn--ghost" type="button">Ver mornos</button>
+            </div>
+            <div class="daily-card daily-card--cold">
+              <div class="daily-card__top">
+                <span class="daily-card__icon">❄️</span>
+                <div>
+                  <p class="daily-card__label">Frios</p>
+                  <p class="daily-card__value" id="dailyColdCount">—</p>
+                </div>
+              </div>
+              <p class="text-muted">Nutrir / automação</p>
+              <button class="btn btn--small btn--ghost" type="button">Ver frios</button>
+            </div>
+            <div class="daily-card daily-card--success">
+              <div class="daily-card__top">
+                <span class="daily-card__icon">✅</span>
+                <div>
+                  <p class="daily-card__label">Convertidos hoje</p>
+                  <p class="daily-card__value" id="dailyConvertedCount">—</p>
+                </div>
+              </div>
+              <p class="text-muted">Feedback do time</p>
+              <button class="btn btn--tiny btn--ghost" type="button">Ver convertidos</button>
+            </div>
+          </div>
+        </div>
         <div class="dashboard__header">
           <div>
             <p class="eyebrow">Dashboard</p>
@@ -337,6 +392,17 @@ function goToUpgradeIfRequested() {
       if (wrap) wrap.innerHTML = html;
     }
 
+    function renderDailyHero(f) {
+      const hot = f.hot_today ?? f.hot ?? 0;
+      const warm = f.warm ?? 0;
+      const cold = f.cold ?? 0;
+      const convertedToday = f.convertidos_hoje ?? f.convertidos_today ?? f.convertidos ?? 0;
+      el("dailyHotCount").textContent = hot;
+      el("dailyWarmCount").textContent = warm;
+      el("dailyColdCount").textContent = cold;
+      el("dailyConvertedCount").textContent = convertedToday;
+    }
+
     async function loadDashboard() {
       msg.style.display = "none";
       const { client_id } = getAuth();
@@ -351,6 +417,7 @@ function goToUpgradeIfRequested() {
 
         renderCharts(f);
         renderSummary(f);
+        renderDailyHero(f);
 
         setMsg("alert--success", "Dashboard carregado.");
       } catch (e) {

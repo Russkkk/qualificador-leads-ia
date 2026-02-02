@@ -276,6 +276,88 @@ main {
   padding: 40px 0 64px;
 }
 
+.daily-hero {
+  background: linear-gradient(135deg, rgba(248, 113, 113, 0.12), rgba(59, 130, 246, 0.12));
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  margin-bottom: 28px;
+}
+
+.daily-hero__header {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  margin-bottom: 20px;
+}
+
+.daily-hero__title {
+  font-size: clamp(2rem, 3vw, 2.6rem);
+  margin: 0 0 8px;
+}
+
+.daily-hero__grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(210px, 1fr));
+  gap: 16px;
+}
+
+.daily-card {
+  background: rgba(255, 255, 255, 0.04);
+  border-radius: 18px;
+  padding: 16px;
+  border: 1px solid var(--stroke);
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.daily-card__top {
+  display: flex;
+  gap: 12px;
+  align-items: center;
+}
+
+.daily-card__icon {
+  font-size: 1.4rem;
+}
+
+.daily-card__label {
+  margin: 0;
+  font-size: 0.85rem;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--muted);
+}
+
+.daily-card__value {
+  margin: 4px 0 0;
+  font-size: 1.9rem;
+  font-weight: 700;
+}
+
+.daily-card--hot {
+  border-color: rgba(248, 113, 113, 0.4);
+}
+
+.daily-card--warm {
+  border-color: rgba(251, 191, 36, 0.4);
+}
+
+.daily-card--cold {
+  border-color: rgba(59, 130, 246, 0.4);
+}
+
+.daily-card--success {
+  border-color: rgba(56, 211, 159, 0.4);
+}
+
+.btn--tiny {
+  padding: 6px 12px;
+  font-size: 0.75rem;
+  border-radius: 999px;
+}
+
 .dashboard__header {
   display: flex;
   flex-wrap: wrap;

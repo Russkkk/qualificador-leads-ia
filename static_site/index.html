@@ -202,36 +202,28 @@
           </div>
         </div>
 
-        <div class="card action-list" data-state="empty">
 
-        <div class="card action-list" data-state="empty">
-
-        <div class="card action-list" data-state="empty">
-
-        <div class="card action-list" data-state="empty">
-
-        <div class="card action-list" data-state="empty">
-
-        <div class="card action-list">
-
+        <div class="card action-list" data-state="loading" id="actionList">
           <div class="action-list__header">
             <h2>📞 Leads para agir agora</h2>
           </div>
+
           <div class="action-list__bar">
             <div class="chip-group" role="tablist" aria-label="Filtro rápido">
-              <button class="chip chip--active" type="button">🔥 Quentes</button>
-              <button class="chip" type="button">🟡 Mornos</button>
-              <button class="chip" type="button">❄️ Frios</button>
-              <button class="chip" type="button">⏳ Pendentes</button>
-              <button class="chip" type="button">✅ Convertidos</button>
-              <button class="chip" type="button">❌ Negados</button>
+              <button class="chip chip--active" type="button" data-filter="hot">🔥 Quentes</button>
+              <button class="chip" type="button" data-filter="warm">🟡 Mornos</button>
+              <button class="chip" type="button" data-filter="cold">❄️ Frios</button>
+              <button class="chip" type="button" data-filter="pendente">⏳ Pendentes</button>
+              <button class="chip" type="button" data-filter="convertido">✅ Convertidos</button>
+              <button class="chip" type="button" data-filter="negado">❌ Negados</button>
             </div>
+
             <div class="action-list__controls">
               <label class="search">
                 <span class="sr-only">Buscar por nome, telefone, origem</span>
-                <input type="search" placeholder="Buscar por nome, telefone, origem" />
+                <input type="search" id="leadSearch" name="leadSearch" placeholder="Buscar por nome, telefone, origem" autocomplete="off" />
               </label>
-              <button class="btn btn--ghost btn--small" type="button" data-export>Exportar CSV</button>
+              <button class="btn btn--ghost btn--small" type="button" id="btnExport" data-export>Exportar CSV</button>
             </div>
           </div>
 
@@ -260,38 +252,46 @@
               <p class="empty-state__title">Você ainda não tem leads suficientes para priorizar.</p>
               <p class="text-muted">Comece gerando leads de teste ou conecte seu CRM para liberar a priorização diária.</p>
               <div class="action-list__cta">
-                <button class="btn btn--small" type="button" data-seed10>Gerar 10 leads de teste</button>
+                <button class="btn btn--small" type="button" id="btnSeed10Action" data-seed10>Gerar 10 leads de teste</button>
                 <a class="btn btn--ghost btn--small" href="onboarding.html#integracao" target="_blank" rel="noreferrer">Ver como integrar</a>
               </div>
             </div>
 
             <div class="action-state action-state--error">
               <p class="empty-state__title">Não conseguimos carregar seus leads. Confira sua conexão ou chave de integração.</p>
-              <button class="btn btn--small" type="button" data-retry>Tentar novamente</button>
+              <button class="btn btn--small" type="button" id="btnRetryAction" data-retry>Tentar novamente</button>
             </div>
 
-            <div class="action-state action-state--ready">
-              <div class="lead-row">
+            <div class="action-state action-state--ready" id="actionReady">
+              <div class="lead-row" tabindex="0"
+                   data-open-details
+                   data-lead-id="1"
+                   data-nome="Maria Oliveira"
+                   data-telefone="(11) 90000-0000"
+                   data-email="maria@empresa.com"
+                   data-origem="formulario-site"
+                   data-score="86"
+                   data-prob="72%">
                 <div>
                   <p class="lead-row__name">Maria Oliveira</p>
                   <p class="text-muted">formulario-site • (11) 90000-0000</p>
                 </div>
                 <div class="lead-row__meta">
                   <span class="pill pill--muted">🔥 Quente</span>
-                  <button class="btn btn--small" type="button" data-open-details
-                    data-name="Maria Oliveira"
-                    data-phone="(11) 90000-0000"
-                    data-origin="formulario-site"
-                    data-time="180"
-                    data-pages="4"
-                    data-price="Sim"
-                    data-score="86"
-                    data-prob="72%"
-                  >
+                  <button class="btn btn--small" type="button"
+                          data-open-details
+                          data-lead-id="1"
+                          data-nome="Maria Oliveira"
+                          data-telefone="(11) 90000-0000"
+                          data-email="maria@empresa.com"
+                          data-origem="formulario-site"
+                          data-score="86"
+                          data-prob="72%">
                     Ver detalhes
                   </button>
                 </div>
               </div>
+
               <div class="action-list__insights">
                 <p>Leads quentes = maiores chances de fechar agora.</p>
                 <p>Marque o resultado do contato. O LeadRank aprende com seu time.</p>
@@ -299,37 +299,10 @@
               </div>
             </div>
           </div>
-
-          <div class="action-list__body">
-            <div class="lead-row">
-              <div>
-                <p class="lead-row__name">Maria Oliveira</p>
-                <p class="text-muted">formulario-site • (11) 90000-0000</p>
-              </div>
-              <div class="lead-row__meta">
-                <span class="pill pill--muted">🔥 Quente</span>
-                <button class="btn btn--small" type="button" data-open-details
-                  data-name="Maria Oliveira"
-                  data-phone="(11) 90000-0000"
-                  data-origin="formulario-site"
-                  data-time="180"
-                  data-pages="4"
-                  data-price="Sim"
-                  data-score="86"
-                  data-prob="72%"
-                >
-                  Ver detalhes
-                </button>
-              </div>
-            </div>
-            <p class="text-muted" style="margin-top:12px">Selecione um filtro para ver mais leads prioritários.</p>
-          </div>
-
-          <div class="action-list__body text-muted">Selecione um filtro para ver os leads prioritários.</div>
-
         </div>
       </section>
     </main>
+
 
     <footer class="site-footer">
       <span>© 2024 LeadRank. Todos os direitos reservados.</span>
@@ -341,167 +314,98 @@
     </footer>
   </div>
 
-  <div class="modal" id="leadDetailsModal" role="dialog" aria-modal="true">
-    <div class="modal__backdrop" data-close-details></div>
-    <div class="modal__content" role="dialog" aria-modal="true" aria-labelledby="leadDetailsTitle">
-      <div class="modal__header">
-        <div>
-          <p class="eyebrow">Detalhes do lead</p>
-          <h3 id="leadDetailsTitle">—</h3>
-        </div>
-        <button class="btn btn--ghost btn--small" type="button" data-close-details>Fechar</button>
-      </div>
-      <div class="modal__grid">
-        <div>
-          <p class="text-muted">Contato</p>
-          <div class="modal__contact">
-            <span id="leadDetailsPhone">—</span>
-            <button class="btn btn--tiny btn--ghost" type="button" id="copyPhone">Copiar</button>
+
+  <div
+    class="modal"
+    id="leadDetailsModal"
+    role="dialog"
+    aria-modal="true"
+    aria-labelledby="leadDetailsTitle"
+    aria-describedby="leadDetailsDesc"
+    hidden
+  >
+    <div class="modal__backdrop" data-close-modal tabindex="-1"></div>
+
+    <div class="modal__panel" role="document">
+      <header class="modal__header">
+        <h2 id="leadDetailsTitle" class="modal__title">Detalhes do Lead</h2>
+        <p id="leadDetailsDesc" class="modal__desc">Revise os dados e escolha a melhor ação.</p>
+
+        <button class="btn btn--ghost btn--small modal__close" type="button" aria-label="Fechar modal" data-close-modal>
+          ✕
+        </button>
+      </header>
+
+      <section class="modal__body">
+        <div class="lead-grid">
+          <div class="lead-field">
+            <span class="lead-field__label">Nome</span>
+            <span class="lead-field__value" id="leadNameValue">—</span>
+          </div>
+          <div class="lead-field">
+            <span class="lead-field__label">Telefone</span>
+            <span class="lead-field__value" id="leadPhoneValue">—</span>
+          </div>
+          <div class="lead-field">
+            <span class="lead-field__label">Email</span>
+            <span class="lead-field__value" id="leadEmailValue">—</span>
+          </div>
+          <div class="lead-field">
+            <span class="lead-field__label">Origem</span>
+            <span class="lead-field__value" id="leadSourceValue">—</span>
+          </div>
+          <div class="lead-field">
+            <span class="lead-field__label">Score</span>
+            <span class="lead-field__value" id="leadScoreValue">—</span>
+          </div>
+          <div class="lead-field">
+            <span class="lead-field__label">Probabilidade</span>
+            <span class="lead-field__value" id="leadProbValue">—</span>
           </div>
         </div>
-        <div>
-          <p class="text-muted">Origem</p>
-          <p class="modal__value" id="leadDetailsOrigin">—</p>
-        </div>
-        <div>
-          <p class="text-muted">Tempo no site</p>
-          <p class="modal__value" id="leadDetailsTime">—</p>
-        </div>
-        <div>
-          <p class="text-muted">Páginas visitadas</p>
-          <p class="modal__value" id="leadDetailsPages">—</p>
-        </div>
-        <div>
-          <p class="text-muted">Clicou em preço</p>
-          <p class="modal__value" id="leadDetailsPrice">—</p>
-        </div>
-        <div class="modal__score">
-          <p class="text-muted">Score + Probabilidade</p>
-          <p class="modal__value" id="leadDetailsScore">—</p>
-          <p class="text-muted">Score considera intenção e fit. Probabilidade estima chance de fechar.</p>
-        </div>
-      </div>
-      <div class="modal__actions">
-        <button class="btn btn--ghost btn--small" type="button">✅</button>
-        <button class="btn btn--ghost btn--small" type="button">❌</button>
-        <button class="btn btn--ghost btn--small" type="button">⏳</button>
-      </div>
+
+        <hr class="divider" />
+
+        <form id="leadActionForm" class="form" autocomplete="on">
+          <input type="hidden" id="leadId" name="leadId" value="" />
+
+          <div class="form__row">
+            <label class="form__label" for="actionType">Ação recomendada</label>
+            <select id="actionType" name="actionType" class="form__control" required>
+              <option value="" selected disabled>Selecione…</option>
+              <option value="whatsapp">Enviar WhatsApp</option>
+              <option value="ligar">Ligar</option>
+              <option value="email">Enviar email</option>
+              <option value="followup">Follow-up</option>
+            </select>
+          </div>
+
+          <div class="form__row">
+            <label class="form__label" for="actionDate">Quando</label>
+            <input id="actionDate" name="actionDate" type="date" class="form__control" />
+          </div>
+
+          <div class="form__row">
+            <label class="form__label" for="messageTemplate">Mensagem</label>
+            <textarea id="messageTemplate" name="messageTemplate" class="form__control" rows="4" placeholder="Escreva a mensagem…" autocomplete="off"></textarea>
+          </div>
+
+          <div class="form__row form__row--inline">
+            <div class="form__inline">
+              <input id="confirmSale" name="confirmSale" type="checkbox" class="form__checkbox" />
+              <label for="confirmSale">Marcar como venda confirmada</label>
+            </div>
+          </div>
+
+          <div class="modal__footer">
+            <button class="btn btn--ghost" type="button" data-close-modal>Cancelar</button>
+            <button class="btn btn--primary" type="submit">Salvar ação</button>
+          </div>
+        </form>
+      </section>
     </div>
   </div>
 
-  <!-- Botão que abre o modal (exemplo). Garanta que exista um gatilho com data-open-modal -->
-<button
-  id="openLeadDetailsBtn"
-  class="btn btn--ghost btn--small"
-  type="button"
-  data-open-modal="#leadDetailsModal"
->
-  Ver detalhes
-</button>
-
-<!-- MODAL: Lead Details -->
-<div
-  class="modal"
-  id="leadDetailsModal"
-  role="dialog"
-  aria-modal="true"
-  aria-labelledby="leadDetailsTitle"
-  aria-describedby="leadDetailsDesc"
-  hidden
->
-  <!-- Overlay -->
-  <div class="modal__backdrop" data-close-modal tabindex="-1"></div>
-
-  <!-- Container -->
-  <div class="modal__panel" role="document">
-    <header class="modal__header">
-      <h2 id="leadDetailsTitle" class="modal__title">Detalhes do Lead</h2>
-      <p id="leadDetailsDesc" class="modal__desc">
-        Revise os dados e escolha a melhor ação.
-      </p>
-
-      <button
-        class="btn btn--ghost btn--small modal__close"
-        type="button"
-        aria-label="Fechar modal"
-        data-close-modal
-      >
-        ✕
-      </button>
-    </header>
-
-    <section class="modal__body">
-      <!-- Exemplo de conteúdo dinâmico -->
-      <div class="lead-grid">
-        <div class="lead-field">
-          <span class="lead-field__label">Nome</span>
-          <span class="lead-field__value" id="leadNameValue">—</span>
-        </div>
-        <div class="lead-field">
-          <span class="lead-field__label">Telefone</span>
-          <span class="lead-field__value" id="leadPhoneValue">—</span>
-        </div>
-        <div class="lead-field">
-          <span class="lead-field__label">Origem</span>
-          <span class="lead-field__value" id="leadSourceValue">—</span>
-        </div>
-        <div class="lead-field">
-          <span class="lead-field__label">Score</span>
-          <span class="lead-field__value" id="leadScoreValue">—</span>
-        </div>
-      </div>
-
-      <hr class="divider" />
-
-      <!-- FORM: corrigido com id + name -->
-      <form id="leadActionForm" class="form" autocomplete="on">
-        <div class="form__row">
-          <label class="form__label" for="actionType">Ação recomendada</label>
-          <select id="actionType" name="actionType" class="form__control" required>
-            <option value="" selected disabled>Selecione…</option>
-            <option value="whatsapp">Enviar WhatsApp</option>
-            <option value="ligar">Ligar</option>
-            <option value="email">Enviar email</option>
-            <option value="followup">Follow-up</option>
-          </select>
-        </div>
-
-        <div class="form__row">
-          <label class="form__label" for="messageTemplate">Mensagem</label>
-          <textarea
-            id="messageTemplate"
-            name="messageTemplate"
-            class="form__control"
-            rows="4"
-            placeholder="Escreva a mensagem…"
-            autocomplete="off"
-          ></textarea>
-        </div>
-
-        <div class="form__row form__row--inline">
-          <div class="form__inline">
-            <input
-              id="confirmSale"
-              name="confirmSale"
-              type="checkbox"
-              class="form__checkbox"
-            />
-            <label for="confirmSale">Marcar como venda confirmada</label>
-          </div>
-        </div>
-
-        <div class="modal__footer">
-          <button class="btn btn--ghost" type="button" data-close-modal>
-            Cancelar
-          </button>
-          <button class="btn btn--primary" type="submit">
-            Salvar ação
-          </button>
-        </div>
-      </form>
-    </section>
-  </div>
-</div>
 
   <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
   <script>
@@ -525,21 +429,7 @@ function buildKiwifyUrl(base, { client_id, plan }) {
   return u.toString();
 }
 
-function openModal() {
-  const modal = document.getElementById('leadDetailsModal');
-  modal.classList.add('open');
 
-  // move o foco para dentro do modal
-  modal.querySelector('button, input, [tabindex]').focus();
-}
-
-function closeModal() {
-  const modal = document.getElementById('leadDetailsModal');
-  modal.classList.remove('open');
-
-  // devolve foco para o botão que abriu o modal
-  document.querySelector('#openModalBtn').focus();
-}
 
 function goToUpgradeIfRequested() {
   const plan = (qs("upgrade") || "").toLowerCase();
@@ -951,5 +841,6 @@ function goToUpgradeIfRequested() {
       }
     });
   </script>
+  <script src="modal.js" defer></script>
 </body>
 </html>

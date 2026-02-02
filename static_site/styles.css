@@ -551,71 +551,6 @@ main {
   border: 0;
 }
 
-.modal {
-  position: fixed;
-  inset: 0;
-  display: none;
-  align-items: center;
-  justify-content: center;
-  z-index: 40;
-}
-
-.modal--open {
-  display: flex;
-}
-
-.modal__backdrop {
-  position: absolute;
-  inset: 0;
-  background: rgba(6, 10, 18, 0.72);
-}
-
-.modal__content {
-  position: relative;
-  background: var(--bg-light);
-  border: 1px solid var(--stroke);
-  border-radius: 20px;
-  padding: 24px;
-  width: min(720px, 92vw);
-  z-index: 1;
-  box-shadow: 0 24px 60px rgba(0, 0, 0, 0.35);
-}
-
-.modal__header {
-  display: flex;
-  align-items: flex-start;
-  justify-content: space-between;
-  gap: 16px;
-  margin-bottom: 16px;
-}
-
-.modal__grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-  gap: 16px;
-}
-
-.modal__value {
-  margin: 6px 0 0;
-  font-size: 1.05rem;
-}
-
-.modal__contact {
-  display: flex;
-  align-items: center;
-  gap: 12px;
-  flex-wrap: wrap;
-}
-
-.modal__score {
-  grid-column: span 2;
-}
-
-.modal__actions {
-  display: flex;
-  gap: 10px;
-  margin-top: 20px;
-}
 
 .dashboard__header {
   display: flex;
@@ -1016,3 +951,5 @@ main {
   outline: 3px solid rgba(255, 255, 255, 0.18);
   outline-offset: -3px;
 }
+
+.btn--primary { background: var(--primary); color: #fff; }

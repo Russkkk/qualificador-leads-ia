@@ -358,6 +358,10 @@ main {
   border-radius: 999px;
 }
 
+ codex/implementar-resumo-do-dia-com-leads-v6m6xg
+
+ codex/implementar-resumo-do-dia-com-leads
+ main
 .action-list {
   margin-top: 24px;
 }
@@ -389,6 +393,7 @@ main {
   background: rgba(255, 255, 255, 0.02);
 }
 
+ codex/implementar-resumo-do-dia-com-leads-v6m6xg
 .lead-row {
   display: flex;
   flex-wrap: wrap;
@@ -409,6 +414,8 @@ main {
   flex-wrap: wrap;
 }
 
+
+ main
 .chip-group {
   display: flex;
   flex-wrap: wrap;
@@ -460,6 +467,7 @@ main {
   border: 0;
 }
 
+ codex/implementar-resumo-do-dia-com-leads-v6m6xg
 .modal {
   position: fixed;
   inset: 0;
@@ -526,6 +534,10 @@ main {
   margin-top: 20px;
 }
 
+
+
+ main
+ main
 .dashboard__header {
   display: flex;
   flex-wrap: wrap;

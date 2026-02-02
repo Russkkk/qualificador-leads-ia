@@ -223,6 +223,7 @@
               <button class="btn btn--ghost btn--small" type="button" data-export>Exportar CSV</button>
             </div>
           </div>
+ codex/implementar-resumo-do-dia-com-leads-v6m6xg
           <div class="action-list__body">
             <div class="lead-row">
               <div>
@@ -247,6 +248,9 @@
             </div>
             <p class="text-muted" style="margin-top:12px">Selecione um filtro para ver mais leads prioritários.</p>
           </div>
+
+          <div class="action-list__body text-muted">Selecione um filtro para ver os leads prioritários.</div>
+ main
         </div>
       </section>
     </main>
@@ -544,6 +548,7 @@ function goToUpgradeIfRequested() {
         window.location.href = url.toString();
       };
     });
+ codex/implementar-resumo-do-dia-com-leads-v6m6xg
 
     const modal = el("leadDetailsModal");
     const modalTitle = el("leadDetailsTitle");
@@ -600,6 +605,8 @@ function goToUpgradeIfRequested() {
         window.prompt("Copie o telefone:", phone);
       }
     };
+
+ main
 
     el("btnTest").onclick = async () => {
       const t = el("testMsg");

@@ -315,9 +315,14 @@ if (loginForm){
         const email = document.getElementById("email").value.trim().toLowerCase();
         const empresa = document.getElementById("empresa").value.trim();
         const telefone = document.getElementById("telefone").value.trim();
+        const password = document.getElementById("password").value.trim();
 
         if (!nome || !email){
           showError("Nome e email são obrigatórios");
+          return;
+        }
+        if (!password || password.length < 6) {
+          showError("A senha deve ter pelo menos 6 caracteres.");
           return;
         }
 

@@ -202,7 +202,11 @@
           </div>
         </div>
 
+ codex/implementar-resumo-do-dia-com-leads-izpnj8
         <div class="card action-list" data-state="empty">
+
+        <div class="card action-list">
+ main
           <div class="action-list__header">
             <h2>📞 Leads para agir agora</h2>
           </div>
@@ -223,6 +227,7 @@
               <button class="btn btn--ghost btn--small" type="button" data-export>Exportar CSV</button>
             </div>
           </div>
+ codex/implementar-resumo-do-dia-com-leads-izpnj8
           <div class="action-list__body">
             <div class="action-state action-state--loading">
               <div class="skeleton-grid">
@@ -287,6 +292,36 @@
               </div>
             </div>
           </div>
+
+ codex/implementar-resumo-do-dia-com-leads-v6m6xg
+          <div class="action-list__body">
+            <div class="lead-row">
+              <div>
+                <p class="lead-row__name">Maria Oliveira</p>
+                <p class="text-muted">formulario-site • (11) 90000-0000</p>
+              </div>
+              <div class="lead-row__meta">
+                <span class="pill pill--muted">🔥 Quente</span>
+                <button class="btn btn--small" type="button" data-open-details
+                  data-name="Maria Oliveira"
+                  data-phone="(11) 90000-0000"
+                  data-origin="formulario-site"
+                  data-time="180"
+                  data-pages="4"
+                  data-price="Sim"
+                  data-score="86"
+                  data-prob="72%"
+                >
+                  Ver detalhes
+                </button>
+              </div>
+            </div>
+            <p class="text-muted" style="margin-top:12px">Selecione um filtro para ver mais leads prioritários.</p>
+          </div>
+
+          <div class="action-list__body text-muted">Selecione um filtro para ver os leads prioritários.</div>
+ main
+ main
         </div>
       </section>
     </main>
@@ -554,7 +589,10 @@ function goToUpgradeIfRequested() {
         renderCharts(f);
         renderSummary(f);
         renderDailyHero(f);
+ codex/implementar-resumo-do-dia-com-leads-izpnj8
         setActionState(Number(f.total || 0) > 0 ? "ready" : "empty");
+
+ main
 
         setMsg("alert--success", "Dashboard carregado.");
       } catch (e) {
@@ -587,6 +625,7 @@ function goToUpgradeIfRequested() {
         window.location.href = url.toString();
       };
     });
+ codex/implementar-resumo-do-dia-com-leads-izpnj8
 
     const actionList = document.querySelector(".action-list");
     function setActionState(state) {
@@ -604,6 +643,9 @@ function goToUpgradeIfRequested() {
         if (seedButton) seedButton.click();
       };
     });
+
+ codex/implementar-resumo-do-dia-com-leads-v6m6xg
+ main
 
     const modal = el("leadDetailsModal");
     const modalTitle = el("leadDetailsTitle");
@@ -660,6 +702,8 @@ function goToUpgradeIfRequested() {
         window.prompt("Copie o telefone:", phone);
       }
     };
+
+ main
 
     el("btnTest").onclick = async () => {
       const t = el("testMsg");

@@ -1,5 +1,5 @@
 (function () {
-  const BACKEND = (window.BACKEND_URL || "").replace(/\/$/, "");
+  const BACKEND = (window.BACKEND_URL || "https://qualificador-leads-i-a.onrender.com").replace(/\/$/, "");
 
   function $(sel, root = document) {
     return root.querySelector(sel);
@@ -16,7 +16,7 @@
   }
 
   function setState(state) {
-    const wrap = $("#actionList");
+    const wrap = $("#actionList") || $(".action-list");
     if (wrap) wrap.dataset.state = state; // loading | empty | error | ready
   }
 

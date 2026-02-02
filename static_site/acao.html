@@ -164,10 +164,9 @@
     const chips = Array.from(document.querySelectorAll("[data-filter]"));
     const actionList = document.querySelector(".action-list");
     let allItems = [];
- codex/implementar-resumo-do-dia-com-leads-xeeucz
+
     let summaryState = { hot: 0, warm: 0, cold: 0, converted_today: 0 };
 
- main
     let activeFilter = "hot";
 
     function setMsg(type, text) {
@@ -204,7 +203,6 @@
       return data;
     }
 
- codex/implementar-resumo-do-dia-com-leads-xeeucz
     async function apiPost(path, body) {
       const { api_key } = getAuth();
       const headers = { "Content-Type": "application/json" };
@@ -219,8 +217,6 @@
       return data;
     }
 
-
- main
     function renderHero(summary) {
       el("dailyHotCount").textContent = summary.hot ?? 0;
       el("dailyWarmCount").textContent = summary.warm ?? 0;
@@ -265,7 +261,7 @@
             <td>${item.temperatura || "pendente"}</td>
             <td>${item.status || "pendente"}</td>
             <td>${item.created_at ? new Date(item.created_at).toLocaleDateString("pt-BR") : "—"}</td>
- codex/implementar-resumo-do-dia-com-leads-xeeucz
+
             <td>
               <div class="button-group">
                 <button class="btn btn--tiny" type="button" data-action="convert" data-id="${item.id}">✅</button>
@@ -274,7 +270,6 @@
               </div>
             </td>
 
- main
           </tr>
         `;
       }).join("");
@@ -291,10 +286,9 @@
               <th>Temperatura</th>
               <th>Status</th>
               <th>Data</th>
- codex/implementar-resumo-do-dia-com-leads-xeeucz
+
               <th>Ações</th>
 
- main
             </tr>
           </thead>
           <tbody>${rows}</tbody>
@@ -342,7 +336,7 @@
       }
       try {
         const data = await api("/acao_do_dia");
- codex/implementar-resumo-do-dia-com-leads-xeeucz
+
         summaryState = {
           hot: data.summary?.hot ?? 0,
           warm: data.summary?.warm ?? 0,
@@ -352,7 +346,7 @@
         renderHero(summaryState);
 
         renderHero(data.summary || {});
- main
+
         allItems = data.items || [];
         if (!allItems.length) {
           setActionState("empty");
@@ -367,7 +361,6 @@
       }
     }
 
- codex/implementar-resumo-do-dia-com-leads-xeeucz
     leadsTableWrap.addEventListener("click", async (event) => {
       const button = event.target.closest("[data-action]");
       if (!button) return;
@@ -398,8 +391,6 @@
       }
     });
 
-
- main
     loadAction();
   </script>
 </body>

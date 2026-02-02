@@ -186,7 +186,6 @@
                 <button type="submit" class="btn" id="submitBtn">Criar conta trial grátis</button>
             </form>
 
-
 <form id="loginForm" style="display:none">
     <div class="form-group">
         <label>Email</label>
@@ -218,13 +217,11 @@
         return n ? n : defaultUrl;
       }
 
-
       const form = document.getElementById("signupForm");
       const submitBtn = document.getElementById("submitBtn");
       const loading = document.getElementById("loading");
       const successDiv = document.getElementById("success");
       const errorDiv = document.getElementById("error");
-
 
 const qs = (k) => new URLSearchParams(location.search).get(k) || "";
 const mode = (qs("mode") || "signup").toLowerCase();

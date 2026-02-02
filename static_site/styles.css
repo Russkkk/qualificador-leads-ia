@@ -358,6 +358,91 @@ main {
   border-radius: 999px;
 }
 
+ codex/implementar-resumo-do-dia-com-leads
+.action-list {
+  margin-top: 24px;
+}
+
+.action-list__header h2 {
+  margin: 0 0 12px;
+}
+
+.action-list__bar {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 16px;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 12px;
+}
+
+.action-list__controls {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
+.action-list__body {
+  padding: 18px;
+  border-radius: 16px;
+  border: 1px dashed var(--stroke);
+  background: rgba(255, 255, 255, 0.02);
+}
+
+.chip-group {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+
+.chip {
+  border: 1px solid var(--stroke);
+  background: rgba(255, 255, 255, 0.02);
+  color: inherit;
+  padding: 6px 14px;
+  border-radius: 999px;
+  font-size: 0.85rem;
+  cursor: pointer;
+}
+
+.chip--active {
+  background: rgba(56, 211, 159, 0.18);
+  border-color: rgba(56, 211, 159, 0.4);
+  color: #eafff5;
+}
+
+.search {
+  display: flex;
+  align-items: center;
+}
+
+.search input {
+  background: rgba(255, 255, 255, 0.04);
+  border: 1px solid var(--stroke);
+  border-radius: 999px;
+  padding: 8px 14px;
+  color: inherit;
+  min-width: 240px;
+}
+
+.search input::placeholder {
+  color: var(--muted);
+}
+
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  border: 0;
+}
+
+
+ main
 .dashboard__header {
   display: flex;
   flex-wrap: wrap;

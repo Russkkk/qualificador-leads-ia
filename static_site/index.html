@@ -202,10 +202,14 @@
           </div>
         </div>
 
+ codex/implementar-resumo-do-dia-com-leads-89righ
+        <div class="card action-list" data-state="empty">
+
  codex/implementar-resumo-do-dia-com-leads-izpnj8
         <div class="card action-list" data-state="empty">
 
         <div class="card action-list">
+ main
  main
           <div class="action-list__header">
             <h2>📞 Leads para agir agora</h2>
@@ -227,7 +231,10 @@
               <button class="btn btn--ghost btn--small" type="button" data-export>Exportar CSV</button>
             </div>
           </div>
+ codex/implementar-resumo-do-dia-com-leads-89righ
+
  codex/implementar-resumo-do-dia-com-leads-izpnj8
+ main
           <div class="action-list__body">
             <div class="action-state action-state--loading">
               <div class="skeleton-grid">
@@ -292,6 +299,8 @@
               </div>
             </div>
           </div>
+ codex/implementar-resumo-do-dia-com-leads-89righ
+
 
  codex/implementar-resumo-do-dia-com-leads-v6m6xg
           <div class="action-list__body">
@@ -320,6 +329,7 @@
           </div>
 
           <div class="action-list__body text-muted">Selecione um filtro para ver os leads prioritários.</div>
+ main
  main
  main
         </div>
@@ -589,9 +599,13 @@ function goToUpgradeIfRequested() {
         renderCharts(f);
         renderSummary(f);
         renderDailyHero(f);
+ codex/implementar-resumo-do-dia-com-leads-89righ
+        setActionState(Number(f.total || 0) > 0 ? "ready" : "empty");
+
  codex/implementar-resumo-do-dia-com-leads-izpnj8
         setActionState(Number(f.total || 0) > 0 ? "ready" : "empty");
 
+ main
  main
 
         setMsg("alert--success", "Dashboard carregado.");
@@ -625,7 +639,10 @@ function goToUpgradeIfRequested() {
         window.location.href = url.toString();
       };
     });
+ codex/implementar-resumo-do-dia-com-leads-89righ
+
  codex/implementar-resumo-do-dia-com-leads-izpnj8
+ main
 
     const actionList = document.querySelector(".action-list");
     function setActionState(state) {
@@ -644,9 +661,12 @@ function goToUpgradeIfRequested() {
       };
     });
 
+ codex/implementar-resumo-do-dia-com-leads-89righ
+
  codex/implementar-resumo-do-dia-com-leads-v6m6xg
  main
 
+ main
     const modal = el("leadDetailsModal");
     const modalTitle = el("leadDetailsTitle");
     const modalPhone = el("leadDetailsPhone");

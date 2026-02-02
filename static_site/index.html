@@ -202,7 +202,11 @@
           </div>
         </div>
 
+ codex/implementar-resumo-do-dia-com-leads-izpnj8
+        <div class="card action-list" data-state="empty">
+
         <div class="card action-list">
+ main
           <div class="action-list__header">
             <h2>📞 Leads para agir agora</h2>
           </div>
@@ -223,6 +227,72 @@
               <button class="btn btn--ghost btn--small" type="button" data-export>Exportar CSV</button>
             </div>
           </div>
+ codex/implementar-resumo-do-dia-com-leads-izpnj8
+          <div class="action-list__body">
+            <div class="action-state action-state--loading">
+              <div class="skeleton-grid">
+                <div class="skeleton-card">
+                  <div class="skeleton-line skeleton-line--lg"></div>
+                  <div class="skeleton-line"></div>
+                  <div class="skeleton-pill"></div>
+                </div>
+                <div class="skeleton-card">
+                  <div class="skeleton-line skeleton-line--lg"></div>
+                  <div class="skeleton-line"></div>
+                  <div class="skeleton-pill"></div>
+                </div>
+              </div>
+              <div class="skeleton-table">
+                <div class="skeleton-line skeleton-line--md"></div>
+                <div class="skeleton-line"></div>
+                <div class="skeleton-line"></div>
+              </div>
+            </div>
+
+            <div class="action-state action-state--empty">
+              <p class="empty-state__title">Você ainda não tem leads suficientes para priorizar.</p>
+              <p class="text-muted">Comece gerando leads de teste ou conecte seu CRM para liberar a priorização diária.</p>
+              <div class="action-list__cta">
+                <button class="btn btn--small" type="button" data-seed10>Gerar 10 leads de teste</button>
+                <a class="btn btn--ghost btn--small" href="onboarding.html#integracao" target="_blank" rel="noreferrer">Ver como integrar</a>
+              </div>
+            </div>
+
+            <div class="action-state action-state--error">
+              <p class="empty-state__title">Não conseguimos carregar seus leads. Confira sua conexão ou chave de integração.</p>
+              <button class="btn btn--small" type="button" data-retry>Tentar novamente</button>
+            </div>
+
+            <div class="action-state action-state--ready">
+              <div class="lead-row">
+                <div>
+                  <p class="lead-row__name">Maria Oliveira</p>
+                  <p class="text-muted">formulario-site • (11) 90000-0000</p>
+                </div>
+                <div class="lead-row__meta">
+                  <span class="pill pill--muted">🔥 Quente</span>
+                  <button class="btn btn--small" type="button" data-open-details
+                    data-name="Maria Oliveira"
+                    data-phone="(11) 90000-0000"
+                    data-origin="formulario-site"
+                    data-time="180"
+                    data-pages="4"
+                    data-price="Sim"
+                    data-score="86"
+                    data-prob="72%"
+                  >
+                    Ver detalhes
+                  </button>
+                </div>
+              </div>
+              <div class="action-list__insights">
+                <p>Leads quentes = maiores chances de fechar agora.</p>
+                <p>Marque o resultado do contato. O LeadRank aprende com seu time.</p>
+                <p>Quanto mais feedback, melhor a priorização.</p>
+              </div>
+            </div>
+          </div>
+
  codex/implementar-resumo-do-dia-com-leads-v6m6xg
           <div class="action-list__body">
             <div class="lead-row">
@@ -250,6 +320,7 @@
           </div>
 
           <div class="action-list__body text-muted">Selecione um filtro para ver os leads prioritários.</div>
+ main
  main
         </div>
       </section>
@@ -504,6 +575,7 @@ function goToUpgradeIfRequested() {
 
     async function loadDashboard() {
       msg.style.display = "none";
+      setActionState("loading");
       const { client_id } = getAuth();
       wsPill.textContent = "workspace: " + (client_id || "—");
 
@@ -517,9 +589,14 @@ function goToUpgradeIfRequested() {
         renderCharts(f);
         renderSummary(f);
         renderDailyHero(f);
+ codex/implementar-resumo-do-dia-com-leads-izpnj8
+        setActionState(Number(f.total || 0) > 0 ? "ready" : "empty");
+
+ main
 
         setMsg("alert--success", "Dashboard carregado.");
       } catch (e) {
+        setActionState("error");
         setMsg("alert--error", "Erro ao carregar: " + e.message);
       }
     }
@@ -548,7 +625,27 @@ function goToUpgradeIfRequested() {
         window.location.href = url.toString();
       };
     });
+ codex/implementar-resumo-do-dia-com-leads-izpnj8
+
+    const actionList = document.querySelector(".action-list");
+    function setActionState(state) {
+      if (!actionList) return;
+      actionList.dataset.state = state;
+    }
+
+    document.querySelectorAll("[data-retry]").forEach((btn) => {
+      btn.onclick = () => loadDashboard();
+    });
+
+    document.querySelectorAll("[data-seed10]").forEach((btn) => {
+      btn.onclick = () => {
+        const seedButton = el("btnSeed10");
+        if (seedButton) seedButton.click();
+      };
+    });
+
  codex/implementar-resumo-do-dia-com-leads-v6m6xg
+ main
 
     const modal = el("leadDetailsModal");
     const modalTitle = el("leadDetailsTitle");

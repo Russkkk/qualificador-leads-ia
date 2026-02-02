@@ -358,9 +358,12 @@ main {
   border-radius: 999px;
 }
 
+ codex/implementar-resumo-do-dia-com-leads-izpnj8
+
  codex/implementar-resumo-do-dia-com-leads-v6m6xg
 
  codex/implementar-resumo-do-dia-com-leads
+ main
  main
 .action-list {
   margin-top: 24px;
@@ -393,7 +396,101 @@ main {
   background: rgba(255, 255, 255, 0.02);
 }
 
+ codex/implementar-resumo-do-dia-com-leads-izpnj8
+.action-state {
+  display: none;
+}
+
+.action-list[data-state="loading"] .action-state--loading,
+.action-list[data-state="empty"] .action-state--empty,
+.action-list[data-state="error"] .action-state--error,
+.action-list[data-state="ready"] .action-state--ready {
+  display: block;
+}
+
+.action-list__cta {
+  display: flex;
+  gap: 12px;
+  flex-wrap: wrap;
+  margin-top: 16px;
+}
+
+.action-list__insights {
+  margin-top: 16px;
+  display: grid;
+  gap: 8px;
+  color: var(--muted);
+}
+
+.action-list__insights p {
+  margin: 0;
+}
+
+.empty-state__title {
+  font-size: 1.05rem;
+  font-weight: 600;
+  margin: 0 0 8px;
+}
+
+.skeleton-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: 16px;
+  margin-bottom: 20px;
+}
+
+.skeleton-card {
+  border-radius: 16px;
+  padding: 16px;
+  background: rgba(255, 255, 255, 0.04);
+  border: 1px solid var(--stroke);
+  display: grid;
+  gap: 10px;
+}
+
+.skeleton-line {
+  height: 12px;
+  border-radius: 999px;
+  background: linear-gradient(90deg, rgba(255, 255, 255, 0.08), rgba(255, 255, 255, 0.18), rgba(255, 255, 255, 0.08));
+  background-size: 200% 100%;
+  animation: skeleton 1.6s ease-in-out infinite;
+}
+
+.skeleton-line--lg {
+  height: 18px;
+  width: 70%;
+}
+
+.skeleton-line--md {
+  width: 50%;
+}
+
+.skeleton-pill {
+  height: 28px;
+  width: 110px;
+  border-radius: 999px;
+  background: linear-gradient(90deg, rgba(255, 255, 255, 0.08), rgba(255, 255, 255, 0.18), rgba(255, 255, 255, 0.08));
+  background-size: 200% 100%;
+  animation: skeleton 1.6s ease-in-out infinite;
+}
+
+.skeleton-table {
+  display: grid;
+  gap: 10px;
+}
+
+@keyframes skeleton {
+  0% {
+    background-position: 0% 50%;
+  }
+  100% {
+    background-position: 200% 50%;
+  }
+}
+
+
  codex/implementar-resumo-do-dia-com-leads-v6m6xg
+ main
 .lead-row {
   display: flex;
   flex-wrap: wrap;
@@ -414,7 +511,10 @@ main {
   flex-wrap: wrap;
 }
 
+ codex/implementar-resumo-do-dia-com-leads-izpnj8
 
+
+ main
  main
 .chip-group {
   display: flex;
@@ -467,7 +567,10 @@ main {
   border: 0;
 }
 
+ codex/implementar-resumo-do-dia-com-leads-izpnj8
+
  codex/implementar-resumo-do-dia-com-leads-v6m6xg
+ main
 .modal {
   position: fixed;
   inset: 0;
@@ -534,8 +637,11 @@ main {
   margin-top: 20px;
 }
 
+ codex/implementar-resumo-do-dia-com-leads-izpnj8
 
 
+
+ main
  main
  main
 .dashboard__header {

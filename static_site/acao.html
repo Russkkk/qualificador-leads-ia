@@ -164,6 +164,10 @@
     const chips = Array.from(document.querySelectorAll("[data-filter]"));
     const actionList = document.querySelector(".action-list");
     let allItems = [];
+ codex/implementar-resumo-do-dia-com-leads-xeeucz
+    let summaryState = { hot: 0, warm: 0, cold: 0, converted_today: 0 };
+
+ main
     let activeFilter = "hot";
 
     function setMsg(type, text) {
@@ -200,6 +204,23 @@
       return data;
     }
 
+ codex/implementar-resumo-do-dia-com-leads-xeeucz
+    async function apiPost(path, body) {
+      const { api_key } = getAuth();
+      const headers = { "Content-Type": "application/json" };
+      if (api_key) headers["X-API-KEY"] = api_key;
+      const res = await fetch(BACKEND + path, {
+        method: "POST",
+        headers,
+        body: JSON.stringify(body),
+      });
+      const data = await res.json().catch(() => ({}));
+      if (!res.ok) throw new Error(data.error || data.message || ("HTTP " + res.status));
+      return data;
+    }
+
+
+ main
     function renderHero(summary) {
       el("dailyHotCount").textContent = summary.hot ?? 0;
       el("dailyWarmCount").textContent = summary.warm ?? 0;
@@ -244,6 +265,16 @@
             <td>${item.temperatura || "pendente"}</td>
             <td>${item.status || "pendente"}</td>
             <td>${item.created_at ? new Date(item.created_at).toLocaleDateString("pt-BR") : "—"}</td>
+ codex/implementar-resumo-do-dia-com-leads-xeeucz
+            <td>
+              <div class="button-group">
+                <button class="btn btn--tiny" type="button" data-action="convert" data-id="${item.id}">✅</button>
+                <button class="btn btn--tiny btn--ghost" type="button" data-action="deny" data-id="${item.id}">❌</button>
+                <button class="btn btn--tiny btn--ghost" type="button" data-action="later" data-id="${item.id}">⏳</button>
+              </div>
+            </td>
+
+ main
           </tr>
         `;
       }).join("");
@@ -260,6 +291,10 @@
               <th>Temperatura</th>
               <th>Status</th>
               <th>Data</th>
+ codex/implementar-resumo-do-dia-com-leads-xeeucz
+              <th>Ações</th>
+
+ main
             </tr>
           </thead>
           <tbody>${rows}</tbody>
@@ -307,7 +342,17 @@
       }
       try {
         const data = await api("/acao_do_dia");
+ codex/implementar-resumo-do-dia-com-leads-xeeucz
+        summaryState = {
+          hot: data.summary?.hot ?? 0,
+          warm: data.summary?.warm ?? 0,
+          cold: data.summary?.cold ?? 0,
+          converted_today: data.summary?.converted_today ?? 0,
+        };
+        renderHero(summaryState);
+
         renderHero(data.summary || {});
+ main
         allItems = data.items || [];
         if (!allItems.length) {
           setActionState("empty");
@@ -322,6 +367,39 @@
       }
     }
 
+ codex/implementar-resumo-do-dia-com-leads-xeeucz
+    leadsTableWrap.addEventListener("click", async (event) => {
+      const button = event.target.closest("[data-action]");
+      if (!button) return;
+      const action = button.dataset.action;
+      const leadId = Number(button.dataset.id || 0);
+      const { client_id } = getAuth();
+      if (!leadId || !client_id) return;
+
+      try {
+        if (action === "convert") {
+          await apiPost("/confirmar_venda", { client_id, lead_id: leadId });
+          summaryState.converted_today += 1;
+          renderHero(summaryState);
+          allItems = allItems.map((item) =>
+            item.id === leadId ? { ...item, status: "convertido" } : item
+          );
+        } else if (action === "deny") {
+          await apiPost("/negar_venda", { client_id, lead_id: leadId });
+          allItems = allItems.map((item) =>
+            item.id === leadId ? { ...item, status: "negado" } : item
+          );
+        } else if (action === "later") {
+          allItems = allItems.filter((item) => item.id !== leadId);
+        }
+        applyFilters();
+      } catch (err) {
+        setMsg("alert--error", "Não foi possível atualizar o lead. Tente novamente.");
+      }
+    });
+
+
+ main
     loadAction();
   </script>
 </body>

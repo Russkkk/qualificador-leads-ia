@@ -188,12 +188,19 @@ def _hot_leads_today(client_id: str, limit: int = 20):
 
 def _lead_temperature(probabilidade: Optional[float], score: Optional[int]) -> str:
     prob = _safe_float(probabilidade, None)
+ codex/implementar-resumo-do-dia-com-leads-vmr4y6
     score_val = _safe_int(score, 0) if score is not None else None
     if prob is None and score_val is None:
         return "unknown"
     if (prob is not None and prob >= 0.70) or score_val >= 70:
         return "hot"
     if (prob is not None and 0.40 <= prob < 0.70) or (score_val is not None and 40 <= score_val < 70):
+
+    score_val = _safe_int(score, 0)
+    if (prob is not None and prob >= 0.70) or score_val >= 70:
+        return "hot"
+    if (prob is not None and prob >= 0.35) or score_val >= 35:
+ main
         return "warm"
     return "cold"
 
@@ -2143,12 +2150,20 @@ def acao_do_dia():
                                 AND ((probabilidade IS NOT NULL AND probabilidade >= 0.70) OR (score IS NOT NULL AND score >= 70))
                                THEN 1 ELSE 0 END) AS hot_today,
                       SUM(CASE WHEN created_at >= %s AND created_at <= %s
+ codex/implementar-resumo-do-dia-com-leads-vmr4y6
                                 AND ((probabilidade IS NOT NULL AND probabilidade >= 0.40 AND probabilidade < 0.70)
                                      OR (score IS NOT NULL AND score >= 40 AND score < 70))
                                THEN 1 ELSE 0 END) AS warm_today,
                       SUM(CASE WHEN created_at >= %s AND created_at <= %s
                                 AND ((probabilidade IS NOT NULL AND probabilidade < 0.40)
                                      OR (score IS NOT NULL AND score < 40))
+
+                                AND ((probabilidade IS NOT NULL AND probabilidade >= 0.35 AND probabilidade < 0.70)
+                                     OR (score IS NOT NULL AND score >= 35 AND score < 70))
+                               THEN 1 ELSE 0 END) AS warm_today,
+                      SUM(CASE WHEN created_at >= %s AND created_at <= %s
+                                AND ((probabilidade IS NOT NULL AND probabilidade < 0.35) OR (score IS NOT NULL AND score < 35))
+
                                THEN 1 ELSE 0 END) AS cold_today,
                       SUM(CASE WHEN updated_at >= %s AND updated_at <= %s AND virou_cliente = 1 THEN 1 ELSE 0 END) AS converted_today
                     FROM leads

@@ -233,6 +233,7 @@ def handle_exception(err: Exception):
     trace = _log_exception("Unhandled exception")
     payload = {
         "error_code": "internal_error",
+        "code": "internal_error",
         "error_type": err.__class__.__name__,
     }
     if DEBUG_MODE or INCLUDE_TRACEBACK:

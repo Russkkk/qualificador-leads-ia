@@ -187,20 +187,26 @@ def _hot_leads_today(client_id: str, limit: int = 20):
         conn.close()
 
 def _lead_temperature(probabilidade: Optional[float], score: Optional[int]) -> str:
+    """Classifica 'temperatura' do lead de forma consistente.
+
+    Regras:
+      - hot  : prob>=0.70 ou score>=70
+      - warm : prob>=0.35 ou score>=35
+      - cold : abaixo disso
+      - unknown: quando ambos ausentes
+    """
     prob = _safe_float(probabilidade, None)
-    score_val = _safe_int(score, 0) if score is not None else None
+    score_val = None if score is None else _safe_int(score, 0)
+
     if prob is None and score_val is None:
         return "unknown"
-    if (prob is not None and prob >= 0.70) or score_val >= 70:
+
+    if (prob is not None and prob >= 0.70) or (score_val is not None and score_val >= 70):
         return "hot"
-    if (prob is not None and 0.40 <= prob < 0.70) or (score_val is not None and 40 <= score_val < 70):
-    
-    score_val = _safe_int(score, 0)
-    if (prob is not None and prob >= 0.70) or score_val >= 70:
-        return "hot"
-    if (prob is not None and prob >= 0.35) or score_val >= 35:
+    if (prob is not None and prob >= 0.35) or (score_val is not None and score_val >= 35):
         return "warm"
     return "cold"
+
 
 def _resp(payload: Dict[str, Any], code: int = 200):
     return jsonify(payload), code
@@ -2148,12 +2154,12 @@ def acao_do_dia():
                                 AND ((probabilidade IS NOT NULL AND probabilidade >= 0.70) OR (score IS NOT NULL AND score >= 70))
                                THEN 1 ELSE 0 END) AS hot_today,
                       SUM(CASE WHEN created_at >= %s AND created_at <= %s
-                                AND ((probabilidade IS NOT NULL AND probabilidade >= 0.40 AND probabilidade < 0.70)
-                                     OR (score IS NOT NULL AND score >= 40 AND score < 70))
+                                AND ((probabilidade IS NOT NULL AND probabilidade >= 0.35 AND probabilidade < 0.70)
+                                     OR (score IS NOT NULL AND score >= 35 AND score < 70))
                                THEN 1 ELSE 0 END) AS warm_today,
                       SUM(CASE WHEN created_at >= %s AND created_at <= %s
-                                AND ((probabilidade IS NOT NULL AND probabilidade < 0.40)
-                                     OR (score IS NOT NULL AND score < 40))
+                                AND ((probabilidade IS NOT NULL AND probabilidade < 0.35)
+                                     OR (score IS NOT NULL AND score < 35))
                                 AND ((probabilidade IS NOT NULL AND probabilidade >= 0.35 AND probabilidade < 0.70)
                                      OR (score IS NOT NULL AND score >= 35 AND score < 70))
                                THEN 1 ELSE 0 END) AS warm_today,
@@ -2172,8 +2178,6 @@ def acao_do_dia():
                     """
                     SELECT id, nome, telefone, email_lead, origem,
                            score, probabilidade, created_at, virou_cliente
-                           score, probabilidade, created_at, virou_cliente
-                           score, probabilidade, created_at
                     FROM leads
                     WHERE client_id=%s
                     ORDER BY COALESCE(probabilidade, score / 100.0) DESC NULLS LAST,
@@ -2203,7 +2207,6 @@ def acao_do_dia():
                 "score": _safe_int(item.get("score"), 0) if item.get("score") is not None else None,
                 "probabilidade": _safe_float(item.get("probabilidade"), None),
                 "temperatura": _lead_temperature(item.get("probabilidade"), item.get("score")),
-                "status": status,
                 "status": status,
                 "created_at": _iso(item.get("created_at")),
             })

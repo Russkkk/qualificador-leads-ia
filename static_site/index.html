@@ -223,7 +223,34 @@
               <button class="btn btn--ghost btn--small" type="button" data-export>Exportar CSV</button>
             </div>
           </div>
+ codex/implementar-resumo-do-dia-com-leads-v6m6xg
+          <div class="action-list__body">
+            <div class="lead-row">
+              <div>
+                <p class="lead-row__name">Maria Oliveira</p>
+                <p class="text-muted">formulario-site • (11) 90000-0000</p>
+              </div>
+              <div class="lead-row__meta">
+                <span class="pill pill--muted">🔥 Quente</span>
+                <button class="btn btn--small" type="button" data-open-details
+                  data-name="Maria Oliveira"
+                  data-phone="(11) 90000-0000"
+                  data-origin="formulario-site"
+                  data-time="180"
+                  data-pages="4"
+                  data-price="Sim"
+                  data-score="86"
+                  data-prob="72%"
+                >
+                  Ver detalhes
+                </button>
+              </div>
+            </div>
+            <p class="text-muted" style="margin-top:12px">Selecione um filtro para ver mais leads prioritários.</p>
+          </div>
+
           <div class="action-list__body text-muted">Selecione um filtro para ver os leads prioritários.</div>
+ main
         </div>
       </section>
     </main>
@@ -236,6 +263,54 @@
         <a href="onboarding.html">Criar conta</a>
       </div>
     </footer>
+  </div>
+
+  <div class="modal" id="leadDetailsModal" aria-hidden="true">
+    <div class="modal__backdrop" data-close-details></div>
+    <div class="modal__content" role="dialog" aria-modal="true" aria-labelledby="leadDetailsTitle">
+      <div class="modal__header">
+        <div>
+          <p class="eyebrow">Detalhes do lead</p>
+          <h3 id="leadDetailsTitle">—</h3>
+        </div>
+        <button class="btn btn--ghost btn--small" type="button" data-close-details>Fechar</button>
+      </div>
+      <div class="modal__grid">
+        <div>
+          <p class="text-muted">Contato</p>
+          <div class="modal__contact">
+            <span id="leadDetailsPhone">—</span>
+            <button class="btn btn--tiny btn--ghost" type="button" id="copyPhone">Copiar</button>
+          </div>
+        </div>
+        <div>
+          <p class="text-muted">Origem</p>
+          <p class="modal__value" id="leadDetailsOrigin">—</p>
+        </div>
+        <div>
+          <p class="text-muted">Tempo no site</p>
+          <p class="modal__value" id="leadDetailsTime">—</p>
+        </div>
+        <div>
+          <p class="text-muted">Páginas visitadas</p>
+          <p class="modal__value" id="leadDetailsPages">—</p>
+        </div>
+        <div>
+          <p class="text-muted">Clicou em preço</p>
+          <p class="modal__value" id="leadDetailsPrice">—</p>
+        </div>
+        <div class="modal__score">
+          <p class="text-muted">Score + Probabilidade</p>
+          <p class="modal__value" id="leadDetailsScore">—</p>
+          <p class="text-muted">Score considera intenção e fit. Probabilidade estima chance de fechar.</p>
+        </div>
+      </div>
+      <div class="modal__actions">
+        <button class="btn btn--ghost btn--small" type="button">✅</button>
+        <button class="btn btn--ghost btn--small" type="button">❌</button>
+        <button class="btn btn--ghost btn--small" type="button">⏳</button>
+      </div>
+    </div>
   </div>
 
   <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
@@ -473,6 +548,65 @@ function goToUpgradeIfRequested() {
         window.location.href = url.toString();
       };
     });
+ codex/implementar-resumo-do-dia-com-leads-v6m6xg
+
+    const modal = el("leadDetailsModal");
+    const modalTitle = el("leadDetailsTitle");
+    const modalPhone = el("leadDetailsPhone");
+    const modalOrigin = el("leadDetailsOrigin");
+    const modalTime = el("leadDetailsTime");
+    const modalPages = el("leadDetailsPages");
+    const modalPrice = el("leadDetailsPrice");
+    const modalScore = el("leadDetailsScore");
+    const copyPhoneBtn = el("copyPhone");
+
+    function openLeadDetails(data) {
+      modalTitle.textContent = data.name || "—";
+      modalPhone.textContent = data.phone || "—";
+      modalOrigin.textContent = data.origin || "—";
+      modalTime.textContent = data.time ? `${data.time}s` : "—";
+      modalPages.textContent = data.pages || "—";
+      modalPrice.textContent = data.price || "—";
+      modalScore.textContent = data.score && data.prob ? `${data.score} • ${data.prob}` : "—";
+      modal.classList.add("modal--open");
+      modal.setAttribute("aria-hidden", "false");
+    }
+
+    function closeLeadDetails() {
+      modal.classList.remove("modal--open");
+      modal.setAttribute("aria-hidden", "true");
+    }
+
+    document.querySelectorAll("[data-open-details]").forEach((btn) => {
+      btn.onclick = () => {
+        openLeadDetails({
+          name: btn.dataset.name,
+          phone: btn.dataset.phone,
+          origin: btn.dataset.origin,
+          time: btn.dataset.time,
+          pages: btn.dataset.pages,
+          price: btn.dataset.price,
+          score: btn.dataset.score,
+          prob: btn.dataset.prob
+        });
+      };
+    });
+
+    document.querySelectorAll("[data-close-details]").forEach((btn) => {
+      btn.onclick = closeLeadDetails;
+    });
+
+    copyPhoneBtn.onclick = () => {
+      const phone = modalPhone.textContent.trim();
+      if (!phone || phone === "—") return;
+      if (navigator.clipboard?.writeText) {
+        navigator.clipboard.writeText(phone);
+      } else {
+        window.prompt("Copie o telefone:", phone);
+      }
+    };
+
+ main
 
     el("btnTest").onclick = async () => {
       const t = el("testMsg");

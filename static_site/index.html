@@ -341,7 +341,7 @@
     </footer>
   </div>
 
-  <div class="modal" id="leadDetailsModal" aria-hidden="true">
+  <div class="modal" id="leadDetailsModal" role="dialog" aria-modal="true">
     <div class="modal__backdrop" data-close-details></div>
     <div class="modal__content" role="dialog" aria-modal="true" aria-labelledby="leadDetailsTitle">
       <div class="modal__header">
@@ -389,6 +389,120 @@
     </div>
   </div>
 
+  <!-- Botão que abre o modal (exemplo). Garanta que exista um gatilho com data-open-modal -->
+<button
+  id="openLeadDetailsBtn"
+  class="btn btn--ghost btn--small"
+  type="button"
+  data-open-modal="#leadDetailsModal"
+>
+  Ver detalhes
+</button>
+
+<!-- MODAL: Lead Details -->
+<div
+  class="modal"
+  id="leadDetailsModal"
+  role="dialog"
+  aria-modal="true"
+  aria-labelledby="leadDetailsTitle"
+  aria-describedby="leadDetailsDesc"
+  hidden
+>
+  <!-- Overlay -->
+  <div class="modal__backdrop" data-close-modal tabindex="-1"></div>
+
+  <!-- Container -->
+  <div class="modal__panel" role="document">
+    <header class="modal__header">
+      <h2 id="leadDetailsTitle" class="modal__title">Detalhes do Lead</h2>
+      <p id="leadDetailsDesc" class="modal__desc">
+        Revise os dados e escolha a melhor ação.
+      </p>
+
+      <button
+        class="btn btn--ghost btn--small modal__close"
+        type="button"
+        aria-label="Fechar modal"
+        data-close-modal
+      >
+        ✕
+      </button>
+    </header>
+
+    <section class="modal__body">
+      <!-- Exemplo de conteúdo dinâmico -->
+      <div class="lead-grid">
+        <div class="lead-field">
+          <span class="lead-field__label">Nome</span>
+          <span class="lead-field__value" id="leadNameValue">—</span>
+        </div>
+        <div class="lead-field">
+          <span class="lead-field__label">Telefone</span>
+          <span class="lead-field__value" id="leadPhoneValue">—</span>
+        </div>
+        <div class="lead-field">
+          <span class="lead-field__label">Origem</span>
+          <span class="lead-field__value" id="leadSourceValue">—</span>
+        </div>
+        <div class="lead-field">
+          <span class="lead-field__label">Score</span>
+          <span class="lead-field__value" id="leadScoreValue">—</span>
+        </div>
+      </div>
+
+      <hr class="divider" />
+
+      <!-- FORM: corrigido com id + name -->
+      <form id="leadActionForm" class="form" autocomplete="on">
+        <div class="form__row">
+          <label class="form__label" for="actionType">Ação recomendada</label>
+          <select id="actionType" name="actionType" class="form__control" required>
+            <option value="" selected disabled>Selecione…</option>
+            <option value="whatsapp">Enviar WhatsApp</option>
+            <option value="ligar">Ligar</option>
+            <option value="email">Enviar email</option>
+            <option value="followup">Follow-up</option>
+          </select>
+        </div>
+
+        <div class="form__row">
+          <label class="form__label" for="messageTemplate">Mensagem</label>
+          <textarea
+            id="messageTemplate"
+            name="messageTemplate"
+            class="form__control"
+            rows="4"
+            placeholder="Escreva a mensagem…"
+            autocomplete="off"
+          ></textarea>
+        </div>
+
+        <div class="form__row form__row--inline">
+          <div class="form__inline">
+            <input
+              id="confirmSale"
+              name="confirmSale"
+              type="checkbox"
+              class="form__checkbox"
+            />
+            <label for="confirmSale">Marcar como venda confirmada</label>
+          </div>
+        </div>
+
+        <div class="modal__footer">
+          <button class="btn btn--ghost" type="button" data-close-modal>
+            Cancelar
+          </button>
+          <button class="btn btn--primary" type="submit">
+            Salvar ação
+          </button>
+        </div>
+      </form>
+    </section>
+  </div>
+</div>
+
   <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
   <script>
     const BACKEND = (window.BACKEND_URL || "https://qualificador-leads-i-a.onrender.com").replace(/\/$/, "");
@@ -409,6 +523,22 @@ function buildKiwifyUrl(base, { client_id, plan }) {
   if (!u.searchParams.get("utm_medium")) u.searchParams.set("utm_medium", "checkout");
   if (!u.searchParams.get("utm_campaign")) u.searchParams.set("utm_campaign", "pricing");
   return u.toString();
+}
+
+function openModal() {
+  const modal = document.getElementById('leadDetailsModal');
+  modal.classList.add('open');
+
+  // move o foco para dentro do modal
+  modal.querySelector('button, input, [tabindex]').focus();
+}
+
+function closeModal() {
+  const modal = document.getElementById('leadDetailsModal');
+  modal.classList.remove('open');
+
+  // devolve foco para o botão que abriu o modal
+  document.querySelector('#openModalBtn').focus();
 }
 
 function goToUpgradeIfRequested() {

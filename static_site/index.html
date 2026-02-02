@@ -24,6 +24,61 @@
 
     <main>
       <section class="dashboard">
+        <div class="card daily-hero">
+          <div class="daily-hero__header">
+            <div>
+              <p class="eyebrow">Resumo do dia</p>
+              <h1 class="daily-hero__title">🔥 Ação do dia</h1>
+              <p class="subtitle">Esses são os leads com maior chance de fechar agora.</p>
+            </div>
+          </div>
+          <div class="daily-hero__grid">
+            <div class="daily-card daily-card--hot">
+              <div class="daily-card__top">
+                <span class="daily-card__icon">🔥</span>
+                <div>
+                  <p class="daily-card__label">Quentes</p>
+                  <p class="daily-card__value" id="dailyHotCount">—</p>
+                </div>
+              </div>
+              <p class="text-muted">Ligue primeiro</p>
+              <button class="btn btn--small" type="button">Ver quentes</button>
+            </div>
+            <div class="daily-card daily-card--warm">
+              <div class="daily-card__top">
+                <span class="daily-card__icon">🟡</span>
+                <div>
+                  <p class="daily-card__label">Mornos</p>
+                  <p class="daily-card__value" id="dailyWarmCount">—</p>
+                </div>
+              </div>
+              <p class="text-muted">Acompanhe hoje</p>
+              <button class="btn btn--small btn--ghost" type="button">Ver mornos</button>
+            </div>
+            <div class="daily-card daily-card--cold">
+              <div class="daily-card__top">
+                <span class="daily-card__icon">❄️</span>
+                <div>
+                  <p class="daily-card__label">Frios</p>
+                  <p class="daily-card__value" id="dailyColdCount">—</p>
+                </div>
+              </div>
+              <p class="text-muted">Nutrir / automação</p>
+              <button class="btn btn--small btn--ghost" type="button">Ver frios</button>
+            </div>
+            <div class="daily-card daily-card--success">
+              <div class="daily-card__top">
+                <span class="daily-card__icon">✅</span>
+                <div>
+                  <p class="daily-card__label">Convertidos hoje</p>
+                  <p class="daily-card__value" id="dailyConvertedCount">—</p>
+                </div>
+              </div>
+              <p class="text-muted">Feedback do time</p>
+              <button class="btn btn--tiny btn--ghost" type="button">Ver convertidos</button>
+            </div>
+          </div>
+        </div>
         <div class="dashboard__header">
           <div>
             <p class="eyebrow">Dashboard</p>
@@ -86,7 +141,7 @@
               <div class="button-group">
                 <button class="btn btn--small" type="button" id="btnSave">Salvar</button>
                 <button class="btn btn--ghost btn--small" type="button" id="btnLoad">Carregar dashboard</button>
-                <button class="btn btn--ghost btn--small" type="button" id="btnExport">Exportar CSV</button>
+                <button class="btn btn--ghost btn--small" type="button" id="btnExport" data-export>Exportar CSV</button>
               </div>
               <p class="form__hint">
                 A API Key é usada no header <code>X-API-KEY</code>.
@@ -145,6 +200,30 @@
               <div class="alert" id="realLeadMsg"></div>
             </div>
           </div>
+        </div>
+
+        <div class="card action-list">
+          <div class="action-list__header">
+            <h2>📞 Leads para agir agora</h2>
+          </div>
+          <div class="action-list__bar">
+            <div class="chip-group" role="tablist" aria-label="Filtro rápido">
+              <button class="chip chip--active" type="button">🔥 Quentes</button>
+              <button class="chip" type="button">🟡 Mornos</button>
+              <button class="chip" type="button">❄️ Frios</button>
+              <button class="chip" type="button">⏳ Pendentes</button>
+              <button class="chip" type="button">✅ Convertidos</button>
+              <button class="chip" type="button">❌ Negados</button>
+            </div>
+            <div class="action-list__controls">
+              <label class="search">
+                <span class="sr-only">Buscar por nome, telefone, origem</span>
+                <input type="search" placeholder="Buscar por nome, telefone, origem" />
+              </label>
+              <button class="btn btn--ghost btn--small" type="button" data-export>Exportar CSV</button>
+            </div>
+          </div>
+          <div class="action-list__body text-muted">Selecione um filtro para ver os leads prioritários.</div>
         </div>
       </section>
     </main>
@@ -337,6 +416,17 @@ function goToUpgradeIfRequested() {
       if (wrap) wrap.innerHTML = html;
     }
 
+    function renderDailyHero(f) {
+      const hot = f.hot_today ?? f.hot ?? 0;
+      const warm = f.warm ?? 0;
+      const cold = f.cold ?? 0;
+      const convertedToday = f.convertidos_hoje ?? f.convertidos_today ?? f.convertidos ?? 0;
+      el("dailyHotCount").textContent = hot;
+      el("dailyWarmCount").textContent = warm;
+      el("dailyColdCount").textContent = cold;
+      el("dailyConvertedCount").textContent = convertedToday;
+    }
+
     async function loadDashboard() {
       msg.style.display = "none";
       const { client_id } = getAuth();
@@ -351,6 +441,7 @@ function goToUpgradeIfRequested() {
 
         renderCharts(f);
         renderSummary(f);
+        renderDailyHero(f);
 
         setMsg("alert--success", "Dashboard carregado.");
       } catch (e) {
@@ -368,17 +459,20 @@ function goToUpgradeIfRequested() {
 
     el("btnLoad").onclick = loadDashboard;
 
-    el("btnExport").onclick = () => {
-      const { client_id, api_key } = getAuth();
-      if (!client_id) return setMsg("alert--error", "Informe o client_id.");
-      const url = new URL(BACKEND + "/leads_export.csv");
-      url.searchParams.set("client_id", client_id);
-      if (api_key) {
-        setMsg("alert--error", "Para exportar com API Key, faça o download via API ou desative a exigência.");
-        return;
-      }
-      window.location.href = url.toString();
-    };
+    const exportButtons = document.querySelectorAll("[data-export]");
+    exportButtons.forEach((btn) => {
+      btn.onclick = () => {
+        const { client_id, api_key } = getAuth();
+        if (!client_id) return setMsg("alert--error", "Informe o client_id.");
+        const url = new URL(BACKEND + "/leads_export.csv");
+        url.searchParams.set("client_id", client_id);
+        if (api_key) {
+          setMsg("alert--error", "Para exportar com API Key, faça o download via API ou desative a exigência.");
+          return;
+        }
+        window.location.href = url.toString();
+      };
+    });
 
     el("btnTest").onclick = async () => {
       const t = el("testMsg");

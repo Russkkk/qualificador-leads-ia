@@ -181,6 +181,7 @@
 9. **Funciona com meu setor?**
    - Se você recebe leads digitais, funciona.
 10. **Tem suporte no início?**
+
 **Estrutura simples (Trial 14 dias + 2 planos principais)**
 - **Trial 14 dias**: todas as funções liberadas, sem cartão.
 - **Plano Essencial**: até 1.000 leads/mês.
@@ -455,7 +456,6 @@
 - 3–5% de visita → cadastro.
 - 40–60% de cadastro → ativação.
 - 10–20% de ativação → upgrade em 30 dias.
-
 
 **Sinais claros**
 - **Mensagem ruim:** muitas visitas e poucos cadastros.

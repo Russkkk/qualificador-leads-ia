@@ -26,47 +26,72 @@
     <main>
       <section class="pricing">
         <p class="eyebrow">Planos flexíveis para cada fase</p>
-        <h1>Escolha o plano ideal para o seu volume de leads</h1>
+        <h1>Escolha o plano ideal para a sua capacidade de leads</h1>
         <p class="subtitle">
-          Comece no trial e evolua conforme a operação cresce. Todos os planos incluem métricas em tempo real e integração via API.
+          Comece no trial e evolua conforme a operação cresce. Todos os planos incluem a Ação do Dia e priorização diária.
         </p>
 
-        <div class="pricing__grid">
-          <article class="card">
+        <div class="pricing__grid" id="pricingGrid">
+          <article class="card" data-plan="trial">
             <span class="pricing__tag">Trial • 14 dias</span>
             <div class="pricing__price">R$ 0</div>
-            <p class="subtitle">Valide o produto com o time comercial.</p>
+            <p class="subtitle">Teste a Ação do Dia com seus próprios leads.</p>
             <ul class="pricing__list">
-              <li>Até 100 leads por mês</li>
-              <li>Dashboard completo</li>
-              <li>Exportação CSV</li>
+              <li>Ação do Dia todos os dias</li>
+              <li>Lista priorizada de leads</li>
+              <li>Feedback em 1 clique (✅ / ❌)</li>
+              <li>Integração com seus leads</li>
+              <li>Suporte inicial</li>
             </ul>
-            <a class="btn btn--block" href="onboarding.html">Começar grátis</a>
+            <a class="btn btn--block" href="onboarding.html">Começar grátis por 14 dias</a>
+            <p class="pricing__microcopy">Em menos de 5 minutos você já sabe quem ligar primeiro.</p>
           </article>
 
-          <article class="card">
-            <span class="pricing__tag">Starter</span>
-            <div class="pricing__price">R$ 79</div>
-            <p class="subtitle">Operação contínua com suporte padrão.</p>
+          <article class="card" data-plan="rotina">
+            <span class="pricing__tag">Rotina</span>
+            <div class="pricing__price">R$ 79 / mês</div>
+            <p class="pricing__capacity">Capacidade: até 1.000 leads / mês</p>
+            <p class="subtitle">Para manter uma rotina diária clara de vendas.</p>
             <ul class="pricing__list">
-              <li>Até 1.000 leads por mês</li>
-              <li>Insights por origem</li>
-              <li>Relatórios rápidos</li>
+              <li>Ação do Dia recalculada todos os dias</li>
+              <li>Lista pronta para o time ligar</li>
+              <li>Prioridade clara sem adivinhação</li>
+              <li>Feedback em 1 clique para melhorar a lista</li>
+              <li>Ideal para times pequenos e organizados</li>
             </ul>
-            <a class="btn btn--ghost btn--block" href="planos.html#plan-stander">Ativar agora</a>
+            <p class="pricing__note">Uma venda a mais no mês normalmente paga o plano.</p>
+            <a class="btn btn--ghost btn--block" href="planos.html#rotina">Ativar Rotina</a>
           </article>
 
-          <article class="card">
-            <span class="pricing__tag">Pro</span>
-            <div class="pricing__price">R$ 179</div>
-            <p class="subtitle">Times com alto volume e integrações.</p>
+          <article class="card card--featured" data-plan="escala">
+            <span class="pricing__tag pricing__tag--highlight">⭐ Recomendado</span>
+            <div class="pricing__price">R$ 179 / mês</div>
+            <p class="pricing__capacity">Capacidade: até 3.000 leads / mês</p>
+            <p class="subtitle">Para quem quer crescer sem perder foco.</p>
             <ul class="pricing__list">
-              <li>Até 5.000 leads por mês</li>
-              <li>Automação e integrações</li>
+              <li>Tudo do plano Rotina</li>
+              <li>Mais capacidade para novos leads</li>
+              <li>Prioridade diária mesmo com alto volume</li>
               <li>Suporte prioritário</li>
+              <li>Ideal para times em crescimento</li>
             </ul>
-            <a class="btn btn--ghost btn--block" href="planos.html#plan-pro">Ativar agora</a>
+            <p class="pricing__note">Sua lista diária continua clara mesmo com mais leads entrando.</p>
+            <a class="btn btn--ghost btn--block" href="planos.html#escala">Ativar Escala</a>
           </article>
+        </div>
+
+        <div class="pricing__info card card--soft" id="capacity">
+          <h2>Capacidade mensal de leads</h2>
+          <p class="subtitle">
+            Você paga pela capacidade da sua operação — sem surpresas. Conforme sua operação cresce, você pode aumentar a capacidade quando quiser.
+          </p>
+        </div>
+
+        <div class="pricing__info card card--soft">
+          <h2>Garantia LeadRank</h2>
+          <p class="subtitle">
+            Se em 7 dias você não sentir mais foco e velocidade no comercial, eu te ajudo pessoalmente a configurar — ou você não paga.
+          </p>
         </div>
       </section>
     </main>
@@ -79,5 +104,36 @@
       </div>
     </footer>
   </div>
+
+  <script>
+    const grid = document.getElementById("pricingGrid");
+    const getVariant = () => {
+      const params = new URLSearchParams(window.location.search);
+      const queryVariant = params.get("ab");
+      if (queryVariant) {
+        localStorage.setItem("pricing_ab", queryVariant);
+        return queryVariant;
+      }
+      return localStorage.getItem("pricing_ab") || "rotina-first";
+    };
+    const variant = getVariant();
+    if (grid) {
+      const cards = Array.from(grid.querySelectorAll("[data-plan]"));
+      const trial = cards.find((card) => card.dataset.plan === "trial");
+      const rotina = cards.find((card) => card.dataset.plan === "rotina");
+      const escala = cards.find((card) => card.dataset.plan === "escala");
+      const order = variant === "escala-first"
+        ? [trial, escala, rotina]
+        : [trial, rotina, escala];
+      order.filter(Boolean).forEach((card) => grid.appendChild(card));
+      console.log("[pricing_ab]", variant);
+      grid.addEventListener("click", (event) => {
+        const target = event.target.closest("a");
+        if (target) {
+          console.log("[pricing_click]", variant, target.textContent.trim());
+        }
+      });
+    }
+  </script>
 </body>
 </html>

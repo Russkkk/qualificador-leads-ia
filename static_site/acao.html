@@ -28,6 +28,7 @@
 
     <main>
       <section class="dashboard">
+        <div class="alert upgrade-banner" id="upgradeBanner"></div>
         <div class="card daily-hero">
           <div class="daily-hero__header">
             <div>
@@ -188,6 +189,7 @@
     const chips = Array.from(document.querySelectorAll("[data-filter]"));
     const chipCounts = Array.from(document.querySelectorAll("[data-chip-count]"));
     const actionList = document.querySelector(".action-list");
+    const upgradeBanner = el("upgradeBanner");
     let allItems = [];
 
     let summaryState = { hot: 0, warm: 0, cold: 0, converted_today: 0 };
@@ -303,6 +305,66 @@
       el("dailyConvertedCount").textContent = summary.converted_today ?? 0;
     }
 
+    function shouldShowUpgradeBanner() {
+      const dismissedAt = Number(localStorage.getItem("leadrank_upgrade_banner_dismissed_at") || 0);
+      if (!dismissedAt) return true;
+      const hoursSince = (Date.now() - dismissedAt) / (1000 * 60 * 60);
+      return hoursSince >= 24;
+    }
+
+    function dismissUpgradeBanner() {
+      localStorage.setItem("leadrank_upgrade_banner_dismissed_at", String(Date.now()));
+      if (upgradeBanner) upgradeBanner.style.display = "none";
+    }
+
+    function updateUpgradeBanner(summary) {
+      if (!upgradeBanner) return;
+      const used = Number(summary?.leads_used_month ?? 0);
+      const limit = Number(summary?.lead_limit_month ?? 0);
+      if (!limit || !used || !shouldShowUpgradeBanner()) {
+        upgradeBanner.style.display = "none";
+        return;
+      }
+      const usagePercent = (used / limit) * 100;
+      let variant = null;
+      if (usagePercent >= 90) {
+        variant = {
+          className: "alert--danger",
+          text: "🚨 Você está a um passo de pausar novos leads. Faça upgrade para não perder oportunidades.",
+          primary: { label: "Upgrade imediato", href: "pricing.html" },
+          secondary: { label: "Falar com suporte", href: "mailto:suporte@leadrank.com" },
+        };
+      } else if (usagePercent >= 70) {
+        variant = {
+          className: "alert--warning",
+          text: "⚠️ Sua Ação do Dia pode começar a ficar incompleta. Quer manter a lista diária sempre cheia?",
+          primary: { label: "Fazer upgrade agora", href: "pricing.html" },
+          secondary: { label: "Ver capacidade", href: "pricing.html#capacity" },
+        };
+      }
+      if (!variant) {
+        upgradeBanner.style.display = "none";
+        return;
+      }
+      upgradeBanner.className = `alert upgrade-banner ${variant.className}`;
+      upgradeBanner.innerHTML = `
+        <div>
+          <strong>Capacidade em uso: ${Math.round(usagePercent)}%</strong>
+          <p>${variant.text}</p>
+          <div class="upgrade-banner__actions">
+            <a class="btn btn--small" href="${variant.primary.href}">${variant.primary.label}</a>
+            <a class="btn btn--ghost btn--small" href="${variant.secondary.href}">${variant.secondary.label}</a>
+          </div>
+        </div>
+        <button class="upgrade-banner__close" type="button" aria-label="Fechar aviso">×</button>
+      `;
+      upgradeBanner.style.display = "flex";
+      const closeBtn = upgradeBanner.querySelector(".upgrade-banner__close");
+      if (closeBtn) {
+        closeBtn.addEventListener("click", dismissUpgradeBanner);
+      }
+    }
+
     function normalizeText(value) {
       return (value || "").toString().toLowerCase();
     }
@@ -410,7 +472,7 @@
       const url = new URL(BACKEND + "/leads_export.csv");
       url.searchParams.set("client_id", client_id);
       if (api_key) {
-        setMsg("alert--error", "Para exportar com API Key, faça o download via API ou desative a exigência.");
+        setMsg("alert--error", "Para exportar com Chave de integração, faça o download via API ou desative a exigência.");
         return;
       }
       window.location.href = url.toString();
@@ -441,6 +503,7 @@
           converted_today: data.summary?.converted_today ?? 0,
         };
         renderHero(summaryState);
+        updateUpgradeBanner(summaryState);
 
         renderHero(data.summary || {});
 

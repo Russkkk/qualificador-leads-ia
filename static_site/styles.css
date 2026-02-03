@@ -864,6 +864,49 @@ main {
   display: block;
 }
 
+.alert--warning {
+  border-color: rgba(244, 199, 76, 0.5);
+  color: #f4c74c;
+  background: rgba(244, 199, 76, 0.12);
+  display: block;
+}
+
+.alert--danger {
+  border-color: rgba(248, 113, 113, 0.55);
+  color: var(--danger);
+  background: rgba(248, 113, 113, 0.18);
+  display: block;
+}
+
+.upgrade-banner {
+  display: none;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 16px;
+  margin-bottom: 16px;
+}
+
+.upgrade-banner p {
+  margin: 6px 0 0;
+  color: var(--text);
+}
+
+.upgrade-banner__actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+  margin-top: 12px;
+}
+
+.upgrade-banner__close {
+  background: transparent;
+  border: none;
+  color: inherit;
+  font-size: 1.2rem;
+  cursor: pointer;
+  padding: 4px;
+}
+
 .data-table {
   width: 100%;
   border-collapse: collapse;
@@ -973,6 +1016,24 @@ main {
   margin: 12px 0;
 }
 
+.pricing__capacity {
+  color: var(--muted);
+  font-size: 0.9rem;
+  margin-bottom: 12px;
+}
+
+.pricing__microcopy {
+  margin-top: 12px;
+  color: var(--muted);
+  font-size: 0.85rem;
+}
+
+.pricing__note {
+  margin-top: 16px;
+  color: var(--muted);
+  font-size: 0.9rem;
+}
+
 .pricing__list {
   list-style: none;
   display: grid;
@@ -989,6 +1050,21 @@ main {
   color: var(--muted);
   font-size: 0.75rem;
   font-weight: 600;
+}
+
+.pricing__tag--highlight {
+  border-color: rgba(244, 199, 76, 0.6);
+  color: #f4c74c;
+  background: rgba(244, 199, 76, 0.12);
+}
+
+.pricing__info {
+  margin-top: 24px;
+}
+
+.card--featured {
+  border-color: rgba(244, 199, 76, 0.4);
+  box-shadow: 0 28px 60px rgba(4, 8, 24, 0.6);
 }
 
 .cta {

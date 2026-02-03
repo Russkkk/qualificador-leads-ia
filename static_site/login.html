@@ -15,11 +15,12 @@
         </a>
         <nav class="site-nav">
           <a href="landing.html">Início</a>
+          <a href="acao.html">Ação do dia</a>
           <a href="pricing.html">Planos</a>
           <a href="onboarding.html">Criar conta</a>
           <a href="login.html" aria-current="page">Entrar</a>
         </nav>
-        <a class="btn btn--ghost" href="index.html">Acessar dashboard</a>
+        <a class="btn btn--ghost" href="acao.html">Acessar dashboard</a>
       </header>
 
       <main>
@@ -114,7 +115,7 @@
           }
 
           const next = new URLSearchParams(location.search).get('next') || '';
-          window.location.href = next || `index.html?client_id=${encodeURIComponent(clientId)}&api_key=${encodeURIComponent(apiKey)}`;
+          window.location.href = next || `acao.html?client_id=${encodeURIComponent(clientId)}&api_key=${encodeURIComponent(apiKey)}`;
         } catch (err) {
           loginError.textContent = err.message || "Erro de conexão. Tente novamente.";
           loginError.className = "alert alert--error";

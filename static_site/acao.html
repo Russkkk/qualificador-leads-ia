@@ -14,9 +14,11 @@
         <span class="brand__text">LeadRank</span>
       </a>
       <nav class="site-nav">
-        <a href="acao.html">Ação do dia</a>
-        <a href="index.html">Dashboard</a>
+        <a href="landing.html">Início</a>
+        <a href="acao.html" aria-current="page">Ação do dia</a>
         <a href="pricing.html">Planos</a>
+        <a href="onboarding.html">Criar conta</a>
+        <a href="login.html">Entrar</a>
       </nav>
       <a class="btn btn--ghost" href="onboarding.html?mode=login">Trocar conta</a>
     </header>
@@ -30,7 +32,7 @@
               <h1 class="daily-hero__title">🔥 Ação do dia</h1>
               <p class="subtitle">Esses são os leads com maior chance de fechar agora.</p>
             </div>
-            <div class="pill pill--muted" id="wsPill">workspace: —</div>
+            <div class="pill pill--muted" id="wsPill">Workspace desconectado</div>
           </div>
           <div class="daily-hero__grid">
             <div class="daily-card daily-card--hot">
@@ -81,13 +83,25 @@
             <h2>📞 Leads para agir agora</h2>
           </div>
           <div class="action-list__bar">
-            <div class="chip-group" role="tablist" aria-label="Filtro rápido">
-              <button class="chip chip--active" type="button" data-filter="hot">🔥 Quentes</button>
-              <button class="chip" type="button" data-filter="warm">🟡 Mornos</button>
-              <button class="chip" type="button" data-filter="cold">❄️ Frios</button>
-              <button class="chip" type="button" data-filter="pendente">⏳ Pendentes</button>
-              <button class="chip" type="button" data-filter="convertido">✅ Convertidos</button>
-              <button class="chip" type="button" data-filter="negado">❌ Negados</button>
+            <div class="chip-group" role="group" aria-label="Filtro rápido">
+              <button class="chip chip--active" type="button" data-filter="hot" aria-pressed="true">
+                🔥 Quentes <span class="chip__count" data-chip-count="hot"></span>
+              </button>
+              <button class="chip" type="button" data-filter="warm" aria-pressed="false">
+                🟡 Mornos <span class="chip__count" data-chip-count="warm"></span>
+              </button>
+              <button class="chip" type="button" data-filter="cold" aria-pressed="false">
+                ❄️ Frios <span class="chip__count" data-chip-count="cold"></span>
+              </button>
+              <button class="chip" type="button" data-filter="pendente" aria-pressed="false">
+                ⏳ Pendentes <span class="chip__count" data-chip-count="pendente"></span>
+              </button>
+              <button class="chip" type="button" data-filter="convertido" aria-pressed="false">
+                ✅ Convertidos <span class="chip__count" data-chip-count="convertido"></span>
+              </button>
+              <button class="chip" type="button" data-filter="negado" aria-pressed="false">
+                ❌ Negados <span class="chip__count" data-chip-count="negado"></span>
+              </button>
             </div>
             <div class="action-list__controls">
               <label class="search">
@@ -99,6 +113,7 @@
           </div>
           <div class="action-list__body">
             <div class="action-state action-state--loading">
+              <p class="text-muted">Atualizando a lista de leads com maior prioridade...</p>
               <div class="skeleton-grid">
                 <div class="skeleton-card">
                   <div class="skeleton-line skeleton-line--lg"></div>
@@ -118,16 +133,21 @@
               </div>
             </div>
             <div class="action-state action-state--empty">
-              <p class="empty-state__title">Você ainda não tem leads suficientes para priorizar.</p>
-              <p class="text-muted">Comece gerando leads de teste ou conecte seu CRM para liberar a priorização diária.</p>
-              <div class="action-list__cta">
-                <a class="btn btn--small" href="index.html#btnSeed10">Gerar 10 leads de teste</a>
-                <a class="btn btn--ghost btn--small" href="onboarding.html#integracao" target="_blank" rel="noreferrer">Ver como integrar</a>
+              <div class="empty-state">
+                <p class="empty-state__title">Você ainda não tem leads suficientes para priorizar.</p>
+                <p class="text-muted">Gere leads de teste ou conecte seu CRM para ver recomendações diárias automaticamente.</p>
+                <div class="action-list__cta">
+                  <button class="btn btn--small" type="button" data-seed10>Gerar 10 leads de teste</button>
+                  <a class="btn btn--ghost btn--small" href="onboarding.html#integracao" target="_blank" rel="noreferrer">Ver como integrar</a>
+                </div>
               </div>
             </div>
             <div class="action-state action-state--error">
-              <p class="empty-state__title">Não conseguimos carregar seus leads. Confira sua conexão ou chave de integração.</p>
-              <button class="btn btn--small" type="button" id="btnRetry">Tentar novamente</button>
+              <div class="error-state">
+                <p class="empty-state__title">Não conseguimos carregar seus leads agora.</p>
+                <p class="text-muted">Verifique sua conexão e tente novamente em instantes.</p>
+                <button class="btn btn--small" type="button" id="btnRetry">Tentar novamente</button>
+              </div>
             </div>
             <div class="action-state action-state--ready">
               <div class="action-list__insights">
@@ -162,6 +182,7 @@
     const leadsTableWrap = el("leadsTableWrap");
     const searchInput = el("leadSearch");
     const chips = Array.from(document.querySelectorAll("[data-filter]"));
+    const chipCounts = Array.from(document.querySelectorAll("[data-chip-count]"));
     const actionList = document.querySelector(".action-list");
     let allItems = [];
 
@@ -178,6 +199,38 @@
     function setActionState(state) {
       if (!actionList) return;
       actionList.dataset.state = state;
+    }
+
+    function normalizeTempLabel(temp) {
+      if (!temp) return "unknown";
+      const value = temp.toString().toLowerCase();
+      if (value.startsWith("hot") || value.startsWith("quente")) return "hot";
+      if (value.startsWith("warm") || value.startsWith("morno")) return "warm";
+      if (value.startsWith("cold") || value.startsWith("frio")) return "cold";
+      return "unknown";
+    }
+
+    function updateChipCounts(items) {
+      const counts = {
+        hot: 0,
+        warm: 0,
+        cold: 0,
+        pendente: 0,
+        convertido: 0,
+        negado: 0,
+      };
+      items.forEach((item) => {
+        const temp = normalizeTempLabel(item.temperatura);
+        if (counts[temp] != null) counts[temp] += 1;
+        const status = (item.status || "pendente").toString().toLowerCase();
+        if (counts[status] != null) counts[status] += 1;
+      });
+      chipCounts.forEach((el) => {
+        const key = el.dataset.chipCount;
+        if (!key) return;
+        const value = counts[key];
+        el.textContent = typeof value === "number" ? `(${value})` : "";
+      });
     }
 
     function qs(name) {
@@ -217,6 +270,28 @@
       return data;
     }
 
+    async function seedTestLeads() {
+      const { client_id, api_key } = getAuth();
+      if (!client_id || !api_key) {
+        setMsg("alert--error", "Conecte seu workspace para gerar leads de teste.");
+        return;
+      }
+      try {
+        await fetch(BACKEND + "/seed_test_leads", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            "X-API-KEY": api_key,
+          },
+          body: JSON.stringify({ client_id, n: 10 }),
+        });
+        setMsg("alert--success", "Leads de teste gerados. Atualizando a lista...");
+        await loadAction();
+      } catch (err) {
+        setMsg("alert--error", "Não foi possível gerar leads de teste agora.");
+      }
+    }
+
     function renderHero(summary) {
       el("dailyHotCount").textContent = summary.hot ?? 0;
       el("dailyWarmCount").textContent = summary.warm ?? 0;
@@ -249,46 +324,52 @@
         return;
       }
       const rows = items.map((item) => {
+        const temperature = normalizeTempLabel(item.temperatura);
+        const tempLabel = temperature === "hot" ? "🔥 Quente" : temperature === "warm" ? "🟡 Morno" : temperature === "cold" ? "❄️ Frio" : "—";
         const prob = item.probabilidade != null ? Math.round(item.probabilidade * 100) + "%" : "—";
         const score = item.score != null ? item.score : "—";
         return `
           <tr>
-            <td>${item.nome || "—"}</td>
-            <td>${item.telefone || "—"}</td>
-            <td>${item.origem || "—"}</td>
-            <td>${score}</td>
-            <td>${prob}</td>
-            <td>${item.temperatura || "pendente"}</td>
-            <td>${item.status || "pendente"}</td>
-            <td>${item.created_at ? new Date(item.created_at).toLocaleDateString("pt-BR") : "—"}</td>
-
-            <td>
-              <div class="button-group">
-                <button class="btn btn--tiny" type="button" data-action="convert" data-id="${item.id}">✅</button>
-                <button class="btn btn--tiny btn--ghost" type="button" data-action="deny" data-id="${item.id}">❌</button>
-                <button class="btn btn--tiny btn--ghost" type="button" data-action="later" data-id="${item.id}">⏳</button>
+            <td data-label="Lead">
+              <div class="lead-cell">
+                <p class="lead-cell__name">${item.nome || "Lead sem nome"}</p>
+                <p class="lead-cell__meta text-muted">${item.telefone || "Sem telefone"} • ${item.email_lead || "Sem email"}</p>
               </div>
             </td>
-
+            <td data-label="Origem">
+              <span class="pill pill--muted">${item.origem || "—"}</span>
+            </td>
+            <td data-label="Temperatura">
+              <span class="pill pill--muted">${tempLabel}</span>
+            </td>
+            <td data-label="Score/Prob">
+              <div class="table-metric">
+                <strong>${score}</strong>
+                <span class="text-muted">${prob}</span>
+              </div>
+            </td>
+            <td data-label="Criado em">${item.created_at ? new Date(item.created_at).toLocaleDateString("pt-BR") : "—"}</td>
+            <td data-label="Ações">
+              <div class="button-group">
+                <button class="btn btn--tiny" type="button" data-action="convert" data-id="${item.id}" aria-label="Marcar ${item.nome || "lead"} como virou cliente">✅ Virou</button>
+                <button class="btn btn--tiny btn--ghost" type="button" data-action="deny" data-id="${item.id}" aria-label="Marcar ${item.nome || "lead"} como não virou">❌ Não virou</button>
+                <button class="btn btn--tiny btn--ghost" type="button" data-action="later" data-id="${item.id}" aria-label="Lembrar depois do lead ${item.nome || "sem nome"}">⏳ Depois</button>
+              </div>
+            </td>
           </tr>
         `;
       }).join("");
 
       leadsTableWrap.innerHTML = `
-        <table class="data-table">
+        <table class="data-table leads-table">
           <thead>
             <tr>
-              <th>Nome</th>
-              <th>Telefone</th>
+              <th>Lead</th>
               <th>Origem</th>
-              <th>Score</th>
-              <th>Probabilidade</th>
               <th>Temperatura</th>
-              <th>Status</th>
-              <th>Data</th>
-
+              <th>Score/Prob</th>
+              <th>Criado</th>
               <th>Ações</th>
-
             </tr>
           </thead>
           <tbody>${rows}</tbody>
@@ -300,12 +381,19 @@
       activeFilter = filter;
       chips.forEach((chip) => {
         chip.classList.toggle("chip--active", chip.dataset.filter === filter);
+        chip.setAttribute("aria-pressed", chip.dataset.filter === filter ? "true" : "false");
       });
       applyFilters();
     }
 
     chips.forEach((chip) => {
       chip.addEventListener("click", () => setActiveChip(chip.dataset.filter));
+      chip.addEventListener("keydown", (event) => {
+        if (event.key === "Enter" || event.key === " ") {
+          event.preventDefault();
+          chip.click();
+        }
+      });
     });
 
     searchInput.addEventListener("input", () => applyFilters());
@@ -314,7 +402,7 @@
 
     el("btnExport").onclick = () => {
       const { client_id, api_key } = getAuth();
-      if (!client_id) return setMsg("alert--error", "Informe o client_id.");
+      if (!client_id) return setMsg("alert--error", "Informe seu workspace para exportar.");
       const url = new URL(BACKEND + "/leads_export.csv");
       url.searchParams.set("client_id", client_id);
       if (api_key) {
@@ -324,14 +412,19 @@
       window.location.href = url.toString();
     };
 
+    const seedBtn = document.querySelector("[data-seed10]");
+    if (seedBtn) {
+      seedBtn.addEventListener("click", seedTestLeads);
+    }
+
     async function loadAction() {
       msg.style.display = "none";
       setActionState("loading");
       const { client_id } = getAuth();
-      wsPill.textContent = "workspace: " + (client_id || "—");
+      wsPill.textContent = client_id ? "Workspace conectado" : "Workspace desconectado";
       if (!client_id) {
         setActionState("error");
-        setMsg("alert--error", "Informe seu client_id para carregar.");
+        setMsg("alert--error", "Informe seu workspace para carregar.");
         return;
       }
       try {
@@ -348,6 +441,7 @@
         renderHero(data.summary || {});
 
         allItems = data.items || [];
+        updateChipCounts(allItems);
         if (!allItems.length) {
           setActionState("empty");
         } else {
@@ -385,6 +479,7 @@
         } else if (action === "later") {
           allItems = allItems.filter((item) => item.id !== leadId);
         }
+        updateChipCounts(allItems);
         applyFilters();
       } catch (err) {
         setMsg("alert--error", "Não foi possível atualizar o lead. Tente novamente.");

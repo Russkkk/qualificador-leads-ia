@@ -59,7 +59,7 @@
 - Negócios que não capturam leads digitais.
 - Times que não querem mudar a rotina de priorização.
 - Operações com ticket muito baixo e volume extremo de leads.
- 
+
 ---
 
 ## 2) OFERTA E PRICING

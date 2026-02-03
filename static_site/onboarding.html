@@ -251,7 +251,31 @@ if (mode === "login") {
 
       function redirectToDashboard(clientId, apiKey){
         // mantém querystring só no primeiro acesso e depois o dashboard limpa
-        window.location.href = nextUrl(`index.html?client_id=${encodeURIComponent(clientId||"")}&api_key=${encodeURIComponent(apiKey||"")}`);
+        window.location.href = nextUrl(`acao.html?client_id=${encodeURIComponent(clientId||"")}&api_key=${encodeURIComponent(apiKey||"")}`);
+      }
+
+      async function maybeSeedLeads(clientId, apiKey) {
+        if (!clientId || !apiKey) return;
+        try {
+          const url = new URL(BACKEND + "/acao_do_dia");
+          url.searchParams.set("client_id", clientId);
+          const res = await fetch(url.toString(), {
+            headers: { "X-API-KEY": apiKey },
+          });
+          const data = await res.json().catch(() => ({}));
+          const items = Array.isArray(data.items) ? data.items : [];
+          if (items.length) return;
+          await fetch(BACKEND + "/seed_test_leads", {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+              "X-API-KEY": apiKey,
+            },
+            body: JSON.stringify({ client_id: clientId, n: 10 }),
+          });
+        } catch (err) {
+          console.warn("Falha ao gerar leads de teste.", err);
+        }
       }
 
       function showError(msg){
@@ -296,6 +320,7 @@ if (loginForm){
       successDiv.innerHTML = `✅ Login feito! Redirecionando...`;
       successDiv.style.display = "block";
 
+      await maybeSeedLeads(clientId, apiKey);
       setTimeout(() => redirectToDashboard(clientId, apiKey), 400);
     }catch(err){
       showError(err.message || "Erro de conexão. Tente novamente.");
@@ -348,6 +373,7 @@ if (loginForm){
           successDiv.innerHTML = `✅ Conta criada! Redirecionando para o dashboard...`;
           successDiv.style.display = "block";
 
+          await maybeSeedLeads(clientId, apiKey);
           setTimeout(() => redirectToDashboard(clientId, apiKey), 600);
         }catch(err){
           showError(err.message || "Erro de conexão. Tente novamente.");

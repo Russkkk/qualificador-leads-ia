@@ -20,7 +20,10 @@
         <a href="onboarding.html">Criar conta</a>
         <a href="login.html">Entrar</a>
       </nav>
-      <a class="btn btn--ghost" href="onboarding.html?mode=login">Trocar conta</a>
+      <div class="header-actions">
+        <button class="btn btn--ghost btn--small" type="button" id="restartDemoBtn">Reiniciar demo</button>
+        <a class="btn btn--ghost" href="onboarding.html?mode=login">Trocar conta</a>
+      </div>
     </header>
 
     <main>
@@ -35,11 +38,11 @@
             <div class="pill pill--muted" id="wsPill">Workspace desconectado</div>
           </div>
           <div class="daily-hero__grid">
-            <div class="daily-card daily-card--hot">
+            <div class="daily-card daily-card--hot" id="kpiHot">
               <div class="daily-card__top">
                 <span class="daily-card__icon">🔥</span>
                 <div>
-                  <p class="daily-card__label">Quentes</p>
+                  <p class="daily-card__label">Leads quentes hoje</p>
                   <p class="daily-card__value" id="dailyHotCount">—</p>
                 </div>
               </div>
@@ -78,9 +81,10 @@
           </div>
         </div>
 
-        <div class="card action-list" data-state="loading">
+        <div class="card action-list" data-state="loading" id="leadsSection">
           <div class="action-list__header">
             <h2>📞 Leads para agir agora</h2>
+            <a class="btn btn--ghost btn--small" href="onboarding.html#integracao" id="integrationLink">Ver como integrar</a>
           </div>
           <div class="action-list__bar">
             <div class="chip-group" role="group" aria-label="Filtro rápido">
@@ -329,7 +333,7 @@
         const prob = item.probabilidade != null ? Math.round(item.probabilidade * 100) + "%" : "—";
         const score = item.score != null ? item.score : "—";
         return `
-          <tr>
+          <tr class="lead-row">
             <td data-label="Lead">
               <div class="lead-cell">
                 <p class="lead-cell__name">${item.nome || "Lead sem nome"}</p>
@@ -350,7 +354,7 @@
             </td>
             <td data-label="Criado em">${item.created_at ? new Date(item.created_at).toLocaleDateString("pt-BR") : "—"}</td>
             <td data-label="Ações">
-              <div class="button-group">
+              <div class="button-group lead-actions">
                 <button class="btn btn--tiny" type="button" data-action="convert" data-id="${item.id}" aria-label="Marcar ${item.nome || "lead"} como virou cliente">✅ Virou</button>
                 <button class="btn btn--tiny btn--ghost" type="button" data-action="deny" data-id="${item.id}" aria-label="Marcar ${item.nome || "lead"} como não virou">❌ Não virou</button>
                 <button class="btn btn--tiny btn--ghost" type="button" data-action="later" data-id="${item.id}" aria-label="Lembrar depois do lead ${item.nome || "sem nome"}">⏳ Depois</button>
@@ -487,6 +491,298 @@
     });
 
     loadAction();
+
+    const DEMO_KEY = "leadrank_demo_completed";
+    const restartBtn = document.getElementById("restartDemoBtn");
+    const demoState = {
+      active: false,
+      current: 0,
+      actionDone: false,
+      overlay: null,
+      highlight: null,
+      tooltip: null,
+      progress: null,
+      title: null,
+      body: null,
+      helper: null,
+      btnPrev: null,
+      btnNext: null,
+      btnSkip: null,
+      btnFinish: null,
+      demoLeadInserted: false,
+      prevActionState: null,
+    };
+
+    const steps = [
+      {
+        id: "daily-hot",
+        title: "Ação do Dia",
+        text: "Aqui estão os leads com maior chance de fechar agora. Comece por eles.",
+        target: () => document.getElementById("kpiHot"),
+      },
+      {
+        id: "lead-list",
+        title: "Lista de prioridades",
+        text: "Esta é sua fila do dia. Comece sempre pelos primeiros.",
+        target: () => document.getElementById("leadsSection"),
+      },
+      {
+        id: "lead-actions",
+        title: "Marque o resultado em 1 clique",
+        text: "Depois do contato, marque ✅ ou ❌. Isso melhora a priorização automaticamente.",
+        requireAction: true,
+        target: () => document.querySelector(".lead-actions"),
+        fallback: () => document.querySelector(".demo-lead-actions"),
+      },
+      {
+        id: "daily-ritual",
+        title: "Rotina diária simples",
+        text: "Amanhã a lista é recalculada. Quanto mais você marca resultados, melhor fica.",
+        target: () => document.querySelector(".daily-hero"),
+      },
+      {
+        id: "integration",
+        title: "Use com seus leads reais",
+        text: "Conecte formulário, tráfego pago, WhatsApp ou CRM e deixe a lista pronta todo dia.",
+        target: () => document.getElementById("integrationLink"),
+      },
+      {
+        id: "finish",
+        title: "Pronto. Agora é só seguir a lista.",
+        text: "Menos dúvida. Mais foco. Mais vendas.",
+        target: () => null,
+        isFinal: true,
+      },
+    ];
+
+    function buildTourUI() {
+      if (demoState.overlay) return;
+      const overlay = document.createElement("div");
+      overlay.className = "tour-overlay";
+      overlay.innerHTML = `<div class="tour-highlight" role="presentation"></div>`;
+      document.body.appendChild(overlay);
+      const tooltip = document.createElement("div");
+      tooltip.className = "tour-tooltip";
+      tooltip.setAttribute("role", "dialog");
+      tooltip.setAttribute("aria-live", "polite");
+      tooltip.style.display = "none";
+      tooltip.innerHTML = `
+        <div class="tour-progress"></div>
+        <h3 class="tour-title"></h3>
+        <p class="tour-text"></p>
+        <p class="tour-helper"></p>
+        <div class="tour-actions">
+          <button class="btn btn--ghost btn--small" type="button" data-tour-prev>Voltar</button>
+          <button class="btn btn--small" type="button" data-tour-next>Próximo</button>
+          <button class="btn btn--ghost btn--small" type="button" data-tour-skip>Pular demo</button>
+        </div>
+        <div class="tour-actions tour-actions--final">
+          <button class="btn btn--small" type="button" data-tour-finish>Continuar</button>
+          <a class="btn btn--ghost btn--small" href="pricing.html">Ver planos</a>
+        </div>
+      `;
+      document.body.appendChild(tooltip);
+      demoState.overlay = overlay;
+      demoState.highlight = overlay.querySelector(".tour-highlight");
+      demoState.tooltip = tooltip;
+      demoState.progress = tooltip.querySelector(".tour-progress");
+      demoState.title = tooltip.querySelector(".tour-title");
+      demoState.body = tooltip.querySelector(".tour-text");
+      demoState.helper = tooltip.querySelector(".tour-helper");
+      demoState.btnPrev = tooltip.querySelector("[data-tour-prev]");
+      demoState.btnNext = tooltip.querySelector("[data-tour-next]");
+      demoState.btnSkip = tooltip.querySelector("[data-tour-skip]");
+      demoState.btnFinish = tooltip.querySelector("[data-tour-finish]");
+
+      demoState.btnPrev.addEventListener("click", prevStep);
+      demoState.btnNext.addEventListener("click", nextStep);
+      demoState.btnSkip.addEventListener("click", () => endDemo(false));
+      demoState.btnFinish.addEventListener("click", () => endDemo(true));
+
+      document.addEventListener("keydown", (event) => {
+        if (!demoState.active) return;
+        if (event.key === "Escape") {
+          endDemo(false);
+        }
+      });
+    }
+
+    function ensureDemoLeadRow() {
+      if (document.querySelector(".lead-row")) return;
+      demoState.prevActionState = actionList?.dataset.state || "loading";
+      setActionState("ready");
+      const demoRow = document.createElement("div");
+      demoRow.className = "demo-lead-row lead-row";
+      demoRow.innerHTML = `
+        <div class="demo-lead-info">
+          <strong>Lead de teste</strong>
+          <span class="text-muted">WhatsApp • agora</span>
+        </div>
+        <div class="lead-actions demo-lead-actions">
+          <button class="btn btn--tiny" type="button" data-action="convert">✅ Virou</button>
+          <button class="btn btn--tiny btn--ghost" type="button" data-action="deny">❌ Não virou</button>
+          <button class="btn btn--tiny btn--ghost" type="button" data-action="later">⏳ Depois</button>
+        </div>
+      `;
+      leadsTableWrap.innerHTML = "";
+      leadsTableWrap.appendChild(demoRow);
+      demoState.demoLeadInserted = true;
+    }
+
+    function cleanupDemoLeadRow() {
+      if (!demoState.demoLeadInserted) return;
+      const demoRow = document.querySelector(".demo-lead-row");
+      if (demoRow) demoRow.remove();
+      if (demoState.prevActionState) {
+        setActionState(demoState.prevActionState);
+      }
+      demoState.demoLeadInserted = false;
+      demoState.prevActionState = null;
+    }
+
+    function resolveTarget(step) {
+      if (!step) return null;
+      const target = step.target ? step.target() : null;
+      if (target) return target;
+      if (step.fallback) return step.fallback();
+      return null;
+    }
+
+    function positionHighlight(target) {
+      if (!target) {
+        demoState.highlight.style.display = "none";
+        return;
+      }
+      const rect = target.getBoundingClientRect();
+      const padding = 10;
+      demoState.highlight.style.display = "block";
+      demoState.highlight.style.top = `${Math.max(rect.top - padding, 8)}px`;
+      demoState.highlight.style.left = `${Math.max(rect.left - padding, 8)}px`;
+      demoState.highlight.style.width = `${Math.min(rect.width + padding * 2, window.innerWidth - 16)}px`;
+      demoState.highlight.style.height = `${Math.min(rect.height + padding * 2, window.innerHeight - 16)}px`;
+    }
+
+    function positionTooltip(target) {
+      const tooltip = demoState.tooltip;
+      const isMobile = window.matchMedia("(max-width: 768px)").matches;
+      tooltip.classList.toggle("tour-tooltip--mobile", isMobile);
+      if (isMobile || !target) {
+        tooltip.style.top = "";
+        tooltip.style.left = "";
+        return;
+      }
+      const rect = target.getBoundingClientRect();
+      const margin = 16;
+      const tooltipRect = tooltip.getBoundingClientRect();
+      let top = rect.bottom + margin;
+      let left = rect.left;
+      if (top + tooltipRect.height > window.innerHeight) {
+        top = rect.top - tooltipRect.height - margin;
+      }
+      if (left + tooltipRect.width > window.innerWidth) {
+        left = window.innerWidth - tooltipRect.width - margin;
+      }
+      if (left < margin) left = margin;
+      tooltip.style.top = `${Math.max(top, margin)}px`;
+      tooltip.style.left = `${left}px`;
+    }
+
+    function updateStepUI(step, index) {
+      demoState.progress.textContent = `Passo ${index + 1}/${steps.length}`;
+      demoState.title.textContent = step.title;
+      demoState.body.textContent = step.text;
+      demoState.helper.textContent = "";
+      demoState.btnPrev.style.display = index === 0 ? "none" : "inline-flex";
+      demoState.btnNext.style.display = step.isFinal ? "none" : "inline-flex";
+      demoState.btnFinish.closest(".tour-actions--final").style.display = step.isFinal ? "flex" : "none";
+
+      if (step.requireAction) {
+        demoState.actionDone = false;
+        demoState.btnNext.disabled = true;
+        demoState.helper.textContent = "Clique em ✅ ou ❌ para continuar.";
+      } else {
+        demoState.btnNext.disabled = false;
+      }
+    }
+
+    function goToStep(index) {
+      if (index < 0 || index >= steps.length) return;
+      const step = steps[index];
+      if (!step.requireAction) {
+        cleanupDemoLeadRow();
+      }
+      if (step.requireAction) ensureDemoLeadRow();
+      const target = resolveTarget(step);
+      if (!step.isFinal && !target) {
+        goToStep(index + 1);
+        return;
+      }
+      demoState.current = index;
+      updateStepUI(step, index);
+      positionHighlight(target);
+      positionTooltip(target);
+    }
+
+    function startDemo() {
+      buildTourUI();
+      cleanupDemoLeadRow();
+      demoState.active = true;
+      demoState.overlay.style.display = "block";
+      demoState.tooltip.style.display = "block";
+      localStorage.removeItem(DEMO_KEY);
+      goToStep(0);
+    }
+
+    function nextStep() {
+      if (!demoState.active) return;
+      goToStep(demoState.current + 1);
+    }
+
+    function prevStep() {
+      if (!demoState.active) return;
+      goToStep(demoState.current - 1);
+    }
+
+    function endDemo(completed) {
+      if (completed) {
+        localStorage.setItem(DEMO_KEY, "true");
+      }
+      demoState.active = false;
+      if (demoState.overlay) demoState.overlay.style.display = "none";
+      if (demoState.tooltip) demoState.tooltip.style.display = "none";
+      cleanupDemoLeadRow();
+    }
+
+    window.addEventListener("resize", () => {
+      if (!demoState.active) return;
+      const step = steps[demoState.current];
+      const target = resolveTarget(step);
+      positionHighlight(target);
+      positionTooltip(target);
+    });
+
+    leadsTableWrap.addEventListener("click", (event) => {
+      if (!demoState.active) return;
+      const step = steps[demoState.current];
+      if (!step || !step.requireAction) return;
+      const button = event.target.closest("[data-action]");
+      if (!button) return;
+      if (button.dataset.action !== "convert" && button.dataset.action !== "deny") return;
+      demoState.actionDone = true;
+      demoState.btnNext.disabled = false;
+      demoState.helper.textContent = "Perfeito! Você já pode continuar.";
+    });
+
+    if (restartBtn) {
+      restartBtn.addEventListener("click", () => {
+        localStorage.removeItem(DEMO_KEY);
+        startDemo();
+      });
+    }
+
+    if (!localStorage.getItem(DEMO_KEY)) {
+      window.setTimeout(startDemo, 600);
+    }
   </script>
 </body>
 </html>

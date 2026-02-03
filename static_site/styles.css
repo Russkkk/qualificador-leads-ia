@@ -42,6 +42,16 @@ a {
   text-decoration: none;
 }
 
+a:focus-visible,
+button:focus-visible,
+input:focus-visible,
+select:focus-visible,
+textarea:focus-visible {
+  outline: 2px solid rgba(110, 231, 255, 0.8);
+  outline-offset: 2px;
+  box-shadow: 0 0 0 4px rgba(79, 124, 255, 0.2);
+}
+
 .page {
   display: flex;
   flex-direction: column;
@@ -434,6 +444,12 @@ main {
   margin: 0 0 8px;
 }
 
+.empty-state,
+.error-state {
+  display: grid;
+  gap: 8px;
+}
+
 .skeleton-grid {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
@@ -535,12 +551,21 @@ main {
   border-radius: 999px;
   font-size: 0.85rem;
   cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
 }
 
-.chip--active {
+.chip--active,
+.chip[aria-pressed="true"] {
   background: rgba(56, 211, 159, 0.18);
   border-color: rgba(56, 211, 159, 0.4);
   color: #eafff5;
+}
+
+.chip__count {
+  color: var(--muted);
+  font-weight: 600;
 }
 
 .search {
@@ -749,6 +774,77 @@ main {
   letter-spacing: 0.08em;
   font-size: 0.75rem;
   color: var(--muted);
+}
+
+.lead-cell__name {
+  margin: 0 0 6px;
+  font-weight: 600;
+}
+
+.lead-cell__meta {
+  margin: 0;
+  font-size: 0.85rem;
+}
+
+.table-metric {
+  display: grid;
+  gap: 4px;
+  font-size: 0.9rem;
+}
+
+.leads-table td .pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+
+@media (max-width: 768px) {
+  .leads-table thead {
+    display: none;
+  }
+
+  .leads-table,
+  .leads-table tbody,
+  .leads-table tr,
+  .leads-table td {
+    display: block;
+    width: 100%;
+  }
+
+  .leads-table tr {
+    border: 1px solid var(--stroke);
+    border-radius: 18px;
+    padding: 16px;
+    margin-bottom: 16px;
+    background: rgba(255, 255, 255, 0.03);
+  }
+
+  .leads-table td {
+    border: none;
+    padding: 8px 0;
+  }
+
+  .leads-table td[data-label]::before {
+    content: attr(data-label);
+    display: block;
+    font-size: 0.7rem;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    color: var(--muted);
+    margin-bottom: 4px;
+  }
+
+  .leads-table .button-group {
+    width: 100%;
+    justify-content: flex-start;
+    gap: 8px;
+  }
+
+  .leads-table .btn {
+    flex: 1;
+    display: inline-flex;
+    justify-content: center;
+  }
 }
 
 .pricing {

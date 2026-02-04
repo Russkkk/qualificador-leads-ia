@@ -3,24 +3,31 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>LeadRank • Planos</title>
+  <title>LeadRank - Qualificador de Leads com IA</title>
+  <meta name="description" content="Priorize leads quentes automaticamente e aumente suas vendas. Teste grátis 14 dias.">
+  <meta property="og:title" content="LeadRank - Qualificador de Leads com IA">
+  <meta property="og:description" content="Priorize leads quentes automaticamente e aumente suas vendas. Teste grátis 14 dias.">
+  <meta property="og:image" content="https://via.placeholder.com/1200x630/4f7cff/ffffff?text=LeadRank">
+  <meta property="og:url" content="https://leadrank.com.br/">
+  <meta name="theme-color" content="#4f7cff">
+  <link rel="icon" href="https://via.placeholder.com/32/4f7cff/ffffff?text=LR">
   <link rel="stylesheet" href="styles.css" />
 </head>
 <body>
   <div class="page">
     <header class="site-header">
-      <a class="brand" href="landing.html">
+      <a class="brand" href="index.html">
         <span class="brand__logo">LR</span>
         <span class="brand__text">LeadRank</span>
       </a>
       <nav class="site-nav">
-        <a href="landing.html">Início</a>
+        <a href="index.html">Início</a>
         <a href="acao.html">Ação do dia</a>
         <a href="pricing.html" aria-current="page">Planos</a>
         <a href="onboarding.html">Criar conta</a>
         <a href="login.html">Entrar</a>
       </nav>
-      <a class="btn btn--ghost" href="acao.html">Acessar dashboard</a>
+      <a class="btn btn--ghost" href="onboarding.html">Testar grátis</a>
     </header>
 
     <main>
@@ -31,67 +38,86 @@
           Comece no trial e evolua conforme a operação cresce. Todos os planos incluem a Ação do Dia e priorização diária.
         </p>
 
-        <div class="pricing__grid" id="pricingGrid">
-          <article class="card" data-plan="trial">
-            <span class="pricing__tag">Trial • 14 dias</span>
-            <div class="pricing__price">R$ 0</div>
-            <p class="subtitle">Teste a Ação do Dia com seus próprios leads.</p>
-            <ul class="pricing__list">
-              <li>Ação do Dia todos os dias</li>
-              <li>Lista priorizada de leads</li>
-              <li>Feedback em 1 clique (✅ / ❌)</li>
-              <li>Integração com seus leads</li>
-              <li>Suporte inicial</li>
-            </ul>
-            <a class="btn btn--block" href="onboarding.html">Começar grátis por 14 dias</a>
-            <p class="pricing__microcopy">Em menos de 5 minutos você já sabe quem ligar primeiro.</p>
-          </article>
+        <section class="cta" aria-label="Teste grátis">
+          <div>
+            <h2>Teste grátis 14 dias sem cartão</h2>
+            <p class="subtitle">Crie sua conta e valide o ranking de leads sem compromisso.</p>
+          </div>
+          <a class="btn" href="onboarding.html">Começar teste grátis</a>
+        </section>
 
-          <article class="card" data-plan="rotina">
-            <span class="pricing__tag">Rotina</span>
-            <div class="pricing__price">R$ 79 / mês</div>
-            <p class="pricing__capacity">Capacidade: até 1.000 leads / mês</p>
-            <p class="subtitle">Para manter uma rotina diária clara de vendas.</p>
-            <ul class="pricing__list">
-              <li>Ação do Dia recalculada todos os dias</li>
-              <li>Lista pronta para o time ligar</li>
-              <li>Prioridade clara sem adivinhação</li>
-              <li>Feedback em 1 clique para melhorar a lista</li>
-              <li>Ideal para times pequenos e organizados</li>
-            </ul>
-            <p class="pricing__note">Uma venda a mais no mês normalmente paga o plano.</p>
-            <a class="btn btn--ghost btn--block" href="planos.html#rotina">Ativar Rotina</a>
-          </article>
+        <div class="pricing__grid" id="pricingGrid"></div>
 
-          <article class="card card--featured" data-plan="escala">
-            <span class="pricing__tag pricing__tag--highlight">⭐ Recomendado</span>
-            <div class="pricing__price">R$ 179 / mês</div>
-            <p class="pricing__capacity">Capacidade: até 3.000 leads / mês</p>
-            <p class="subtitle">Para quem quer crescer sem perder foco.</p>
-            <ul class="pricing__list">
-              <li>Tudo do plano Rotina</li>
-              <li>Mais capacidade para novos leads</li>
-              <li>Prioridade diária mesmo com alto volume</li>
-              <li>Suporte prioritário</li>
-              <li>Ideal para times em crescimento</li>
-            </ul>
-            <p class="pricing__note">Sua lista diária continua clara mesmo com mais leads entrando.</p>
-            <a class="btn btn--ghost btn--block" href="planos.html#escala">Ativar Escala</a>
-          </article>
+        <div class="pricing__info card card--soft" id="comparison">
+          <h2>Comparação de planos</h2>
+          <div class="table-wrap">
+            <table class="data-table">
+              <thead>
+                <tr>
+                  <th>Funcionalidade</th>
+                  <th>Free</th>
+                  <th>Starter</th>
+                  <th>Pro</th>
+                  <th>Enterprise</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td>Ação do Dia diária</td>
+                  <td>✅</td>
+                  <td>✅</td>
+                  <td>✅</td>
+                  <td>✅</td>
+                </tr>
+                <tr>
+                  <td>Capacidade de leads</td>
+                  <td>100</td>
+                  <td>1.000</td>
+                  <td>3.000</td>
+                  <td>Personalizado</td>
+                </tr>
+                <tr>
+                  <td>IA com feedback contínuo</td>
+                  <td>—</td>
+                  <td>✅</td>
+                  <td>✅</td>
+                  <td>✅</td>
+                </tr>
+                <tr>
+                  <td>Suporte prioritário</td>
+                  <td>—</td>
+                  <td>—</td>
+                  <td>✅</td>
+                  <td>✅</td>
+                </tr>
+                <tr>
+                  <td>Integrações avançadas</td>
+                  <td>—</td>
+                  <td>✅</td>
+                  <td>✅</td>
+                  <td>✅</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
         </div>
 
-        <div class="pricing__info card card--soft" id="capacity">
-          <h2>Capacidade mensal de leads</h2>
-          <p class="subtitle">
-            Você paga pela capacidade da sua operação — sem surpresas. Conforme sua operação cresce, você pode aumentar a capacidade quando quiser.
-          </p>
-        </div>
-
-        <div class="pricing__info card card--soft">
-          <h2>Garantia LeadRank</h2>
-          <p class="subtitle">
-            Se em 7 dias você não sentir mais foco e velocidade no comercial, eu te ajudo pessoalmente a configurar — ou você não paga.
-          </p>
+        <div class="pricing__info card card--soft" id="faq">
+          <h2>Dúvidas frequentes</h2>
+          <div class="features__grid">
+            <article class="feature">
+              <h3>Preciso de cartão para testar?</h3>
+              <p>Não. O teste é gratuito por 14 dias e você pode cancelar quando quiser.</p>
+            </article>
+            <article class="feature">
+              <h3>Posso mudar de plano depois?</h3>
+              <p>Sim. Você pode fazer upgrade ou downgrade a qualquer momento.</p>
+            </article>
+            <article class="feature">
+              <h3>Como funciona o limite de leads?</h3>
+              <p>O limite é mensal e você pode aumentar sua capacidade a qualquer momento.</p>
+            </article>
+          </div>
         </div>
       </section>
     </main>
@@ -99,41 +125,142 @@
     <footer class="site-footer">
       <span>© 2024 LeadRank. Todos os direitos reservados.</span>
       <div class="footer__links">
-        <a href="landing.html">Início</a>
-        <a href="onboarding.html">Criar conta</a>
+        <a href="index.html">Início</a>
+        <a href="pricing.html">Planos</a>
+        <a href="termos.html">Termos</a>
+        <a href="privacidade.html">Privacidade</a>
       </div>
     </footer>
   </div>
 
   <script>
-    const grid = document.getElementById("pricingGrid");
-    const getVariant = () => {
-      const params = new URLSearchParams(window.location.search);
-      const queryVariant = params.get("ab");
-      if (queryVariant) {
-        localStorage.setItem("pricing_ab", queryVariant);
-        return queryVariant;
-      }
-      return localStorage.getItem("pricing_ab") || "rotina-first";
+    const BACKEND = (window.BACKEND_URL || "https://qualificador-leads-ia.onrender.com").replace(/\/$/, "");
+    const KIWIFY_LINKS = {
+      pro: "https://pay.kiwify.com.br/xBAB8TZ",
+      enterprise: "https://pay.kiwify.com.br/Vq17ohp"
     };
-    const variant = getVariant();
-    if (grid) {
-      const cards = Array.from(grid.querySelectorAll("[data-plan]"));
-      const trial = cards.find((card) => card.dataset.plan === "trial");
-      const rotina = cards.find((card) => card.dataset.plan === "rotina");
-      const escala = cards.find((card) => card.dataset.plan === "escala");
-      const order = variant === "escala-first"
-        ? [trial, escala, rotina]
-        : [trial, rotina, escala];
-      order.filter(Boolean).forEach((card) => grid.appendChild(card));
-      console.log("[pricing_ab]", variant);
-      grid.addEventListener("click", (event) => {
-        const target = event.target.closest("a");
-        if (target) {
-          console.log("[pricing_click]", variant, target.textContent.trim());
-        }
+
+    const fallbackPlans = [
+      {
+        id: "free",
+        name: "Free",
+        price: "R$ 0",
+        period: "",
+        capacity: "Até 100 leads / mês",
+        description: "Ideal para testar a priorização com poucos leads.",
+        tag: "Free",
+        features: ["100 leads/mês", "Ação do Dia", "Ranking diário"],
+        cta: "Começar grátis",
+        href: "onboarding.html"
+      },
+      {
+        id: "starter",
+        name: "Starter",
+        price: "R$ 79",
+        period: "/ mês",
+        capacity: "Até 1.000 leads / mês",
+        description: "Para times pequenos que precisam de consistência.",
+        tag: "Mais escolhido",
+        features: ["Tudo do Free", "Feedback contínuo", "Integrações"],
+        cta: "Assinar Starter",
+        href: "onboarding.html"
+      },
+      {
+        id: "pro",
+        name: "Pro",
+        price: "R$ 179",
+        period: "/ mês",
+        capacity: "Até 3.000 leads / mês",
+        description: "Para quem quer escala com suporte prioritário.",
+        tag: "⭐ Recomendado",
+        featured: true,
+        features: ["Tudo do Starter", "Suporte prioritário", "Relatórios avançados"],
+        cta: "Assinar Pro",
+        href: KIWIFY_LINKS.pro
+      },
+      {
+        id: "enterprise",
+        name: "Enterprise",
+        price: "Sob consulta",
+        period: "",
+        capacity: "Volume personalizado",
+        description: "Projetos com alto volume e integrações customizadas.",
+        tag: "Enterprise",
+        features: ["SLA dedicado", "Onboarding assistido", "Customizações"],
+        cta: "Falar com vendas",
+        href: KIWIFY_LINKS.enterprise
+      }
+    ];
+
+    function normalizePlans(data) {
+      if (!data) return fallbackPlans;
+      const rawPlans = Array.isArray(data) ? data : data.plans || data.data || [];
+      if (!rawPlans.length) return fallbackPlans;
+      return rawPlans.map((plan) => {
+        const name = plan.name || plan.nome || "Plano";
+        const id = (plan.id || plan.slug || name).toString().toLowerCase();
+        const priceValue = plan.price || plan.preco || plan.price_value || "";
+        const price = priceValue ? `R$ ${priceValue}` : plan.price_label || "R$ 0";
+        const period = plan.period || plan.periodo || "/ mês";
+        const capacity = plan.capacity || plan.capacidade || "";
+        const description = plan.description || plan.descricao || "";
+        const features = plan.features || plan.itens || [];
+        const fallback = fallbackPlans.find((item) => item.id === id) || {};
+
+        return {
+          id,
+          name,
+          price: price || fallback.price,
+          period: period || fallback.period,
+          capacity: capacity || fallback.capacity,
+          description: description || fallback.description,
+          tag: plan.tag || fallback.tag,
+          featured: plan.featured || fallback.featured,
+          features: features.length ? features : fallback.features,
+          cta: plan.cta || fallback.cta,
+          href: plan.href || fallback.href || "onboarding.html"
+        };
       });
     }
+
+    function buildCard(plan) {
+      const card = document.createElement("article");
+      card.className = `card${plan.featured ? " card--featured" : ""}`;
+      card.dataset.plan = plan.id;
+
+      const tag = plan.tag ? `<span class="pricing__tag${plan.featured ? " pricing__tag--highlight" : ""}">${plan.tag}</span>` : "";
+      const features = (plan.features || []).map((item) => `<li>${item}</li>`).join("");
+      const priceLabel = `${plan.price}${plan.period ? ` ${plan.period}` : ""}`;
+
+      card.innerHTML = `
+        ${tag}
+        <div class="pricing__price">${priceLabel}</div>
+        <p class="pricing__capacity">${plan.capacity || ""}</p>
+        <p class="subtitle">${plan.description || ""}</p>
+        <ul class="pricing__list">${features}</ul>
+        <a class="btn btn--block ${plan.featured ? "" : "btn--ghost"}" href="${plan.href}">${plan.cta || "Assinar"}</a>
+        <p class="pricing__microcopy">${plan.name}</p>
+      `;
+
+      return card;
+    }
+
+    async function renderPricing() {
+      const grid = document.getElementById("pricingGrid");
+      if (!grid) return;
+
+      grid.innerHTML = "";
+      try {
+        const res = await fetch(`${BACKEND}/pricing`);
+        const data = await res.json().catch(() => ({}));
+        const plans = normalizePlans(data);
+        plans.forEach((plan) => grid.appendChild(buildCard(plan)));
+      } catch (error) {
+        fallbackPlans.forEach((plan) => grid.appendChild(buildCard(plan)));
+      }
+    }
+
+    renderPricing();
   </script>
 </body>
 </html>

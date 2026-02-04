@@ -3,799 +3,186 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>LeadRank • Dashboard</title>
+  <title>LeadRank • Priorize leads quentes com IA</title>
   <link rel="stylesheet" href="styles.css" />
 </head>
 <body>
   <div class="page">
     <header class="site-header">
-      <a class="brand" href="landing.html">
+      <a class="brand" href="index.html">
         <span class="brand__logo">LR</span>
         <span class="brand__text">LeadRank</span>
       </a>
       <nav class="site-nav">
-        <a href="landing.html">Início</a>
+        <a href="index.html" aria-current="page">Início</a>
         <a href="acao.html">Ação do dia</a>
         <a href="pricing.html">Planos</a>
         <a href="onboarding.html">Criar conta</a>
         <a href="login.html">Entrar</a>
       </nav>
-      <a class="btn btn--ghost" href="onboarding.html?mode=login">Trocar conta</a>
+      <div class="header-actions">
+        <a class="btn btn--ghost" href="pricing.html">Ver planos</a>
+        <a class="btn" href="onboarding.html">Testar grátis</a>
+      </div>
     </header>
 
     <main>
-      <section class="dashboard">
-        <div class="card daily-hero">
-          <div class="daily-hero__header">
+      <section class="hero" id="inicio">
+        <div>
+          <p class="eyebrow">IA para qualificar leads em tempo real</p>
+          <h1>Cansado de perder tempo com leads frios?</h1>
+          <p class="subtitle">
+            O LeadRank analisa intenção e fit automaticamente, prioriza quem está pronto para comprar e entrega
+            um ranking diário para seu time agir com velocidade.
+          </p>
+          <div class="hero__actions">
+            <a class="btn" href="onboarding.html">Começar teste grátis 14 dias</a>
+            <a class="btn btn--ghost" href="pricing.html">Ver planos</a>
+          </div>
+          <div class="hero__stats">
             <div>
-              <p class="eyebrow">Resumo do dia</p>
-              <h1 class="daily-hero__title">🔥 Ação do dia</h1>
-              <p class="subtitle">Esses são os leads com maior chance de fechar agora.</p>
+              <strong>3x mais agendamentos</strong>
+              <span>Priorize rápido e aumente conversões</span>
             </div>
-          </div>
-          <div class="daily-hero__grid">
-            <div class="daily-card daily-card--hot">
-              <div class="daily-card__top">
-                <span class="daily-card__icon">🔥</span>
-                <div>
-                  <p class="daily-card__label">Quentes</p>
-                  <p class="daily-card__value" id="dailyHotCount">—</p>
-                </div>
-              </div>
-              <p class="text-muted">Ligue primeiro</p>
-              <button class="btn btn--small" type="button">Ver quentes</button>
+            <div>
+              <strong>Prioridade diária</strong>
+              <span>Lista de ligação pronta todos os dias</span>
             </div>
-            <div class="daily-card daily-card--warm">
-              <div class="daily-card__top">
-                <span class="daily-card__icon">🟡</span>
-                <div>
-                  <p class="daily-card__label">Mornos</p>
-                  <p class="daily-card__value" id="dailyWarmCount">—</p>
-                </div>
-              </div>
-              <p class="text-muted">Acompanhe hoje</p>
-              <button class="btn btn--small btn--ghost" type="button">Ver mornos</button>
-            </div>
-            <div class="daily-card daily-card--cold">
-              <div class="daily-card__top">
-                <span class="daily-card__icon">❄️</span>
-                <div>
-                  <p class="daily-card__label">Frios</p>
-                  <p class="daily-card__value" id="dailyColdCount">—</p>
-                </div>
-              </div>
-              <p class="text-muted">Nutrir / automação</p>
-              <button class="btn btn--small btn--ghost" type="button">Ver frios</button>
-            </div>
-            <div class="daily-card daily-card--success">
-              <div class="daily-card__top">
-                <span class="daily-card__icon">✅</span>
-                <div>
-                  <p class="daily-card__label">Convertidos hoje</p>
-                  <p class="daily-card__value" id="dailyConvertedCount">—</p>
-                </div>
-              </div>
-              <p class="text-muted">Feedback do time</p>
-              <button class="btn btn--tiny btn--ghost" type="button">Ver convertidos</button>
+            <div>
+              <strong>Setup em minutos</strong>
+              <span>Conecte CRM, WhatsApp e formulários</span>
             </div>
           </div>
         </div>
-        <div class="dashboard__header">
-          <div>
-            <p class="eyebrow">Dashboard</p>
-            <h1 class="dashboard__title">Visão geral do funil</h1>
-            <p class="subtitle">Acompanhe o desempenho dos leads e ajuste prioridades rapidamente.</p>
+        <div class="card">
+          <div class="card__header">
+            <h2>Resumo da plataforma</h2>
+            <span class="pill pill--muted">Lead scoring inteligente</span>
           </div>
-          <div class="pill pill--muted" id="wsPill">workspace: —</div>
+          <ul class="list">
+            <li>
+              <span>Score automático com IA a partir dos seus sinais</span>
+              <span class="pill pill--success">+ precisão</span>
+            </li>
+            <li>
+              <span>Fila “Ação do dia” com quem ligar primeiro</span>
+              <span class="pill pill--success">+ foco</span>
+            </li>
+            <li>
+              <span>Feedback do time para melhorar o modelo</span>
+              <span class="pill pill--success">+ aprendizado</span>
+            </li>
+          </ul>
+          <p class="subtitle">Sem cartão de crédito. Cancele quando quiser.</p>
         </div>
+      </section>
 
-        <div class="dashboard__grid">
-          <div class="card">
-            <h2>Indicadores principais</h2>
-            <div class="dashboard__kpis">
-              <div class="kpi">
-                <div class="text-muted">Convertidos</div>
-                <div class="kpi__value" id="kpiConv">—</div>
-              </div>
-              <div class="kpi">
-                <div class="text-muted">Negados</div>
-                <div class="kpi__value" id="kpiNeg">—</div>
-              </div>
-              <div class="kpi">
-                <div class="text-muted">Pendentes</div>
-                <div class="kpi__value" id="kpiPend">—</div>
-              </div>
-            </div>
+      <section class="features" id="como-funciona">
+        <h2>Como funciona</h2>
+        <div class="features__grid">
+          <article class="feature">
+            <h3>1. Conectar</h3>
+            <p>Conecte formulários, CRM ou WhatsApp para centralizar os leads.</p>
+          </article>
+          <article class="feature">
+            <h3>2. Score inteligente</h3>
+            <p>A IA analisa comportamento e fit para priorizar automaticamente.</p>
+          </article>
+          <article class="feature">
+            <h3>3. Ligar pros quentes</h3>
+            <p>Seu time recebe a lista dos leads mais quentes primeiro.</p>
+          </article>
+          <article class="feature">
+            <h3>4. Feedback contínuo</h3>
+            <p>Marque resultados e a IA aprende para melhorar o ranking.</p>
+          </article>
+        </div>
+      </section>
 
-            <div class="alert" id="msg"></div>
-
-            <div class="dashboard__charts">
-              <div class="card card--soft">
-                <h3>Temperatura dos leads</h3>
-                <p class="text-muted">Quentes, mornos, frios e pendentes.</p>
-                <div class="dashboard__chart"><canvas id="funnelChart"></canvas></div>
-              </div>
-              <div class="card card--soft">
-                <h3>Status do pipeline</h3>
-                <p class="text-muted">Convertidos, negados e pendentes.</p>
-                <div class="dashboard__chart"><canvas id="statusChart"></canvas></div>
-              </div>
-            </div>
-
-            <div class="card card--soft" style="margin-top:16px">
-              <h3>Resumo</h3>
-              <div class="text-muted" id="summaryWrap">Carregue o dashboard para ver.</div>
-            </div>
+      <section class="features" id="demo">
+        <h2>Veja o LeadRank em ação</h2>
+        <div class="card">
+          <div style="position: relative; padding-top: 56.25%; border-radius: 16px; overflow: hidden;">
+            <iframe
+              title="Demo LeadRank"
+              src="https://www.youtube.com/embed/dQw4w9WgXcQ"
+              style="position: absolute; inset: 0; width: 100%; height: 100%; border: 0;"
+              allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+              allowfullscreen
+            ></iframe>
           </div>
+          <p class="subtitle">Assista a uma visão geral rápida do dashboard e do ranking diário.</p>
+        </div>
+      </section>
 
-          <div class="card">
-            <h2>Conexão</h2>
-            <form class="form" onsubmit="return false;">
-              <label for="clientId">
-                client_id
-                <input id="clientId" placeholder="trial-..." />
-              </label>
-              <label for="apiKey">
-                api_key
-                <input id="apiKey" placeholder="sk_live_..." />
-              </label>
-              <div class="button-group">
-                <button class="btn btn--small" type="button" id="btnSave">Salvar</button>
-                <button class="btn btn--ghost btn--small" type="button" id="btnLoad">Carregar dashboard</button>
-                <button class="btn btn--ghost btn--small" type="button" id="btnExport" data-export>Exportar CSV</button>
-              </div>
-              <p class="form__hint">
-                A API Key é usada no header <code>X-API-KEY</code>.
-              </p>
-            </form>
+      <section class="features" id="beneficios">
+        <h2>Benefícios para o seu time comercial</h2>
+        <div class="features__grid">
+          <article class="feature">
+            <h3>Aumente agendamentos em 3x</h3>
+            <p>Foque no lead certo e aumente sua taxa de reuniões marcadas.</p>
+          </article>
+          <article class="feature">
+            <h3>IA aprende com feedback</h3>
+            <p>Cada ligação melhora o modelo e refina a priorização automaticamente.</p>
+          </article>
+          <article class="feature">
+            <h3>Freemium sem risco</h3>
+            <p>Comece grátis e escale apenas quando sua operação estiver pronta.</p>
+          </article>
+        </div>
+      </section>
 
-            <div class="card card--soft" style="margin-top:16px">
-              <h3>Teste rápido</h3>
-              <p class="text-muted">Envie um lead e veja o score calculado.</p>
-              <div class="button-group" style="margin-top:12px">
-                <button class="btn btn--ghost btn--small" id="btnTest">Enviar 1 lead de teste</button>
-                <button class="btn btn--small" id="btnSeed10">Gerar 10 leads de teste</button>
-              </div>
-              <p class="text-muted" style="margin-top:12px">Isso ajuda a IA calibrar melhor score e probabilidade.</p>
-              <div class="alert" id="testMsg"></div>
+      <section class="features" id="prova-social">
+        <h2>Prova social</h2>
+        <div class="card">
+          <p class="subtitle">Já qualificamos <strong>+8.400 leads</strong> para times de vendas em todo o Brasil.</p>
+          <div class="hero__stats">
+            <div>
+              <strong>NovaTrack</strong>
+              <span>Vendas B2B</span>
             </div>
-
-            <div class="card card--soft" style="margin-top:16px">
-              <h3>Enviar lead real</h3>
-              <p class="text-muted">Use esse formulário para registrar leads reais do seu time.</p>
-              <form class="form" id="realLeadForm">
-                <label for="realNome">
-                  Nome
-                  <input id="realNome" placeholder="Maria Oliveira" />
-                </label>
-                <label for="realEmail">
-                  Email
-                  <input id="realEmail" type="email" placeholder="maria@empresa.com" />
-                </label>
-                <label for="realTelefone">
-                  Telefone
-                  <input id="realTelefone" placeholder="(11) 90000-0000" />
-                </label>
-                <label for="realOrigem">
-                  Origem
-                  <input id="realOrigem" placeholder="formulario-site" />
-                </label>
-                <label for="realTempo">
-                  Tempo no site (segundos)
-                  <input id="realTempo" type="number" min="0" placeholder="120" />
-                </label>
-                <label for="realPaginas">
-                  Páginas visitadas
-                  <input id="realPaginas" type="number" min="0" placeholder="4" />
-                </label>
-                <label for="realPreco">
-                  Clicou em preço?
-                  <select id="realPreco">
-                    <option value="0">Não</option>
-                    <option value="1">Sim</option>
-                  </select>
-                </label>
-                <button class="btn btn--block" type="submit">Registrar lead real</button>
-              </form>
-              <p class="form__hint">Dica: use o mesmo client_id e api_key para integrar o envio direto pelo seu CRM.</p>
-              <div class="alert" id="realLeadMsg"></div>
+            <div>
+              <strong>PulseCRM</strong>
+              <span>SaaS & Growth</span>
+            </div>
+            <div>
+              <strong>Visão Solar</strong>
+              <span>Energia & Serviços</span>
             </div>
           </div>
         </div>
+      </section>
 
-        <div class="card action-list" id="actionList" data-state="empty">
-          <div class="action-list__header">
-            <h2>📞 Leads para agir agora</h2>
-          </div>
-          <div class="action-list__bar">
-            <div class="chip-group" role="tablist" aria-label="Filtro rápido">
-              <button class="chip chip--active" type="button">🔥 Quentes</button>
-              <button class="chip" type="button">🟡 Mornos</button>
-              <button class="chip" type="button">❄️ Frios</button>
-              <button class="chip" type="button">⏳ Pendentes</button>
-              <button class="chip" type="button">✅ Convertidos</button>
-              <button class="chip" type="button">❌ Negados</button>
-            </div>
-            <div class="action-list__controls">
-              <label class="search">
-                <span class="sr-only">Buscar por nome, telefone, origem</span>
-                <input type="search" placeholder="Buscar por nome, telefone, origem" />
-              </label>
-              <button class="btn btn--ghost btn--small" type="button" data-export>Exportar CSV</button>
-            </div>
-          </div>
-
-
-
-
-          <div class="action-list__body">
-            <div class="action-state action-state--loading">
-              <div class="skeleton-grid">
-                <div class="skeleton-card">
-                  <div class="skeleton-line skeleton-line--lg"></div>
-                  <div class="skeleton-line"></div>
-                  <div class="skeleton-pill"></div>
-                </div>
-                <div class="skeleton-card">
-                  <div class="skeleton-line skeleton-line--lg"></div>
-                  <div class="skeleton-line"></div>
-                  <div class="skeleton-pill"></div>
-                </div>
-              </div>
-              <div class="skeleton-table">
-                <div class="skeleton-line skeleton-line--md"></div>
-                <div class="skeleton-line"></div>
-                <div class="skeleton-line"></div>
-              </div>
-            </div>
-
-            <div class="action-state action-state--empty">
-              <p class="empty-state__title">Você ainda não tem leads suficientes para priorizar.</p>
-              <p class="text-muted">Comece gerando leads de teste ou conecte seu CRM para liberar a priorização diária.</p>
-              <div class="action-list__cta">
-                <button class="btn btn--small" type="button" data-seed10>Gerar 10 leads de teste</button>
-                <a class="btn btn--ghost btn--small" href="onboarding.html#integracao" target="_blank" rel="noreferrer">Ver como integrar</a>
-              </div>
-            </div>
-
-            <div class="action-state action-state--error">
-              <p class="empty-state__title">Não conseguimos carregar seus leads. Confira sua conexão ou chave de integração.</p>
-              <button class="btn btn--small" type="button" data-retry>Tentar novamente</button>
-            </div>
-
-            <div class="action-state action-state--ready" id="actionReady">
-              <div class="lead-row">
-                <div>
-                  <p class="lead-row__name">Maria Oliveira</p>
-                  <p class="text-muted">formulario-site • (11) 90000-0000</p>
-                </div>
-                <div class="lead-row__meta">
-                  <span class="pill pill--muted">🔥 Quente</span>
-                  <button class="btn btn--small" type="button" data-open-details
-                    data-name="Maria Oliveira"
-                    data-phone="(11) 90000-0000"
-                    data-origin="formulario-site"
-                    data-time="180"
-                    data-pages="4"
-                    data-price="Sim"
-                    data-score="86"
-                    data-prob="72%"
-                  >
-                    Ver detalhes
-                  </button>
-                </div>
-              </div>
-              <div class="action-list__insights">
-                <p>Leads quentes = maiores chances de fechar agora.</p>
-                <p>Marque o resultado do contato. O LeadRank aprende com seu time.</p>
-                <p>Quanto mais feedback, melhor a priorização.</p>
-              </div>
-            </div>
-          </div>
+      <section class="cta">
+        <div>
+          <h2>Pronto para priorizar leads quentes com IA?</h2>
+          <p class="subtitle">Crie sua conta e tenha acesso completo por 14 dias grátis.</p>
         </div>
+        <a class="btn" href="onboarding.html">Começar teste grátis</a>
       </section>
     </main>
 
     <footer class="site-footer">
       <span>© 2024 LeadRank. Todos os direitos reservados.</span>
       <div class="footer__links">
-        <a href="landing.html">Início</a>
+        <a href="index.html">Início</a>
         <a href="pricing.html">Planos</a>
-        <a href="onboarding.html">Criar conta</a>
+        <a href="termos.html">Termos</a>
+        <a href="privacidade.html">Privacidade</a>
       </div>
     </footer>
   </div>
 
-  <div class="modal" id="leadDetailsModal" aria-hidden="true">
-    <div class="modal__backdrop" data-close-details></div>
-    <div class="modal__content" role="dialog" aria-modal="true" aria-labelledby="leadDetailsTitle">
-      <div class="modal__header">
-        <div>
-          <p class="eyebrow">Detalhes do lead</p>
-          <h3 id="leadDetailsTitle">—</h3>
-        </div>
-        <button class="btn btn--ghost btn--small" type="button" data-close-details>Fechar</button>
-      </div>
-      <div class="modal__grid">
-        <div>
-          <p class="text-muted">Contato</p>
-          <div class="modal__contact">
-            <span id="leadDetailsPhone">—</span>
-            <button class="btn btn--tiny btn--ghost" type="button" id="copyPhone">Copiar</button>
-          </div>
-        </div>
-        <div>
-          <p class="text-muted">Origem</p>
-          <p class="modal__value" id="leadDetailsOrigin">—</p>
-        </div>
-        <div>
-          <p class="text-muted">Tempo no site</p>
-          <p class="modal__value" id="leadDetailsTime">—</p>
-        </div>
-        <div>
-          <p class="text-muted">Páginas visitadas</p>
-          <p class="modal__value" id="leadDetailsPages">—</p>
-        </div>
-        <div>
-          <p class="text-muted">Clicou em preço</p>
-          <p class="modal__value" id="leadDetailsPrice">—</p>
-        </div>
-        <div class="modal__score">
-          <p class="text-muted">Score + Probabilidade</p>
-          <p class="modal__value" id="leadDetailsScore">—</p>
-          <p class="text-muted">Score considera intenção e fit. Probabilidade estima chance de fechar.</p>
-        </div>
-      </div>
-      <div class="modal__actions">
-        <button class="btn btn--ghost btn--small" type="button">✅</button>
-        <button class="btn btn--ghost btn--small" type="button">❌</button>
-        <button class="btn btn--ghost btn--small" type="button">⏳</button>
-      </div>
-    </div>
-  </div>
-
-  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
   <script>
-    const BACKEND = (window.BACKEND_URL || "https://qualificador-leads-i-a.onrender.com").replace(/\/$/, "");
-// === Kiwify checkout links (substitua pelos seus links) ===
-const KIWIFY_CHECKOUT = {
-  starter: "https://pay.kiwify.com.br/Vq17ohp",
-  pro: "https://pay.kiwify.com.br/xBAB8TZ"
-};
-
-function buildKiwifyUrl(base, { client_id, plan }) {
-  if (!base) return "";
-  const u = new URL(base);
-  // s1/s2: parâmetros simples para identificar o comprador no seu sistema
-  u.searchParams.set("s1", client_id || "");
-  u.searchParams.set("s2", plan || "");
-  // UTMs (opcional)
-  if (!u.searchParams.get("utm_source")) u.searchParams.set("utm_source", "website");
-  if (!u.searchParams.get("utm_medium")) u.searchParams.set("utm_medium", "checkout");
-  if (!u.searchParams.get("utm_campaign")) u.searchParams.set("utm_campaign", "pricing");
-  return u.toString();
-}
-
-function goToUpgradeIfRequested() {
-  const plan = (qs("upgrade") || "").toLowerCase();
-  if (!plan) return false;
-
-  const { client_id, api_key } = getAuth();
-  if (!client_id || !api_key) {
-    const next = `index.html?upgrade=${encodeURIComponent(plan)}`;
-    window.location.href = `onboarding.html?mode=login&next=${encodeURIComponent(next)}`;
-    return true;
-  }
-
-  const base = KIWIFY_CHECKOUT[plan] || "";
-  const url = buildKiwifyUrl(base, { client_id, plan });
-  if (!url) {
-    alert("Checkout ainda não configurado: defina KIWIFY_CHECKOUT_STARTER/PRO ou edite o index.html com seus links da Kiwify.");
-    return true;
-  }
-  window.location.href = url;
-  return true;
-}
-
-    function qs(name) {
-      return new URLSearchParams(location.search).get(name) || "";
-    }
-    function getAuth() {
-      return {
-        client_id: qs("client_id") || localStorage.getItem("leadrank_client_id") || localStorage.getItem("client_id") || localStorage.getItem("LR_CLIENT_ID") || "",
-        api_key: qs("api_key") || localStorage.getItem("leadrank_api_key") || localStorage.getItem("api_key") || localStorage.getItem("LR_API_KEY") || ""
-      };
-    }
-    function setAuth(client_id, api_key) {
-      localStorage.setItem("leadrank_client_id", client_id);
-      localStorage.setItem("leadrank_api_key", api_key);
-      localStorage.setItem("client_id", client_id);
-      localStorage.setItem("api_key", api_key);
-      localStorage.setItem("LR_CLIENT_ID", client_id);
-      localStorage.setItem("LR_API_KEY", api_key);
-      if (qs("client_id") || qs("api_key")) {
-        history.replaceState({}, "", "index.html");
+    (function redirectAfterLogin() {
+      const params = new URLSearchParams(window.location.search);
+      const clientId = params.get("client_id");
+      const apiKey = params.get("api_key");
+      if (clientId && apiKey) {
+        window.location.href = `acao.html?${params.toString()}`;
       }
-    }
-
-    window.__lr = {
-      async lrApi(path, { method = "GET", body = null, headers = {} } = {}) {
-        const { client_id, api_key } = getAuth();
-        const url = new URL(BACKEND + path);
-        if (client_id && method === "GET") url.searchParams.set("client_id", client_id);
-
-        const h = { "Content-Type": "application/json", ...headers };
-        if (api_key) h["X-API-KEY"] = api_key;
-
-        const res = await fetch(url.toString(), {
-          method,
-          headers: h,
-          body: body ? JSON.stringify(body) : null
-        });
-        const data = await res.json().catch(() => ({}));
-        if (!res.ok) throw new Error(data.error || data.message || ("HTTP " + res.status));
-        return data;
-      }
-    };
-
-    const el = (id) => document.getElementById(id);
-    const msg = el("msg");
-    const wsPill = el("wsPill");
-
-    function setMsg(type, text) {
-      msg.className = "alert" + (type ? " " + type : "");
-      msg.style.display = "block";
-      msg.textContent = text;
-    }
-
-    function renderList(container, rows, cols) {
-      if (!rows || !rows.length) {
-        container.innerHTML = "<div class='text-muted'>—</div>";
-        return;
-      }
-      let html = "<table class='data-table'><thead><tr>" + cols.map((c) => `<th>${c.label}</th>`).join("") + "</tr></thead><tbody>";
-      for (const r of rows) {
-        html += "<tr>" + cols.map((c) => `<td>${r[c.key] ?? "—"}</td>`).join("") + "</tr>";
-      }
-      html += "</tbody></table>";
-      container.innerHTML = html;
-    }
-
-    let __funnelChart = null;
-    let __statusChart = null;
-
-    function renderCharts(f) {
-      const hot = Number(f.hot || 0);
-      const warm = Number(f.warm || 0);
-      const cold = Number(f.cold || 0);
-      const pend = Number(f.pendentes || 0);
-
-      const conv = Number(f.convertidos || 0);
-      const neg = Number(f.negados || 0);
-
-      const ctx1 = document.getElementById("funnelChart");
-      const ctx2 = document.getElementById("statusChart");
-
-      if (window.Chart) {
-        if (__funnelChart) __funnelChart.destroy();
-        if (__statusChart) __statusChart.destroy();
-
-        __funnelChart = new Chart(ctx1, {
-          type: "bar",
-          data: {
-            labels: ["Quentes", "Mornos", "Frios", "Pendentes"],
-            datasets: [{ label: "Leads", data: [hot, warm, cold, pend] }]
-          },
-          options: {
-            responsive: true,
-            maintainAspectRatio: false,
-            plugins: { legend: { display: false } },
-            scales: { y: { beginAtZero: true, ticks: { precision: 0 } } }
-          }
-        });
-
-        __statusChart = new Chart(ctx2, {
-          type: "doughnut",
-          data: {
-            labels: ["Convertidos", "Negados", "Pendentes"],
-            datasets: [{ data: [conv, neg, pend] }]
-          },
-          options: { responsive: true, maintainAspectRatio: false }
-        });
-      }
-    }
-
-    function renderSummary(f) {
-      const total = Number(f.total || 0);
-      const rate = Number(f.conversion_rate_labeled || 0);
-      const ratePct = (rate * 100).toFixed(1) + "%";
-      const html = `
-        <div class="dashboard__kpis" style="margin-top:12px">
-          <div class="kpi">
-            <div class="text-muted">Total de leads</div>
-            <div class="kpi__value">${total}</div>
-          </div>
-          <div class="kpi">
-            <div class="text-muted">Quentes</div>
-            <div class="kpi__value">${Number(f.hot || 0)}</div>
-          </div>
-          <div class="kpi">
-            <div class="text-muted">Taxa (labeled)</div>
-            <div class="kpi__value">${ratePct}</div>
-          </div>
-        </div>
-        <p class="text-muted" style="margin-top:12px">
-          Taxa calculada apenas em leads com status (convertido/negado). Pendentes não entram no denominador.
-        </p>
-      `;
-      const wrap = el("summaryWrap");
-      if (wrap) wrap.innerHTML = html;
-    }
-
-    function renderDailyHero(f) {
-      const hot = f.hot_today ?? f.hot ?? 0;
-      const warm = f.warm ?? 0;
-      const cold = f.cold ?? 0;
-      const convertedToday = f.convertidos_hoje ?? f.convertidos_today ?? f.convertidos ?? 0;
-      el("dailyHotCount").textContent = hot;
-      el("dailyWarmCount").textContent = warm;
-      el("dailyColdCount").textContent = cold;
-      el("dailyConvertedCount").textContent = convertedToday;
-    }
-
-    async function loadDashboard() {
-      msg.style.display = "none";
-      setActionState("loading");
-      const { client_id } = getAuth();
-      wsPill.textContent = "workspace: " + (client_id || "—");
-
-      try {
-        const f = await window.__lr.lrApi("/funnels", { method: "GET" });
-
-        el("kpiConv").textContent = f.convertidos ?? "—";
-        el("kpiNeg").textContent = f.negados ?? "—";
-        el("kpiPend").textContent = f.pendentes ?? "—";
-
-        renderCharts(f);
-        renderSummary(f);
-        renderDailyHero(f);
-        setActionState(Number(f.total || 0) > 0 ? "ready" : "empty");
-
-        setActionState(Number(f.total || 0) > 0 ? "ready" : "empty");
-
-        setActionState(Number(f.total || 0) > 0 ? "ready" : "empty");
-
-        setActionState(Number(f.total || 0) > 0 ? "ready" : "empty");
-
-        setActionState(Number(f.total || 0) > 0 ? "ready" : "empty");
-
-
-        setMsg("alert--success", "Dashboard carregado.");
-      } catch (e) {
-        setActionState("error");
-        setMsg("alert--error", "Erro ao carregar: " + e.message);
-      }
-    }
-
-    el("btnSave").onclick = () => {
-      const client_id = el("clientId").value.trim();
-      const api_key = el("apiKey").value.trim();
-      setAuth(client_id, api_key);
-      wsPill.textContent = "workspace: " + (client_id || "—");
-      setMsg("alert--success", "Dados salvos.");
-    };
-
-    el("btnLoad").onclick = loadDashboard;
-
-    const exportButtons = document.querySelectorAll("[data-export]");
-    exportButtons.forEach((btn) => {
-      btn.onclick = () => {
-        const { client_id, api_key } = getAuth();
-        if (!client_id) return setMsg("alert--error", "Informe o client_id.");
-        const url = new URL(BACKEND + "/leads_export.csv");
-        url.searchParams.set("client_id", client_id);
-        if (api_key) {
-          setMsg("alert--error", "Para exportar com API Key, faça o download via API ou desative a exigência.");
-          return;
-        }
-        window.location.href = url.toString();
-      };
-    });
-
-
-
-
-
-    const actionList = document.querySelector(".action-list");
-    function setActionState(state) {
-      if (!actionList) return;
-      actionList.dataset.state = state;
-    }
-
-    document.querySelectorAll("[data-retry]").forEach((btn) => {
-      btn.onclick = () => loadDashboard();
-    });
-
-    document.querySelectorAll("[data-seed10]").forEach((btn) => {
-      btn.onclick = () => {
-        const seedButton = el("btnSeed10");
-        if (seedButton) seedButton.click();
-      };
-    });
-
-
-
-
-
-
-    const modal = el("leadDetailsModal");
-    const modalTitle = el("leadDetailsTitle");
-    const modalPhone = el("leadDetailsPhone");
-    const modalOrigin = el("leadDetailsOrigin");
-    const modalTime = el("leadDetailsTime");
-    const modalPages = el("leadDetailsPages");
-    const modalPrice = el("leadDetailsPrice");
-    const modalScore = el("leadDetailsScore");
-    const copyPhoneBtn = el("copyPhone");
-
-    function openLeadDetails(data) {
-      modalTitle.textContent = data.name || "—";
-      modalPhone.textContent = data.phone || "—";
-      modalOrigin.textContent = data.origin || "—";
-      modalTime.textContent = data.time ? `${data.time}s` : "—";
-      modalPages.textContent = data.pages || "—";
-      modalPrice.textContent = data.price || "—";
-      modalScore.textContent = data.score && data.prob ? `${data.score} • ${data.prob}` : "—";
-      modal.classList.add("modal--open");
-      modal.setAttribute("aria-hidden", "false");
-    }
-
-    function closeLeadDetails() {
-      modal.classList.remove("modal--open");
-      modal.setAttribute("aria-hidden", "true");
-    }
-
-    document.querySelectorAll("[data-open-details]").forEach((btn) => {
-      btn.onclick = () => {
-        openLeadDetails({
-          name: btn.dataset.name,
-          phone: btn.dataset.phone,
-          origin: btn.dataset.origin,
-          time: btn.dataset.time,
-          pages: btn.dataset.pages,
-          price: btn.dataset.price,
-          score: btn.dataset.score,
-          prob: btn.dataset.prob
-        });
-      };
-    });
-
-    document.querySelectorAll("[data-close-details]").forEach((btn) => {
-      btn.onclick = closeLeadDetails;
-    });
-
-    copyPhoneBtn.onclick = () => {
-      const phone = modalPhone.textContent.trim();
-      if (!phone || phone === "—") return;
-      if (navigator.clipboard?.writeText) {
-        navigator.clipboard.writeText(phone);
-      } else {
-        window.prompt("Copie o telefone:", phone);
-      }
-    };
-
-
-    el("btnTest").onclick = async () => {
-      const t = el("testMsg");
-      t.className = "alert";
-      t.style.display = "none";
-      try {
-        const { client_id } = getAuth();
-        if (!client_id) throw new Error("Informe client_id e api_key.");
-        const data = await window.__lr.lrApi("/prever", {
-          method: "POST",
-          body: {
-            client_id,
-            nome: "Lead Teste",
-            email_lead: "teste@exemplo.com",
-            telefone: "11999990000",
-            origem: "onboarding",
-            tempo_site: 180,
-            paginas_visitadas: 4,
-            clicou_preco: 1
-          }
-        });
-        t.className = "alert alert--success";
-        t.style.display = "block";
-        t.textContent = `Lead criado. score=${data.score} prob=${data.probabilidade}`;
-      } catch (e) {
-        t.className = "alert alert--error";
-        t.style.display = "block";
-        t.textContent = "Erro: " + e.message;
-      }
-    };
-
-    el("btnSeed10").onclick = async () => {
-      const t = el("testMsg");
-      t.className = "alert";
-      t.style.display = "none";
-      try {
-        const { client_id } = getAuth();
-        if (!client_id) throw new Error("Informe client_id e api_key.");
-        const data = await window.__lr.lrApi("/seed_test_leads", {
-          method: "POST",
-          body: { client_id, count: 10 }
-        });
-        t.className = "alert alert--success";
-        t.style.display = "block";
-        t.textContent = `${data.inserted || 0} leads criados. Recarregando dashboard...`;
-        await loadDashboard();
-      } catch (e) {
-        t.className = "alert alert--error";
-        t.style.display = "block";
-        t.textContent = "Erro: " + e.message;
-      }
-    };
-
-    const realLeadForm = el("realLeadForm");
-    if (realLeadForm) {
-      realLeadForm.addEventListener("submit", async (event) => {
-        event.preventDefault();
-        const m = el("realLeadMsg");
-        m.className = "alert";
-        m.style.display = "none";
-        try {
-          const { client_id } = getAuth();
-          if (!client_id) throw new Error("Informe client_id e api_key.");
-          const nome = el("realNome").value.trim();
-          const email = el("realEmail").value.trim();
-          const telefone = el("realTelefone").value.trim();
-          const origem = el("realOrigem").value.trim();
-          const tempo_site = Number(el("realTempo").value || 0);
-          const paginas_visitadas = Number(el("realPaginas").value || 0);
-          const clicou_preco = Number(el("realPreco").value || 0);
-
-          const data = await window.__lr.lrApi("/prever", {
-            method: "POST",
-            body: {
-              client_id,
-              nome,
-              email_lead: email,
-              telefone,
-              origem,
-              tempo_site,
-              paginas_visitadas,
-              clicou_preco
-            }
-          });
-          m.className = "alert alert--success";
-          m.style.display = "block";
-          m.textContent = `Lead real registrado. score=${data.score} prob=${data.probabilidade}`;
-          await loadDashboard();
-        } catch (e) {
-          m.className = "alert alert--error";
-          m.style.display = "block";
-          m.textContent = "Erro: " + e.message;
-        }
-      });
-    }
-
-    (function init() {
-      const { client_id, api_key } = getAuth();
-      el("clientId").value = client_id;
-      el("apiKey").value = api_key;
-      wsPill.textContent = "workspace: " + (client_id || "—");
-      if (client_id) loadDashboard();
     })();
-
-    document.addEventListener("DOMContentLoaded", () => {
-      try {
-        if (goToUpgradeIfRequested()) return;
-      } catch (e) {
-        // noop
-      }
-    });
   </script>
-<script src="dashboard.js" defer></script>
 </body>
 </html>

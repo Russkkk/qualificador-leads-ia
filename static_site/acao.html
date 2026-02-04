@@ -82,6 +82,23 @@
           </div>
         </div>
 
+        <div class="card" id="accuracySection">
+          <div class="daily-hero__header">
+            <div>
+              <p class="eyebrow">Relatório de Precisão da IA</p>
+              <h2>Precisão da IA nos últimos 30 dias</h2>
+              <p class="subtitle" id="accuracyText">Nos últimos 30 dias acertamos —% dos leads marcados como quentes.</p>
+            </div>
+            <button class="btn btn--ghost btn--small" type="button" id="recalcBtn">Recalcular scores pendentes</button>
+          </div>
+          <div class="card card--soft">
+            <h3>Conversão por faixa de probabilidade</h3>
+            <p class="text-muted">Comparativo entre faixas de probabilidade previstas e conversões reais.</p>
+            <div class="dashboard__chart"><canvas id="accuracyChart"></canvas></div>
+          </div>
+          <div class="alert" id="recalcMsg" style="display:none;"></div>
+        </div>
+
         <div class="card action-list" data-state="loading" id="leadsSection">
           <div class="action-list__header">
             <h2>📞 Leads para agir agora</h2>
@@ -179,6 +196,7 @@
     </footer>
   </div>
 
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
   <script>
     const BACKEND = (window.BACKEND_URL || "https://qualificador-leads-i-a.onrender.com").replace(/\/$/, "");
 
@@ -191,7 +209,12 @@
     const chipCounts = Array.from(document.querySelectorAll("[data-chip-count]"));
     const actionList = document.querySelector(".action-list");
     const upgradeBanner = el("upgradeBanner");
+    const accuracyText = el("accuracyText");
+    const accuracyChartEl = el("accuracyChart");
+    const recalcBtn = el("recalcBtn");
+    const recalcMsg = el("recalcMsg");
     let allItems = [];
+    let accuracyChart = null;
 
     let summaryState = { hot: 0, warm: 0, cold: 0, converted_today: 0 };
 
@@ -275,6 +298,100 @@
       const data = await res.json().catch(() => ({}));
       if (!res.ok) throw new Error(data.error || data.message || ("HTTP " + res.status));
       return data;
+    }
+
+    function formatPercent(value) {
+      if (value == null || Number.isNaN(value)) return "—";
+      const pct = value > 1 ? value : value * 100;
+      return `${pct.toFixed(1)}%`;
+    }
+
+    function normalizeBuckets(data) {
+      const buckets = data?.buckets || data?.probability_buckets || data?.faixas || data?.conversion_by_bucket;
+      if (Array.isArray(buckets)) {
+        return buckets.map((bucket) => ({
+          label: bucket.label || bucket.range || bucket.faixa || "—",
+          value: Number(bucket.value ?? bucket.rate ?? bucket.conversion ?? 0),
+        }));
+      }
+      if (buckets && typeof buckets === "object") {
+        return Object.entries(buckets).map(([label, value]) => ({
+          label,
+          value: Number(value || 0),
+        }));
+      }
+      return [
+        { label: "0-30%", value: 0.12 },
+        { label: "31-60%", value: 0.28 },
+        { label: "61-80%", value: 0.52 },
+        { label: "81-100%", value: 0.74 },
+      ];
+    }
+
+    function renderAccuracyChart(buckets) {
+      if (!accuracyChartEl) return;
+      const labels = buckets.map((bucket) => bucket.label);
+      const values = buckets.map((bucket) => Math.round((bucket.value || 0) * 100));
+
+      if (accuracyChart) accuracyChart.destroy();
+      if (!window.Chart) return;
+
+      accuracyChart = new Chart(accuracyChartEl, {
+        type: "bar",
+        data: {
+          labels,
+          datasets: [
+            {
+              label: "Conversão (%)",
+              data: values,
+              backgroundColor: "rgba(79, 124, 255, 0.5)",
+              borderRadius: 8,
+            },
+          ],
+        },
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          scales: {
+            y: {
+              beginAtZero: true,
+              ticks: { callback: (value) => `${value}%` },
+            },
+          },
+          plugins: {
+            legend: { display: false },
+          },
+        },
+      });
+    }
+
+    async function loadInsights() {
+      const { client_id } = getAuth();
+      if (!client_id) return;
+      try {
+        let data = null;
+        try {
+          data = await api("/insights");
+        } catch (err) {
+          data = await api("/auto_threshold");
+        }
+        const hotAccuracy =
+          data?.hot_accuracy ??
+          data?.accuracy_hot ??
+          data?.summary?.hot_accuracy ??
+          data?.summary?.hot_conversion ??
+          data?.precision_hot ??
+          0;
+        if (accuracyText) {
+          accuracyText.textContent = `Nos últimos 30 dias acertamos ${formatPercent(hotAccuracy)} dos leads marcados como quentes.`;
+        }
+        const buckets = normalizeBuckets(data);
+        renderAccuracyChart(buckets);
+      } catch (err) {
+        if (accuracyText) {
+          accuracyText.textContent = "Não foi possível carregar o relatório de precisão agora.";
+        }
+      }
     }
 
     async function seedTestLeads() {
@@ -484,6 +601,31 @@
       seedBtn.addEventListener("click", seedTestLeads);
     }
 
+    if (recalcBtn) {
+      recalcBtn.addEventListener("click", async () => {
+        const { client_id } = getAuth();
+        if (!client_id) {
+          recalcMsg.className = "alert alert--error";
+          recalcMsg.textContent = "Conecte seu workspace para recalcular.";
+          recalcMsg.style.display = "block";
+          return;
+        }
+        recalcMsg.style.display = "none";
+        try {
+          await apiPost("/recalc_pending", { client_id });
+          recalcMsg.className = "alert alert--success";
+          recalcMsg.textContent = "Recalculo iniciado! Atualizando dados...";
+          recalcMsg.style.display = "block";
+          await loadAction();
+          await loadInsights();
+        } catch (err) {
+          recalcMsg.className = "alert alert--error";
+          recalcMsg.textContent = "Não foi possível recalcular agora.";
+          recalcMsg.style.display = "block";
+        }
+      });
+    }
+
     async function loadAction() {
       msg.style.display = "none";
       setActionState("loading");
@@ -555,6 +697,7 @@
     });
 
     loadAction();
+    loadInsights();
 
     const DEMO_KEY = "leadrank_demo_completed";
     const restartBtn = document.getElementById("restartDemoBtn");

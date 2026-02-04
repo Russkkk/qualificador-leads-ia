@@ -185,15 +185,5 @@
     </footer>
   </div>
 
-  <script>
-    (function redirectAfterLogin() {
-      const params = new URLSearchParams(window.location.search);
-      const clientId = params.get("client_id");
-      const apiKey = params.get("api_key");
-      if (clientId && apiKey) {
-        window.location.href = `acao.html?${params.toString()}`;
-      }
-    })();
-  </script>
 </body>
 </html>

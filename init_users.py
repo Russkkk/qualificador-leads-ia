@@ -51,7 +51,7 @@ def _gen_api_key(client_id: str) -> str:
     return "sk_live_" + _sha256(raw)[:32]
 
 
-def _pbkdf2_hash(password: str, salt: bytes | None = None, iterations: int = 260_000) -> str:
+def _pbkdf2_hash(password: str, salt: bytes | None = None, iterations: int = 310_000) -> str:
     """
     Retorna string no formato:
       pbkdf2_sha256$<iterations>$<salt_hex>$<hash_hex>

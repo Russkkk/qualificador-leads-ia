@@ -123,7 +123,7 @@
           }
 
           const next = new URLSearchParams(location.search).get('next') || '';
-          window.location.href = next || `acao.html?client_id=${encodeURIComponent(clientId)}&api_key=${encodeURIComponent(apiKey)}`;
+          window.location.href = next || "acao.html";
         } catch (err) {
           loginError.textContent = err.message || "Erro de conexão. Tente novamente.";
           loginError.className = "alert alert--error";

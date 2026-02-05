@@ -8,6 +8,7 @@ def _bool(value: str) -> bool:
 class BaseConfig:
     DATABASE_URL = os.getenv("DATABASE_URL", "").strip()
     DEMO_KEY = os.getenv("DEMO_KEY", "").strip()
+    FLASK_SECRET_KEY = os.getenv("FLASK_SECRET_KEY", "").strip()
     DEBUG_MODE = _bool(os.getenv("DEBUG", ""))
     INCLUDE_TRACEBACK = _bool(os.getenv("INCLUDE_TRACEBACK", ""))
     TRUST_PROXY = _bool(os.getenv("TRUST_PROXY", ""))

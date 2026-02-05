@@ -1,3 +1,5 @@
+import re
+
 from flask import Flask, request
 from flask_cors import CORS
 from werkzeug.exceptions import HTTPException
@@ -52,8 +54,27 @@ def handle_exception(err: Exception):
     return json_err("Erro interno do servidor", 500, **payload)
 
 
+def _is_allowed_origin(origin: str) -> bool:
+    for entry in settings.ALLOWED_ORIGINS:
+        if entry == "null":
+            continue
+        if entry.startswith("^"):
+            if re.match(entry, origin):
+                return True
+        elif entry == origin:
+            return True
+    return False
+
+
 @app.after_request
 def apply_security_headers(response):
+    origin = request.headers.get("Origin")
+    if origin and _is_allowed_origin(origin):
+        response.headers["Access-Control-Allow-Origin"] = origin
+        response.headers.setdefault("Vary", "Origin")
+    else:
+        response.headers.pop("Access-Control-Allow-Origin", None)
+
     response.headers.setdefault("X-Content-Type-Options", "nosniff")
     if settings.CSP_POLICY:
         response.headers.setdefault("Content-Security-Policy", settings.CSP_POLICY)

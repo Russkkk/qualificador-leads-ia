@@ -359,6 +359,7 @@ limiter = Limiter(
     key_func=_client_ip,
     app=app,
     default_limits=[],
+    default_limits=["100 per minute"],
 )
 
 def _validate_password_strength(password: str) -> Tuple[bool, str]:
@@ -377,6 +378,10 @@ def _validate_password_strength(password: str) -> Tuple[bool, str]:
 def _hash_password(password: str) -> str:
     return generate_password_hash(password, method=f"pbkdf2:sha256:{PBKDF2_ITERATIONS}")
 
+  
+def _hash_password(password: str) -> str:
+    return generate_password_hash(password, method=f"pbkdf2:sha256:{PBKDF2_ITERATIONS}")
+  
 def _verify_legacy_pbkdf2(stored: str, password: str) -> bool:
     """
     Legacy format: pbkdf2_sha256$<iterations>$<salt_hex>$<hash_hex>
@@ -916,6 +921,7 @@ def pricing():
     
 @app.route('/signup', methods=['POST'])
 @limiter.limit("5 per minute")
+@limiter.limit("100 per minute")
 def signup():
     """
     Cria workspace trial a partir de nome/email/empresa/telefone + senha.
@@ -994,6 +1000,7 @@ def signup():
 
 @app.route('/login', methods=['POST'])
 @limiter.limit("5 per minute")
+@limiter.limit("100 per minute")
 def login():
     """Login com email+senha. Retorna client_id e envia api_key via header."""
     data = request.get_json(silent=True) or request.form or {}
@@ -1170,6 +1177,7 @@ def set_plan():
 
 @app.post("/prever")
 @limiter.limit(_prever_rate_limit, key_func=_rate_limit_client_id)
+@limiter.limit("600 per minute", key_func=_rate_limit_client_id)
 def prever():
     """
     POST /prever

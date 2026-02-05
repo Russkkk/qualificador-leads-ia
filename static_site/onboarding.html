@@ -135,151 +135,16 @@
 </head>
 <body data-active-nav="onboarding">
   <div class="page">
-    <main class="auth onboarding">
-      <section>
-        <p class="eyebrow">LeadRank onboarding</p>
-        <h1>Configure sua conta em 4 passos</h1>
-        <p class="subtitle">Um fluxo guiado para criar sua conta, receber sua API Key e integrar o LeadRank.</p>
-
-        <div class="stepper" id="stepper">
-          <div class="stepper__item is-active" data-step="1">
-            <span class="stepper__dot">1</span>
-            <div>
-              <strong>Cadastro</strong>
-              <p class="text-muted">Crie sua conta trial</p>
-            </div>
-          </div>
-          <div class="stepper__item" data-step="2">
-            <span class="stepper__dot">2</span>
-            <div>
-              <strong>Sua API Key</strong>
-              <p class="text-muted">Guarde com segurança</p>
-            </div>
-          </div>
-          <div class="stepper__item" data-step="3">
-            <span class="stepper__dot">3</span>
-            <div>
-              <strong>Como integrar</strong>
-              <p class="text-muted">Escolha o melhor caminho</p>
-            </div>
-          </div>
-          <div class="stepper__item" data-step="4">
-            <span class="stepper__dot">4</span>
-            <div>
-              <strong>Ir para o dashboard</strong>
-              <p class="text-muted">Ação do dia pronta</p>
-            </div>
-          </div>
-        </div>
-      </section>
-
-      <section class="card">
-        <div class="step-panel is-active" data-step-panel="1">
-          <h2>Passo 1: Cadastro</h2>
-          <p class="subtitle">Teste grátis por 14 dias. Sem cartão.</p>
-
-          <form id="signupForm" class="form-grid">
-            <label>
-              Nome completo
-              <input type="text" id="nome" required placeholder="João Silva" />
-            </label>
-            <label>
-              Email profissional
-              <input type="email" id="email" required placeholder="joao@empresa.com" />
-            </label>
-            <label>
-              Empresa / Marca (opcional)
-              <input type="text" id="empresa" placeholder="Minha Empresa" />
-            </label>
-            <label>
-              WhatsApp (opcional)
-              <input type="tel" id="telefone" placeholder="(11) 98765-4321" />
-            </label>
-            <label>
-              Senha
-              <input type="password" id="password" required minlength="6" placeholder="Mínimo 6 caracteres" />
-            </label>
-            <button type="submit" class="btn" id="submitBtn">Criar conta trial grátis</button>
-          </form>
-
-          <form id="loginForm" class="form-grid" style="display: none;">
-            <label>
-              Email
-              <input type="email" id="login_email" required placeholder="joao@empresa.com" />
-            </label>
-            <label>
-              Senha
-              <input type="password" id="login_password" required placeholder="Sua senha" />
-            </label>
-            <button type="submit" class="btn" id="loginBtn">Entrar</button>
-          </form>
-
-          <div class="step-message">
-            <div class="alert" id="loading" style="display: none;">Criando sua conta...</div>
-            <div class="alert alert--success" id="success" style="display: none;"></div>
-            <div class="alert alert--error" id="error" style="display: none;"></div>
-          </div>
-
-          <p class="form-hint">
-            Já tem conta? <a href="#" class="link-toggle" id="toggleLogin">Entrar</a>
-          </p>
-        </div>
-
-        <div class="step-panel" data-step-panel="2">
-          <h2>Passo 2: Sua API Key</h2>
-          <p class="subtitle">Guarde esta chave em local seguro. Você precisará dela para integrações.</p>
-          <div class="api-key">
-            <span id="apiKeyValue">—</span>
-            <button class="btn btn--ghost btn--small" type="button" id="copyApiKey">Copiar</button>
-          </div>
-          <p class="form-hint">Nunca compartilhe sua API Key em lugares públicos.</p>
-          <div class="step-message">
-            <div class="alert alert--success" id="seedMessage" style="display: none;"></div>
-          </div>
-          <div class="step-actions">
-            <button class="btn" type="button" id="toIntegrations">Continuar para integrações</button>
-          </div>
-        </div>
-
-        <div class="step-panel" data-step-panel="3">
-          <h2>Passo 3: Como integrar</h2>
-          <p class="subtitle">Escolha uma forma de enviar leads para o LeadRank.</p>
-          <div class="integration-list">
-            <div class="integration-item">
-              <strong>Zapier / Make</strong>
-              <p class="text-muted">Conecte seus formulários sem código.</p>
-            </div>
-            <div class="integration-item">
-              <strong>Webhook (curl)</strong>
-              <p class="text-muted">Envie leads via API com seu backend.</p>
-              <code>curl -X POST "https://qualificador-leads-ia.onrender.com/prever" -H "X-API-KEY: SUA_API_KEY" -H "Content-Type: application/json" -d '{"client_id":"SEU_CLIENT_ID"}'</code>
-            </div>
-            <div class="integration-item">
-              <strong>CSV upload</strong>
-              <p class="text-muted">Envie uma lista de leads para gerar scores em lote.</p>
-              <button class="btn btn--ghost btn--small" type="button" id="seedFive">Enviar 5 leads de teste</button>
-            </div>
-          </div>
-          <div class="step-message">
-            <div class="alert" id="seedFiveMsg" style="display: none;"></div>
-          </div>
-          <div class="step-actions">
-            <button class="btn" type="button" id="toFinish">Ir para o passo final</button>
-          </div>
-        </div>
-
-        <div class="step-panel" data-step-panel="4">
-          <h2>Pronto! Vá para o dashboard</h2>
-          <p class="subtitle">Sua conta está configurada e a Ação do Dia está pronta para você.</p>
-          <a class="btn btn--block" id="goDashboard" href="acao.html">Ir para Ação do Dia</a>
-        </div>
-      </section>
+    <main>
+      <div id="onboarding-app"></div>
     </main>
 
     <div data-include="site-footer"></div>
   </div>
 
   <script src="partials/site-shell.js"></script>
+  <script type="module" src="/src/onboarding/main.js"></script>
+
   <script>
     const BACKEND = (window.BACKEND_URL || "https://qualificador-leads-ia.onrender.com").replace(/\/$/, "");
 

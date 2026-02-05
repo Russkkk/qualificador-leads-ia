@@ -16,6 +16,7 @@ import random
 import string
 import secrets
 import hashlib
+import hmac
 import logging
 import traceback
 import re
@@ -93,6 +94,7 @@ PLAN_CATALOG = {
 DEFAULT_LIMIT = 200
 DEFAULT_THRESHOLD = 0.35
 MIN_LABELED_TO_TRAIN = 4
+PBKDF2_ITERATIONS = 390_000
 
 # rate-limit simples de demo pública (por IP/mês)
 _DEMO_RL: Dict[str, int] = {}
@@ -359,6 +361,41 @@ def _validate_password_strength(password: str) -> Tuple[bool, str]:
     if not re.search(r"[^A-Za-z0-9]", password):
         return False, "Senha deve conter pelo menos 1 símbolo."
     return True, ""
+  
+def _hash_password(password: str) -> str:
+    return generate_password_hash(password, method=f"pbkdf2:sha256:{PBKDF2_ITERATIONS}")
+  
+def _verify_legacy_pbkdf2(stored: str, password: str) -> bool:
+    """
+    Legacy format: pbkdf2_sha256$<iterations>$<salt_hex>$<hash_hex>
+    """
+    try:
+        algo, iter_s, salt_hex, hash_hex = stored.split("$", 3)
+        if algo != "pbkdf2_sha256":
+            return False
+        iterations = int(iter_s)
+        salt = bytes.fromhex(salt_hex)
+        expected = bytes.fromhex(hash_hex)
+        candidate = hashlib.pbkdf2_hmac("sha256", password.encode("utf-8"), salt, iterations)
+        return hmac.compare_digest(candidate, expected)
+    except Exception:
+        return False
+
+def _needs_rehash(stored: str) -> bool:
+    if stored.startswith("pbkdf2_sha256$"):
+        return True
+    if stored.startswith("pbkdf2:sha256:"):
+        try:
+            iterations = int(stored.split(":", 2)[2].split("$", 1)[0])
+            return iterations < PBKDF2_ITERATIONS
+        except Exception:
+            return True
+    return True
+
+def _verify_password(stored: str, password: str) -> bool:
+    if stored.startswith("pbkdf2_sha256$"):
+        return _verify_legacy_pbkdf2(stored, password)
+    return check_password_hash(stored, password)
 
 
 # =========================
@@ -905,7 +942,7 @@ def signup():
                 api_key = _gen_api_key(client_id)
                 mk = _month_key()
                 valid_until = _now_utc() + timedelta(days=14)
-                pw_hash = generate_password_hash(password)
+                pw_hash = _hash_password(password)
 
                 cur.execute("""
                     INSERT INTO clients (
@@ -968,8 +1005,15 @@ def login():
                 if not pw_hash:
                     return jsonify({"ok": False, "success": False, "error": "Conta sem senha. Use o suporte."}), 400
 
-                if not check_password_hash(pw_hash, password):
+                if not _verify_password(pw_hash, password):
                     return jsonify({"ok": False, "success": False, "error": "Email ou senha inválidos"}), 401
+
+                if _needs_rehash(pw_hash):
+                    new_hash = _hash_password(password)
+                    cur.execute(
+                        "UPDATE clients SET password_hash=%s, updated_at=NOW() WHERE client_id=%s",
+                        (new_hash, row["client_id"]),
+                    )
 
                 api_key = (row.get('api_key') or '').strip()
                 if not api_key:

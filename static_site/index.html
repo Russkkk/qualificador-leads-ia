@@ -7,32 +7,15 @@
   <meta name="description" content="Priorize leads quentes automaticamente e aumente suas vendas. Teste grátis 14 dias.">
   <meta property="og:title" content="LeadRank - Qualificador de Leads com IA">
   <meta property="og:description" content="Priorize leads quentes automaticamente e aumente suas vendas. Teste grátis 14 dias.">
-  <meta property="og:image" content="https://via.placeholder.com/1200x630/4f7cff/ffffff?text=LeadRank">
+  <meta property="og:image" content="assets/og-image.svg">
   <meta property="og:url" content="https://leadrank.com.br/">
   <meta name="theme-color" content="#4f7cff">
-  <link rel="icon" href="https://via.placeholder.com/32/4f7cff/ffffff?text=LR">
-  <title>LeadRank • Priorize leads quentes com IA</title>
+  <link rel="icon" href="assets/favicon.svg">
   <link rel="stylesheet" href="styles.css" />
 </head>
 <body>
   <div class="page">
-    <header class="site-header">
-      <a class="brand" href="index.html">
-        <span class="brand__logo">LR</span>
-        <span class="brand__text">LeadRank</span>
-      </a>
-      <nav class="site-nav">
-        <a href="index.html" aria-current="page">Início</a>
-        <a href="acao.html">Ação do dia</a>
-        <a href="pricing.html">Planos</a>
-        <a href="onboarding.html">Criar conta</a>
-        <a href="login.html">Entrar</a>
-      </nav>
-      <div class="header-actions">
-        <a class="btn btn--ghost" href="pricing.html">Ver planos</a>
-        <a class="btn" href="onboarding.html">Testar grátis</a>
-      </div>
-    </header>
+    <div data-include="partials/header.html"></div>
 
     <main>
       <section class="hero" id="inicio">
@@ -171,29 +154,8 @@
       </section>
     </main>
 
-    <footer class="site-footer">
-      <span>© 2024 LeadRank. Todos os direitos reservados.</span>
-      <div class="footer__links">
-        <a href="index.html">Início</a>
-        <a href="pricing.html">Planos</a>
-        <a href="termos.html">Termos</a>
-        <a href="privacidade.html">Privacidade</a>
-        <a href="termos.html">Termos</a>
-        <a href="privacidade.html">Privacidade</a>
-        <a href="pricing.html">Pricing</a>
-      </div>
-    </footer>
+    <div data-include="partials/footer.html"></div>
   </div>
-
-  <script>
-    (function redirectAfterLogin() {
-      const params = new URLSearchParams(window.location.search);
-      const clientId = params.get("client_id");
-      const apiKey = params.get("api_key");
-      if (clientId && apiKey) {
-        window.location.href = `acao.html?${params.toString()}`;
-      }
-    })();
-  </script>
+  <script src="partials/include.js"></script>
 </body>
 </html>

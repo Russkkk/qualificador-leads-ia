@@ -7,28 +7,15 @@
     <meta name="description" content="Priorize leads quentes automaticamente e aumente suas vendas. Teste grátis 14 dias.">
     <meta property="og:title" content="LeadRank - Qualificador de Leads com IA">
     <meta property="og:description" content="Priorize leads quentes automaticamente e aumente suas vendas. Teste grátis 14 dias.">
-    <meta property="og:image" content="https://via.placeholder.com/1200x630/4f7cff/ffffff?text=LeadRank">
+    <meta property="og:image" content="assets/og-image.svg">
     <meta property="og:url" content="https://leadrank.com.br/">
     <meta name="theme-color" content="#4f7cff">
-    <link rel="icon" href="https://via.placeholder.com/32/4f7cff/ffffff?text=LR">
+    <link rel="icon" href="assets/favicon.svg">
     <link rel="stylesheet" href="styles.css" />
   </head>
   <body>
     <div class="page">
-      <header class="site-header">
-        <a class="brand" href="landing.html">
-          <span class="brand__logo">LR</span>
-          <span class="brand__text">LeadRank</span>
-        </a>
-        <nav class="site-nav">
-          <a href="landing.html">Início</a>
-          <a href="acao.html">Ação do dia</a>
-          <a href="pricing.html">Planos</a>
-          <a href="onboarding.html">Criar conta</a>
-          <a href="login.html" aria-current="page">Entrar</a>
-        </nav>
-        <a class="btn btn--ghost" href="acao.html">Acessar dashboard</a>
-      </header>
+      <div data-include="partials/header.html"></div>
 
       <main>
         <section class="auth">
@@ -69,16 +56,9 @@
         </section>
       </main>
 
-      <footer class="site-footer">
-        <span>© 2024 LeadRank. Todos os direitos reservados.</span>
-        <div class="footer__links">
-          <a href="index.html">Início</a>
-          <a href="pricing.html">Planos</a>
-          <a href="termos.html">Termos</a>
-          <a href="privacidade.html">Privacidade</a>
-        </div>
-      </footer>
+      <div data-include="partials/footer.html"></div>
     </div>
+    <script src="partials/include.js"></script>
     <script>
       const BACKEND = (window.BACKEND_URL || "https://qualificador-leads-ia.onrender.com").replace(/\/$/, "");
       const loginForm = document.getElementById("loginForm");
@@ -110,7 +90,7 @@
           }
 
           const clientId = data.client_id || "";
-          const apiKey = data.api_key || "";
+          const apiKey = res.headers.get("X-API-KEY") || "";
           if (clientId) {
             localStorage.setItem("leadrank_client_id", clientId);
             localStorage.setItem("client_id", clientId);
@@ -123,7 +103,7 @@
           }
 
           const next = new URLSearchParams(location.search).get('next') || '';
-          window.location.href = next || `acao.html?client_id=${encodeURIComponent(clientId)}&api_key=${encodeURIComponent(apiKey)}`;
+          window.location.href = next || "acao.html";
         } catch (err) {
           loginError.textContent = err.message || "Erro de conexão. Tente novamente.";
           loginError.className = "alert alert--error";

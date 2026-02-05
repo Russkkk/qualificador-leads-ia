@@ -612,6 +612,7 @@ def demo_public():
                     base += 0.20 if clicou_preco else 0.0
                     prob = max(0.02, min(0.98, base))
                     score = int(round(prob * 100))
+                    label = 1 if prob >= 0.70 else (0 if prob < 0.35 else None)
                     cur.execute(
                         """
                         INSERT INTO leads (client_id, nome, email_lead, telefone, tempo_site, paginas_visitadas, clicou_preco,
@@ -629,7 +630,7 @@ def demo_public():
                             json.dumps(data),
                             float(prob),
                             int(score),
-                            "quente" if prob >= 0.7 else "morno",
+                            label,
                         ),
                     )
         return json_ok({"client_id": client_id, "inserted": 6})
@@ -665,6 +666,7 @@ def seed_demo():
                     base += 0.20 if clicou_preco else 0.0
                     prob = max(0.02, min(0.98, base))
                     score = int(round(prob * 100))
+                    label = 1 if prob >= 0.70 else (0 if prob < 0.35 else None)
                     cur.execute(
                         """
                         INSERT INTO leads (client_id, nome, email_lead, telefone, tempo_site, paginas_visitadas, clicou_preco,
@@ -682,7 +684,7 @@ def seed_demo():
                             json.dumps(data),
                             float(prob),
                             int(score),
-                            "quente" if prob >= 0.7 else "morno",
+                            label,
                         ),
                     )
         return json_ok({"client_id": client_id, "inserted": 6})
@@ -733,6 +735,7 @@ def seed_test_leads():
                     elif prob < 0.35 and random.random() > 0.7:
                         label_vc = 0
                         neg += 1
+                    label = 1 if prob >= 0.70 else (0 if prob < 0.35 else None)
 
                     payload = {
                         "tempo_site": tempo_site,
@@ -756,7 +759,7 @@ def seed_test_leads():
                             json.dumps(payload),
                             float(prob),
                             int(score),
-                            "quente" if prob >= 0.7 else "morno",
+                            label,
                             label_vc,
                         ),
                     )

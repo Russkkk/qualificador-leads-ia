@@ -13,25 +13,13 @@
   <link rel="icon" href="assets/favicon.svg">
   <link rel="stylesheet" href="styles.css" />
 </head>
-<body>
+<body data-active-nav="acao">
+  <template id="header-actions-template">
+    <button class="btn btn--ghost btn--small" type="button" id="restartDemoBtn">Reiniciar demo</button>
+    <a class="btn btn--ghost" href="onboarding.html?mode=login">Trocar conta</a>
+  </template>
   <div class="page">
-    <header class="site-header">
-      <a class="brand" href="landing.html">
-        <span class="brand__logo">LR</span>
-        <span class="brand__text">LeadRank</span>
-      </a>
-      <nav class="site-nav">
-        <a href="landing.html">Início</a>
-        <a href="acao.html" aria-current="page">Ação do dia</a>
-        <a href="pricing.html">Planos</a>
-        <a href="onboarding.html">Criar conta</a>
-        <a href="login.html">Entrar</a>
-      </nav>
-      <div class="header-actions">
-        <button class="btn btn--ghost btn--small" type="button" id="restartDemoBtn">Reiniciar demo</button>
-        <a class="btn btn--ghost" href="onboarding.html?mode=login">Trocar conta</a>
-      </div>
-    </header>
+    <div data-include="site-header"></div>
 
     <main>
       <section class="dashboard">
@@ -192,16 +180,9 @@
       </section>
     </main>
 
-    <footer class="site-footer">
-      <span>© 2024 LeadRank. Todos os direitos reservados.</span>
-      <div class="footer__links">
-        <a href="index.html">Início</a>
-        <a href="pricing.html">Planos</a>
-        <a href="termos.html">Termos</a>
-        <a href="privacidade.html">Privacidade</a>
-      </div>
-    </footer>
+    <div data-include="site-footer"></div>
   </div>
+  <script src="partials/site-shell.js"></script>
 
   <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
   <script>
@@ -744,7 +725,7 @@
     loadInsights();
 
     const DEMO_KEY = "leadrank_demo_completed";
-    const restartBtn = document.getElementById("restartDemoBtn");
+    const resolveRestartBtn = () => document.getElementById("restartDemoBtn");
     const demoState = {
       active: false,
       current: 0,
@@ -1032,12 +1013,20 @@
       demoState.helper.textContent = "Perfeito! Você já pode continuar.";
     });
 
-    if (restartBtn) {
+    const bindRestartBtn = () => {
+      const restartBtn = resolveRestartBtn();
+      if (!restartBtn || restartBtn.dataset.bound === "true") {
+        return;
+      }
+      restartBtn.dataset.bound = "true";
       restartBtn.addEventListener("click", () => {
         localStorage.removeItem(DEMO_KEY);
         startDemo();
       });
-    }
+    };
+
+    document.addEventListener("site-shell:header-ready", bindRestartBtn);
+    bindRestartBtn();
 
     if (!localStorage.getItem(DEMO_KEY)) {
       window.setTimeout(startDemo, 600);

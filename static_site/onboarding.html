@@ -296,7 +296,7 @@
 
           const apiKeyHeader = res.headers.get("X-API-KEY") || "";
           setAuth(data.client_id, apiKeyHeader);
-          successDiv.innerHTML = "✅ Login feito!";
+          successDiv.innerHTML = `<span class="icon-button"><svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M20 6 9 17l-5-5"/></svg>Login feito!</span>`;
           successDiv.style.display = "block";
           setStep(4);
         } catch (err) {
@@ -345,7 +345,7 @@
 
         const apiKeyHeader = res.headers.get("X-API-KEY") || "";
         setAuth(data.client_id, apiKeyHeader);
-        successDiv.textContent = "✅ Conta criada! Gerando sua API Key...";
+        successDiv.innerHTML = `<span class="icon-button"><svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M20 6 9 17l-5-5"/></svg>Conta criada! Gerando sua API Key...</span>`;
         successDiv.style.display = "block";
 
         await seedLeads(10, seedMessage);

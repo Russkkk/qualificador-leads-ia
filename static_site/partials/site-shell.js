@@ -37,6 +37,54 @@ const applyHeaderActions = (root) => {
   actionsSlot.append(actionsTemplate.content.cloneNode(true));
 };
 
+const ICONS = {
+  moon: `<svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3a7.5 7.5 0 1 0 9 9 9 9 0 1 1-9-9z"/></svg>`,
+  sun: `<svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="4"/><path d="M12 2v2"/><path d="M12 20v2"/><path d="M4.93 4.93l1.41 1.41"/><path d="M17.66 17.66l1.41 1.41"/><path d="M2 12h2"/><path d="M20 12h2"/><path d="M6.34 17.66l-1.41 1.41"/><path d="M19.07 4.93l-1.41 1.41"/></svg>`
+};
+
+const THEME_KEY = "leadrank_theme";
+
+const resolveInitialTheme = () => {
+  const stored = localStorage.getItem(THEME_KEY);
+  if (stored === "light" || stored === "dark") return stored;
+  const prefersDark = window.matchMedia && window.matchMedia("(prefers-color-scheme: dark)").matches;
+  return prefersDark ? "dark" : "light";
+};
+
+const applyTheme = (theme) => {
+  document.body.dataset.theme = theme;
+  localStorage.setItem(THEME_KEY, theme);
+};
+
+const applyThemeToggle = (root) => {
+  const actionsSlot = root?.querySelector("[data-header-actions]");
+  if (!actionsSlot) return;
+
+  const button = document.createElement("button");
+  button.type = "button";
+  button.className = "btn btn--ghost btn--small theme-toggle icon-button";
+
+  const renderLabel = (theme) => {
+    if (theme === "dark") {
+      button.innerHTML = `${ICONS.sun} Claro`;
+    } else {
+      button.innerHTML = `${ICONS.moon} Escuro`;
+    }
+  };
+
+  renderLabel(document.body.dataset.theme || "dark");
+
+  button.addEventListener("click", () => {
+    const nextTheme = document.body.dataset.theme === "dark" ? "light" : "dark";
+    applyTheme(nextTheme);
+    renderLabel(nextTheme);
+  });
+
+  actionsSlot.append(button);
+};
+
+applyTheme(resolveInitialTheme());
+
 document.addEventListener("DOMContentLoaded", async () => {
   const activeNav = document.body.dataset.activeNav;
 
@@ -44,6 +92,7 @@ document.addEventListener("DOMContentLoaded", async () => {
     const header = await loadPartial("[data-include='site-header']", "partials/site-header.html");
     applyActiveNav(header, activeNav);
     applyHeaderActions(header);
+    applyThemeToggle(header);
     document.dispatchEvent(new CustomEvent("site-shell:header-ready"));
 
     await loadPartial("[data-include='site-footer']", "partials/site-footer.html");

@@ -343,6 +343,7 @@ def _rate_limit_client_id() -> str:
 limiter = Limiter(
     key_func=_client_ip,
     app=app,
+    default_limits=[],
     default_limits=["100 per minute"],
 )
 
@@ -836,14 +837,17 @@ def _best_threshold(rows: List[Dict[str, Any]]) -> float:
 # Routes
 # =========================
 @app.get("/")
+@limiter.limit("100 per minute")
 def root():
     return jsonify({"ok": True, "service": "LeadRank backend", "ts": _iso(_now_utc())})
 
 @app.get("/health")
+@limiter.limit("100 per minute")
 def health():
     return jsonify({"ok": True, "ts": _iso(_now_utc())})
 
 @app.get("/health_db")
+@limiter.limit("100 per minute")
 def health_db():
     if not DATABASE_URL:
         return jsonify({"ok": True, "db": False, "error": "DATABASE_URL missing", "ts": _iso(_now_utc())})
@@ -851,6 +855,7 @@ def health_db():
     return jsonify({"ok": ok, "db": ok, "error": err, "ts": _iso(_now_utc())})
 
 @app.get("/pricing")
+@limiter.limit("100 per minute")
 def pricing():
     """Retorna o catálogo de plans (para UI)."""
     return _json_ok({
@@ -861,6 +866,7 @@ def pricing():
     })
     
 @app.route('/signup', methods=['POST'])
+@limiter.limit("100 per minute")
 def signup():
     """
     Cria workspace trial a partir de nome/email/empresa/telefone + senha.
@@ -936,6 +942,7 @@ def signup():
 
 
 @app.route('/login', methods=['POST'])
+@limiter.limit("100 per minute")
 def login():
     """Login com email+senha. Retorna client_id + api_key."""
     data = request.get_json(silent=True) or request.form or {}
@@ -1310,6 +1317,7 @@ def negar_venda():
 
 
 @app.get("/metrics")
+@limiter.limit("100 per minute")
 def metrics():
     """Métricas simples (debug/monitoramento)."""
     if not DATABASE_URL:
@@ -1590,6 +1598,7 @@ def leads_export_csv():
 
 
 @app.post("/demo_public")
+@limiter.limit("100 per minute")
 def demo_public():
     """Demo pública controlada (SEM DEMO_KEY) com rate-limit por IP/mês."""
     mk = _month_key()
@@ -1654,6 +1663,7 @@ def demo_public():
 
 
 @app.post("/seed_demo")
+@limiter.limit("100 per minute")
 def seed_demo():
     """Gera dados demo para um client_id (protegido por DEMO_KEY)."""
     ok, err = _require_demo_key()
@@ -1865,6 +1875,7 @@ def _upsert_subscription(client_id: str, plan: str, status: str, provider: str =
 # Opção B: Operação / Cronless reset + Billing
 # =========================
 @app.post("/admin/reset_month")
+@limiter.limit("100 per minute")
 def admin_reset_month():
     if not _admin_required():
         return _json_err("Unauthorized (DEMO_KEY)", 403)
@@ -1973,6 +1984,7 @@ def billing_checkout():
 
 
 @app.post("/billing/webhook")
+@limiter.limit("100 per minute")
 def billing_webhook():
     """
     Webhook genérico (Stripe/MercadoPago/etc.) com segredo simples.
@@ -2095,6 +2107,7 @@ def _kiwify_event_to_status(event_type: str) -> str:
 
 
 @app.post("/kiwify/webhook")
+@limiter.limit("100 per minute")
 def kiwify_webhook():
     """Recebe eventos da Kiwify e aplica status/plan no seu app."""
     payload = request.get_json(silent=True) or {}

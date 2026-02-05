@@ -21,6 +21,7 @@
     if (apiKey) headers["X-API-KEY"] = apiKey;
     if (clientId) headers["X-CLIENT-ID"] = clientId;
     return headers;
+    
   }
   function authHeaders() {
     const apiKey = getApiKey();

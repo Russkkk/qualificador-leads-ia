@@ -342,6 +342,19 @@ def _check_demo_key() -> bool:
 def _rate_limit_client_id() -> str:
     return _get_client_id_from_request() or _client_ip()
 
+def _prever_rate_limit() -> str:
+    client_id = _get_client_id_from_request()
+    if not client_id:
+        return "20 per minute"
+    try:
+        row = _ensure_client_row(client_id, plan="trial")
+        plan = (row.get("plan") or "trial").strip().lower()
+    except Exception:
+        plan = "trial"
+    if plan in ("trial", "demo"):
+        return "20 per minute"
+    return "600 per minute"
+
 limiter = Limiter(
     key_func=_client_ip,
     app=app,
@@ -907,6 +920,7 @@ def pricing():
     })
     
 @app.route('/signup', methods=['POST'])
+@limiter.limit("5 per minute")
 @limiter.limit("100 per minute")
 def signup():
     """
@@ -985,6 +999,7 @@ def signup():
 
 
 @app.route('/login', methods=['POST'])
+@limiter.limit("5 per minute")
 @limiter.limit("100 per minute")
 def login():
     """Login com email+senha. Retorna client_id e envia api_key via header."""
@@ -1161,6 +1176,7 @@ def set_plan():
         conn.close()
 
 @app.post("/prever")
+@limiter.limit(_prever_rate_limit, key_func=_rate_limit_client_id)
 @limiter.limit("600 per minute", key_func=_rate_limit_client_id)
 def prever():
     """

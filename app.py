@@ -30,6 +30,9 @@ from flask import Flask, request, jsonify, Response
 from flask_cors import CORS
 from flask_limiter import Limiter
 from werkzeug.exceptions import HTTPException
+from dotenv import load_dotenv
+
+from config import get_config
 
 import psycopg
 from psycopg.rows import dict_row
@@ -47,23 +50,26 @@ except Exception:
 # =========================
 # Config
 # =========================
-DATABASE_URL = os.environ.get("DATABASE_URL", "").strip()
-DEMO_KEY = os.environ.get("DEMO_KEY", "").strip()
-DEBUG_MODE = os.environ.get("DEBUG", "").strip().lower() in {"1", "true", "yes", "on"}
-INCLUDE_TRACEBACK = os.environ.get("INCLUDE_TRACEBACK", "").strip().lower() in {"1", "true", "yes", "on"}
-TRUST_PROXY = os.environ.get("TRUST_PROXY", "").strip().lower() in {"1", "true", "yes", "on"}
-REQUIRE_API_KEY = os.environ.get("REQUIRE_API_KEY", "").strip().lower() in {"1", "true", "yes", "on"}
+load_dotenv()
+config = get_config()
+
+DATABASE_URL = config.DATABASE_URL
+DEMO_KEY = config.DEMO_KEY
+DEBUG_MODE = config.DEBUG_MODE
+INCLUDE_TRACEBACK = config.INCLUDE_TRACEBACK
+TRUST_PROXY = config.TRUST_PROXY
+REQUIRE_API_KEY = config.REQUIRE_API_KEY
 
 # Billing / Premium (opcional)
-STRIPE_SECRET_KEY = os.environ.get("STRIPE_SECRET_KEY", "").strip()
-STRIPE_PRICE_IDS_JSON = os.environ.get("STRIPE_PRICE_IDS_JSON", "").strip()
-BILLING_WEBHOOK_SECRET = os.environ.get("BILLING_WEBHOOK_SECRET", "").strip()
+STRIPE_SECRET_KEY = config.STRIPE_SECRET_KEY
+STRIPE_PRICE_IDS_JSON = config.STRIPE_PRICE_IDS_JSON
+BILLING_WEBHOOK_SECRET = config.BILLING_WEBHOOK_SECRET
 
 # Kiwify (opcional)
-KIWIFY_ACCOUNT_ID = os.environ.get("KIWIFY_ACCOUNT_ID", "").strip()  # x-kiwify-account-id
-KIWIFY_CLIENT_SECRET = os.environ.get("KIWIFY_CLIENT_SECRET", "").strip()
-KIWIFY_API_KEY = os.environ.get("KIWIFY_API_KEY", "").strip()        # api_key usada no OAuth
-KIWIFY_WEBHOOK_TOKEN = os.environ.get("KIWIFY_WEBHOOK_TOKEN", "").strip()  # token configurado no webhook
+KIWIFY_ACCOUNT_ID = config.KIWIFY_ACCOUNT_ID  # x-kiwify-account-id
+KIWIFY_CLIENT_SECRET = config.KIWIFY_CLIENT_SECRET
+KIWIFY_API_KEY = config.KIWIFY_API_KEY        # api_key usada no OAuth
+KIWIFY_WEBHOOK_TOKEN = config.KIWIFY_WEBHOOK_TOKEN  # token configurado no webhook
 
 
 # ajuste aqui seus domínios permitidos no CORS

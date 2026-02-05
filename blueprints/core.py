@@ -10,19 +10,19 @@ core_bp = Blueprint("core", __name__)
 
 @core_bp.get("/")
 @limiter.limit("100 per minute")
-def root():
+async def root():
     return json_ok({"service": "LeadRank backend", "ts": iso(now_utc())})
 
 
 @core_bp.get("/health")
 @limiter.limit("100 per minute")
-def health():
+async def health():
     return json_ok({"ts": iso(now_utc())})
 
 
 @core_bp.get("/health_db")
 @limiter.limit("100 per minute")
-def health_db():
+async def health_db():
     if not settings.DATABASE_URL:
         return json_ok({"db": False, "error": "DATABASE_URL missing", "ts": iso(now_utc())})
     ok, err = ensure_schema_once()
@@ -31,7 +31,7 @@ def health_db():
 
 @core_bp.get("/pricing")
 @limiter.limit("100 per minute")
-def pricing():
+async def pricing():
     return json_ok(
         {
             "plans": settings.PLAN_CATALOG,

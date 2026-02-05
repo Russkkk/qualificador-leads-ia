@@ -12,3 +12,5 @@ psycopg[binary]==3.2.3
 python-dotenv==1.0.1
 structlog==24.4.0
 sentry-sdk==2.13.0
+redis==5.0.8
+

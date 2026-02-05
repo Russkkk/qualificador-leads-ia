@@ -58,6 +58,9 @@ SENTRY_DSN = os.getenv("SENTRY_DSN", "").strip()
 SENTRY_ENVIRONMENT = os.getenv("SENTRY_ENVIRONMENT", "").strip()
 SENTRY_TRACES_SAMPLE_RATE = float(os.getenv("SENTRY_TRACES_SAMPLE_RATE", "0.0"))
 
+REDIS_URL = os.getenv("REDIS_URL", "").strip()
+CACHE_TTL_SECONDS = int(os.getenv("CACHE_TTL_SECONDS", "60"))
+
 DEFAULT_CSP = (
     "default-src 'self'; "
     "base-uri 'self'; "

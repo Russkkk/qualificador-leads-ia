@@ -121,7 +121,11 @@ def set_threshold(client_id: str, threshold: float):
         conn.close()
 
 
-def fetch_recent_leads(client_id: str, limit: int = settings.DEFAULT_LIMIT) -> List[Dict[str, Any]]:
+def fetch_recent_leads(
+    client_id: str,
+    limit: int = settings.DEFAULT_LIMIT,
+    offset: int = 0,
+) -> List[Dict[str, Any]]:
     ensure_schema_once()
     conn = db()
     try:
@@ -136,10 +140,32 @@ def fetch_recent_leads(client_id: str, limit: int = settings.DEFAULT_LIMIT) -> L
                       AND deleted_at IS NULL
                     ORDER BY created_at DESC
                     LIMIT %s
+                    OFFSET %s
                     """,
-                    (client_id, int(limit)),
+                    (client_id, int(limit), int(offset)),
                 )
                 return [dict(r) for r in (cur.fetchall() or [])]
+    finally:
+        conn.close()
+
+
+def count_leads(client_id: str) -> int:
+    ensure_schema_once()
+    conn = db()
+    try:
+        with conn:
+            with conn.cursor(row_factory=dict_row) as cur:
+                cur.execute(
+                    """
+                    SELECT COUNT(*)::int AS total
+                    FROM leads
+                    WHERE client_id=%s
+                      AND deleted_at IS NULL
+                    """,
+                    (client_id,),
+                )
+                row = cur.fetchone() or {}
+                return int(row.get("total") or 0)
     finally:
         conn.close()
 

@@ -13,8 +13,10 @@ from services import settings
 from services.auth_service import gen_api_key, require_client_auth
 from services.db import db, ensure_client_row, ensure_schema, ensure_schema_once
 from services.demo_service import bump_demo_counter, demo_rate_limited, require_demo_key
+from services.cache import cache_delete, cache_delete_prefix, cache_get_json, cache_set_json
 from services.lead_service import (
     check_quota_and_bump,
+    count_leads,
     count_status,
     fetch_recent_leads,
     get_threshold,
@@ -263,6 +265,9 @@ def prever():
                 if not ok_quota:
                     return json_err(err, 402, **extra)
 
+        cache_delete(f"acao_do_dia:{client_id}")
+        cache_delete_prefix(f"insights:{client_id}:")
+
         return json_ok(
             {
                 "client_id": client_id,
@@ -285,8 +290,11 @@ def prever():
 @limiter.limit("600 per minute", key_func=rate_limit_client_id)
 def dashboard_data():
     client_id = get_client_id_from_request()
-    limit = safe_int(request.args.get("limit"), settings.DEFAULT_LIMIT)
-    limit = max(10, min(limit, 1000))
+    page = safe_int(request.args.get("page"), 1)
+    per_page = safe_int(request.args.get("limit"), settings.DEFAULT_LIMIT)
+    per_page = max(10, min(per_page, 200))
+    page = max(1, page)
+    offset = (page - 1) * per_page
 
     if not client_id:
         return json_err("client_id obrigatório", 400)
@@ -295,7 +303,8 @@ def dashboard_data():
     if not ok_auth:
         return json_err(msg, 403, code="auth_required")
 
-    rows = fetch_recent_leads(client_id, limit=limit)
+    total_leads = count_leads(client_id)
+    rows = fetch_recent_leads(client_id, limit=per_page, offset=offset)
     convertidos, negados, pendentes = count_status(rows)
     top_origens_rows = top_origens(client_id, days=30, limit=6)
     hot_leads = hot_leads_today(client_id, limit=20)
@@ -311,6 +320,9 @@ def dashboard_data():
             "convertidos": convertidos,
             "negados": negados,
             "pendentes": pendentes,
+            "page": page,
+            "per_page": per_page,
+            "total_leads": total_leads,
             "top_origens_30d": top_origens_rows,
             "hot_leads_today": hot_leads,
             "hot_leads_today_tz": "America/Sao_Paulo",
@@ -341,6 +353,8 @@ def confirmar_venda():
                     "UPDATE leads SET virou_cliente=1, updated_at=NOW() WHERE client_id=%s AND id=%s",
                     (client_id, lead_id),
                 )
+        cache_delete(f"acao_do_dia:{client_id}")
+        cache_delete_prefix(f"insights:{client_id}:")
         return json_ok({"client_id": client_id, "lead_id": lead_id, "virou_cliente": 1})
     finally:
         conn.close()
@@ -367,6 +381,8 @@ def negar_venda():
                     "UPDATE leads SET virou_cliente=0, updated_at=NOW() WHERE client_id=%s AND id=%s",
                     (client_id, lead_id),
                 )
+        cache_delete(f"acao_do_dia:{client_id}")
+        cache_delete_prefix(f"insights:{client_id}:")
         return json_ok({"client_id": client_id, "lead_id": lead_id, "virou_cliente": 0})
     finally:
         conn.close()
@@ -414,6 +430,11 @@ def insights():
     ok_auth, _, msg = require_client_auth(client_id)
     if not ok_auth:
         return json_err(msg, 403, code="auth_required")
+
+    cache_key = f"insights:{client_id}:{days}"
+    cached = cache_get_json(cache_key)
+    if cached:
+        return json_ok(cached)
 
     threshold = get_threshold(client_id)
     since = now_utc() - timedelta(days=days)
@@ -476,22 +497,22 @@ def insights():
     den_all = sum(1 for r in labeled_all if float(r["virou_cliente"]) == 0.0)
     overall_rate = (conv_all / len(labeled_all)) if labeled_all else 0.0
 
-    return json_ok(
-        {
-            "client_id": client_id,
-            "threshold": float(threshold),
-            "overall": {
-                "window_total": len(rows),
-                "labeled": len(labeled_all),
-                "converted": conv_all,
-                "denied": den_all,
-                "conversion_rate": round(float(overall_rate), 4),
-            },
-            "bands": bands,
-            "series": series,
-            "window_days": days,
-        }
-    )
+    payload = {
+        "client_id": client_id,
+        "threshold": float(threshold),
+        "overall": {
+            "window_total": len(rows),
+            "labeled": len(labeled_all),
+            "converted": conv_all,
+            "denied": den_all,
+            "conversion_rate": round(float(overall_rate), 4),
+        },
+        "bands": bands,
+        "series": series,
+        "window_days": days,
+    }
+    cache_set_json(cache_key, payload)
+    return json_ok(payload)
 
 
 @leads_bp.get("/leads_export.csv")
@@ -718,6 +739,8 @@ def seed_test_leads():
                     (inserted, client_id),
                 )
 
+        cache_delete(f"acao_do_dia:{client_id}")
+        cache_delete_prefix(f"insights:{client_id}:")
         return json_ok(
             {
                 "client_id": client_id,
@@ -784,6 +807,11 @@ def acao_do_dia():
     if not ok_auth:
         return json_err(msg, 403, code="auth_required")
 
+    cache_key = f"acao_do_dia:{client_id}"
+    cached = cache_get_json(cache_key)
+    if cached:
+        return json_ok(cached)
+
     conn = db()
     try:
         with conn:
@@ -817,7 +845,9 @@ def acao_do_dia():
                     "temperatura": lead_temperature(item.get("probabilidade"), item.get("score")),
                 }
             )
-        return json_ok({"client_id": client_id, "rows": res})
+        payload = {"client_id": client_id, "rows": res}
+        cache_set_json(cache_key, payload)
+        return json_ok(payload)
     finally:
         conn.close()
 

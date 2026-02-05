@@ -13,22 +13,13 @@
   <link rel="icon" href="assets/favicon.svg">
   <link rel="stylesheet" href="styles.css" />
 </head>
-<body>
+<body data-active-nav="pricing">
+  <template id="header-actions-template">
+    <a class="btn btn--ghost" href="index.html">Início</a>
+    <a class="btn" href="onboarding.html">Testar grátis</a>
+  </template>
   <div class="page">
-    <header class="site-header">
-      <a class="brand" href="index.html">
-        <span class="brand__logo">LR</span>
-        <span class="brand__text">LeadRank</span>
-      </a>
-      <nav class="site-nav">
-        <a href="index.html">Início</a>
-        <a href="acao.html">Ação do dia</a>
-        <a href="pricing.html" aria-current="page">Planos</a>
-        <a href="onboarding.html">Criar conta</a>
-        <a href="login.html">Entrar</a>
-      </nav>
-      <a class="btn btn--ghost" href="onboarding.html">Testar grátis</a>
-    </header>
+    <div data-include="site-header"></div>
 
     <main>
       <section class="pricing">
@@ -122,18 +113,10 @@
       </section>
     </main>
 
-    <footer class="site-footer">
-      <span>© 2024 LeadRank. Todos os direitos reservados.</span>
-      <div class="footer__links">
-        <a href="index.html">Início</a>
-        <a href="pricing.html">Planos</a>
-        <a href="termos.html">Termos</a>
-        <a href="privacidade.html">Privacidade</a>
-        <a href="onboarding.html">Criar conta</a>
-      </div>
-    </footer>
+    <div data-include="site-footer"></div>
   </div>
 
+  <script src="partials/site-shell.js"></script>
   <script>
     const BACKEND = (window.BACKEND_URL || "https://qualificador-leads-ia.onrender.com").replace(/\/$/, "");
     const KIWIFY_LINKS = {

@@ -11,18 +11,40 @@ const showStatus = (message, tone = "success") => {
   formStatus.dataset.tone = tone;
 };
 
+const saveLeadLocally = (payload) => {
+  const stored = localStorage.getItem("leadrank_leads");
+  const leads = stored ? JSON.parse(stored) : [];
+  leads.push({
+    ...payload,
+    createdAt: new Date().toISOString(),
+  });
+  localStorage.setItem("leadrank_leads", JSON.stringify(leads));
+};
+
+const serializeForm = (form) => {
+  const data = {};
+  new FormData(form).forEach((value, key) => {
+    data[key] = value;
+  });
+  return data;
+};
+
 if (leadForm) {
   leadForm.addEventListener("submit", async (event) => {
-    if (!leadForm.action || leadForm.action.includes("SEU_FORM_ID")) {
-      showStatus("Atualize o link do formulário (Formspree/Web3Forms) antes de enviar.", "warning");
-      event.preventDefault();
-      return;
-    }
-
     event.preventDefault();
     const formData = new FormData(leadForm);
 
     try {
+      if (!leadForm.action || leadForm.action.includes("SEU_FORM_ID")) {
+        saveLeadLocally(serializeForm(leadForm));
+        leadForm.reset();
+        showStatus(
+          "Lead salvo localmente para teste. Configure o endpoint (Formspree/Web3Forms) para envios reais.",
+          "warning"
+        );
+        return;
+      }
+
       const response = await fetch(leadForm.action, {
         method: "POST",
         body: formData,

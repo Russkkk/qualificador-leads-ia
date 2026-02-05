@@ -39,30 +39,15 @@
     <link rel="stylesheet" href="styles.css" />
     <link rel="stylesheet" href="assets/tailwind.css" />
   </head>
-  <body class="bg-slate-950 text-slate-100">
-    <header class="mx-auto flex w-full max-w-5xl items-center justify-between px-6 py-6">
-      <a class="flex items-center gap-3 text-lg font-semibold" href="index.html">
-        <span class="flex h-10 w-10 items-center justify-center rounded-xl bg-indigo-600 text-white">
-          LR
-        </span>
-        LeadRank
-      </a>
-      <nav class="hidden items-center gap-6 text-sm text-slate-200 md:flex">
-        <a class="hover:text-white" href="#como-funciona">Como funciona</a>
-        <a class="hover:text-white" href="#demo">Demo</a>
-        <a class="hover:text-white" href="#beneficios">Benefícios</a>
-        <a class="hover:text-white" href="#lead-capture">Teste grátis</a>
-      </nav>
-      <a
-        class="rounded-full bg-white px-4 py-2 text-sm font-semibold text-slate-900 shadow-lg shadow-indigo-500/20 hover:bg-slate-200"
-        href="onboarding.html"
-      >
-        Começar teste grátis
-      </a>
-    </header>
+  <body data-active-nav="home" class="bg-slate-950 text-slate-100">
+    <template id="header-actions-template">
+      <a class="btn btn--small" href="onboarding.html">Começar teste grátis</a>
+    </template>
+    <div class="page">
+      <div data-include="site-header"></div>
 
-    <main class="mx-auto w-full max-w-5xl px-6 pb-16">
-      <section class="grid gap-10 pb-16 pt-10 lg:grid-cols-[1.1fr_0.9fr]">
+      <main class="mx-auto w-full max-w-5xl px-6 pb-16">
+      <section class="relative grid gap-10 pb-16 pt-10 lg:grid-cols-[1.1fr_0.9fr]">
         <div class="space-y-6">
           <span class="inline-flex items-center gap-2 rounded-full bg-indigo-500/10 px-4 py-2 text-xs font-semibold text-indigo-200">
             <i data-lucide="sparkles" class="h-4 w-4"></i>
@@ -229,6 +214,38 @@
         </div>
       </section>
 
+      <section class="grid gap-6 pb-16 lg:grid-cols-[1.1fr_0.9fr]" id="planos-migracao">
+        <div class="space-y-4">
+          <h2 class="text-3xl font-semibold text-white">Pronto para plano pago ou migração?</h2>
+          <p class="text-slate-300">
+            Migramos sua base e configuramos o hosting ideal para reduzir latência e aumentar conversões.
+          </p>
+          <div class="grid gap-4 sm:grid-cols-2">
+            <div class="rounded-2xl border border-white/10 bg-white/5 p-5">
+              <p class="text-sm font-semibold text-white">Plano pago sob medida</p>
+              <p class="text-xs text-slate-300">Escolha Starter, Pro ou Enterprise com SLA dedicado.</p>
+            </div>
+            <div class="rounded-2xl border border-white/10 bg-white/5 p-5">
+              <p class="text-sm font-semibold text-white">Migração sem esforço</p>
+              <p class="text-xs text-slate-300">Webhook, CRM e WhatsApp configurados pelo time.</p>
+            </div>
+          </div>
+        </div>
+        <div class="rounded-3xl border border-white/10 bg-gradient-to-br from-indigo-500/20 via-slate-900 to-slate-950 p-6">
+          <h3 class="text-lg font-semibold text-white">Diagnóstico gratuito de infraestrutura</h3>
+          <p class="mt-2 text-sm text-slate-200">
+            Receba um plano de migração em 48h, com checklist técnico e cronograma.
+          </p>
+          <a
+            class="mt-4 inline-flex items-center gap-2 rounded-full bg-white px-5 py-2 text-sm font-semibold text-slate-900 hover:bg-slate-200"
+            href="pricing.html"
+          >
+            Falar sobre migração
+            <i data-lucide="arrow-up-right" class="h-4 w-4"></i>
+          </a>
+        </div>
+      </section>
+
       <section
         class="grid gap-10 rounded-3xl border border-white/10 bg-white/5 p-8 md:grid-cols-[1.1fr_0.9fr]"
         id="lead-capture"
@@ -255,9 +272,11 @@
         </div>
         <form
           class="space-y-4 rounded-2xl border border-white/10 bg-slate-950/40 p-6"
+          id="leadForm"
           action="https://formspree.io/f/SEU_FORM_ID"
           method="POST"
         >
+          <input type="hidden" name="source" value="Landing page LeadRank" />
           <label class="block text-sm font-semibold text-slate-200">
             Nome completo
             <input
@@ -308,6 +327,7 @@
           >
             Quero meu teste grátis
           </button>
+          <div id="formStatus" class="form-status text-xs text-slate-400" role="status"></div>
           <p class="text-xs text-slate-400">
             Cadastre seu Formspree em <strong>formspree.io</strong> e substitua <strong>SEU_FORM_ID</strong>
             no action do formulário.
@@ -329,22 +349,13 @@
           Começar teste grátis
         </a>
       </section>
-    </main>
+      </main>
 
-    <footer class="border-t border-white/10 py-10 text-sm text-slate-400">
-      <div class="mx-auto flex w-full max-w-5xl flex-col gap-4 px-6 md:flex-row md:items-center md:justify-between">
-        <p>© 2024 LeadRank. Todos os direitos reservados.</p>
-        <div class="flex items-center gap-4">
-          <a class="hover:text-white" href="privacidade.html">Privacidade</a>
-          <a class="hover:text-white" href="termos.html">Termos</a>
-          <a class="hover:text-white" href="onboarding.html">Criar conta</a>
-        </div>
-      </div>
-    </footer>
+      <div data-include="site-footer"></div>
+    </div>
 
     <script src="https://unpkg.com/lucide@latest"></script>
-    <script>
-      lucide.createIcons();
-    </script>
+    <script src="partials/site-shell.js"></script>
+    <script src="lead-form.js"></script>
   </body>
 </html>

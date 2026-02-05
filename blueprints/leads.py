@@ -42,6 +42,10 @@ from services.validation import sanitize_name, sanitize_origin, sanitize_phone
 leads_bp = Blueprint("leads", __name__)
 
 
+def _prever_limit() -> str:
+    return prever_rate_limit(get_client_id_from_request())
+
+
 @leads_bp.post("/criar_cliente")
 def criar_cliente():
     data = request.get_json(silent=True) or {}
@@ -155,7 +159,7 @@ def set_plan():
 
 
 @leads_bp.post("/prever")
-@limiter.limit("60 per minute", key_func=rate_limit_client_id)
+@limiter.limit(_prever_limit, key_func=rate_limit_client_id)
 def prever():
     raw_payload = request.get_data(cache=True, as_text=False) or b""
     max_bytes = settings.MAX_PREVER_PAYLOAD_BYTES

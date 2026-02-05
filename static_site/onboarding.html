@@ -3,15 +3,19 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>LeadRank - Qualificador de Leads com IA</title>
+  <title>LeadRank • Criar conta</title>
   <meta name="description" content="Priorize leads quentes automaticamente e aumente suas vendas. Teste grátis 14 dias.">
   <meta property="og:title" content="LeadRank - Qualificador de Leads com IA">
   <meta property="og:description" content="Priorize leads quentes automaticamente e aumente suas vendas. Teste grátis 14 dias.">
   <meta property="og:image" content="assets/og-image.svg">
   <meta property="og:url" content="https://leadrank.com.br/">
+  <meta property="og:type" content="website">
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="LeadRank - Qualificador de Leads com IA">
+  <meta name="twitter:description" content="Priorize leads quentes automaticamente e aumente suas vendas. Teste grátis 14 dias.">
+  <meta name="twitter:image" content="assets/og-image.svg">
   <meta name="theme-color" content="#4f7cff">
   <link rel="icon" href="assets/favicon.svg">
-  <title>LeadRank • Criar conta</title>
   <link rel="stylesheet" href="styles.css" />
   <style>
     .onboarding {
@@ -134,9 +138,137 @@
   </style>
 </head>
 <body data-active-nav="onboarding">
+  <template id="header-actions-template">
+    <a class="btn btn--ghost" href="login.html">Entrar</a>
+  </template>
   <div class="page">
+    <div data-include="site-header"></div>
+
     <main>
-      <div id="onboarding-app"></div>
+      <section class="auth onboarding">
+        <div>
+          <p class="eyebrow">LeadRank onboarding</p>
+          <h1>Configure sua conta em 4 passos</h1>
+          <p class="subtitle">Crie sua conta, acesse sua API Key e integre o LeadRank.</p>
+          <div class="stepper">
+            <div class="stepper__item is-active" data-step="1">
+              <span class="stepper__dot">1</span>
+              <div>
+                <strong>Cadastro</strong>
+                <p class="text-muted">Crie sua conta trial</p>
+              </div>
+            </div>
+            <div class="stepper__item" data-step="2">
+              <span class="stepper__dot">2</span>
+              <div>
+                <strong>Sua API Key</strong>
+                <p class="text-muted">Guarde com segurança</p>
+              </div>
+            </div>
+            <div class="stepper__item" data-step="3">
+              <span class="stepper__dot">3</span>
+              <div>
+                <strong>Como integrar</strong>
+                <p class="text-muted">Escolha o melhor caminho</p>
+              </div>
+            </div>
+            <div class="stepper__item" data-step="4">
+              <span class="stepper__dot">4</span>
+              <div>
+                <strong>Ir para o dashboard</strong>
+                <p class="text-muted">Ação do dia pronta</p>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <section class="card">
+          <div class="step-panel is-active" data-step-panel="1">
+            <h2>Passo 1: Cadastro</h2>
+            <p class="subtitle">Teste grátis por 14 dias. Sem cartão.</p>
+            <form class="form-grid" id="signupForm">
+              <label>
+                Nome completo
+                <input id="nome" name="nome" type="text" required placeholder="João Silva" />
+              </label>
+              <label>
+                Email profissional
+                <input id="email" name="email" type="email" required placeholder="joao@empresa.com" />
+              </label>
+              <label>
+                Empresa / Marca (opcional)
+                <input id="empresa" name="empresa" type="text" placeholder="Minha Empresa" />
+              </label>
+              <label>
+                WhatsApp (opcional)
+                <input id="telefone" name="telefone" type="tel" placeholder="(11) 98765-4321" />
+              </label>
+              <label>
+                Senha
+                <input id="password" name="password" type="password" required minlength="6" placeholder="Mínimo 6 caracteres" />
+              </label>
+              <button class="btn btn--block" type="submit" id="submitBtn">Criar conta</button>
+            </form>
+            <form class="form-grid" id="loginForm" style="display: none;">
+              <label>
+                Email
+                <input id="login_email" name="login_email" type="email" placeholder="seu@email.com" required />
+              </label>
+              <label>
+                Senha
+                <input id="login_password" name="login_password" type="password" placeholder="Sua senha" required />
+              </label>
+              <button class="btn btn--block" type="submit" id="loginBtn">Entrar</button>
+            </form>
+            <div class="step-actions">
+              <a class="link-toggle" id="toggleLogin" href="login.html" data-mode="signup">Entrar</a>
+            </div>
+            <div class="alert" id="loading" style="display: none;">Processando...</div>
+            <div class="alert alert--success" id="success" style="display: none;"></div>
+            <div class="alert alert--error" id="error" style="display: none;"></div>
+          </div>
+
+          <div class="step-panel" data-step-panel="2">
+            <h2>Passo 2: Sua API Key</h2>
+            <p class="subtitle">Guarde sua API Key para integrar o LeadRank.</p>
+            <div class="api-key">
+              <span id="apiKeyValue">—</span>
+              <button class="btn btn--ghost btn--small" type="button" id="copyApiKey">Copiar</button>
+            </div>
+            <div class="step-actions">
+              <button class="btn" type="button" id="toIntegrations">Continuar</button>
+            </div>
+            <div class="step-message alert" id="seedMessage" style="display: none;"></div>
+          </div>
+
+          <div class="step-panel" data-step-panel="3">
+            <h2>Passo 3: Como integrar</h2>
+            <p class="subtitle">Use sua API Key e conecte seus canais.</p>
+            <div class="integration-list">
+              <div class="integration-item">
+                <strong>Endpoint /prever</strong>
+                <code>POST https://qualificador-leads-ia.onrender.com/prever</code>
+              </div>
+              <div class="integration-item">
+                <strong>Headers</strong>
+                <code>X-API-KEY: sua-chave</code>
+                <code>X-CLIENT-ID: seu-workspace</code>
+              </div>
+            </div>
+            <div class="step-actions">
+              <button class="btn btn--ghost" type="button" id="seedFive">Gerar 5 leads teste</button>
+              <button class="btn" type="button" id="toFinish">Ir para o passo final</button>
+            </div>
+            <div class="step-message alert" id="seedFiveMsg" style="display: none;"></div>
+          </div>
+
+          <div class="step-panel" data-step-panel="4">
+            <h2>Pronto! Vá para o dashboard</h2>
+            <p class="subtitle">Sua conta está configurada e a Ação do Dia está pronta para você.</p>
+            <a class="btn btn--block" id="goDashboard" href="acao.html">Ir para Ação do Dia</a>
+          </div>
+        </section>
+      </section>
     </main>
 
     <div data-include="site-footer"></div>

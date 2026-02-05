@@ -346,6 +346,7 @@ limiter = Limiter(
     key_func=_client_ip,
     app=app,
     default_limits=[],
+    default_limits=["100 per minute"],
 )
 
 def _validate_password_strength(password: str) -> Tuple[bool, str]:
@@ -364,6 +365,10 @@ def _validate_password_strength(password: str) -> Tuple[bool, str]:
 def _hash_password(password: str) -> str:
     return generate_password_hash(password, method=f"pbkdf2:sha256:{PBKDF2_ITERATIONS}")
 
+  
+def _hash_password(password: str) -> str:
+    return generate_password_hash(password, method=f"pbkdf2:sha256:{PBKDF2_ITERATIONS}")
+  
 def _verify_legacy_pbkdf2(stored: str, password: str) -> bool:
     """
     Legacy format: pbkdf2_sha256$<iterations>$<salt_hex>$<hash_hex>

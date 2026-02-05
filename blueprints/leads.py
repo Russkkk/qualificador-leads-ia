@@ -13,8 +13,10 @@ from services import settings
 from services.auth_service import gen_api_key, require_client_auth
 from services.db import db, ensure_client_row, ensure_schema, ensure_schema_once
 from services.demo_service import bump_demo_counter, demo_rate_limited, require_demo_key
+from services.cache import cache_delete, cache_delete_prefix, cache_get_json, cache_set_json
 from services.lead_service import (
     check_quota_and_bump,
+    count_leads,
     count_status,
     fetch_recent_leads,
     get_threshold,
@@ -35,6 +37,7 @@ from services.utils import (
     safe_float,
     safe_int,
 )
+from services.validation import sanitize_name, sanitize_origin, sanitize_phone
 
 leads_bp = Blueprint("leads", __name__)
 
@@ -156,6 +159,17 @@ def set_plan():
 @limiter.limit(prever_rate_limit, key_func=rate_limit_client_id)
 @limiter.limit("600 per minute", key_func=rate_limit_client_id)
 def prever():
+    raw_payload = request.get_data(cache=True, as_text=False) or b""
+    max_bytes = settings.MAX_PREVER_PAYLOAD_BYTES
+    if max_bytes and len(raw_payload) > max_bytes:
+        return json_err(
+            "Payload muito grande para /prever.",
+            413,
+            code="payload_too_large",
+            limit_bytes=max_bytes,
+            size_bytes=len(raw_payload),
+        )
+
     data = request.get_json(silent=True) or {}
     client_id = get_client_id_from_request()
     if not client_id:
@@ -185,11 +199,11 @@ def prever():
         )
 
     lead = data.get("lead") or {}
-    nome = (data.get("nome") or lead.get("nome") or "").strip()
+    nome = sanitize_name(data.get("nome") or lead.get("nome") or "")
     email = (data.get("email_lead") or data.get("email") or lead.get("email_lead") or lead.get("email") or "").strip()
-    telefone = (data.get("telefone") or lead.get("telefone") or "").strip()
+    telefone = sanitize_phone(data.get("telefone") or lead.get("telefone") or "")
 
-    origem = (data.get("origem") or lead.get("origem") or lead.get("source") or "").strip()
+    origem = sanitize_origin(data.get("origem") or lead.get("origem") or lead.get("source") or "")
 
     tempo_site = safe_int(data.get("tempo_site") if "tempo_site" in data else lead.get("tempo_site"), 0)
     paginas_visitadas = safe_int(data.get("paginas_visitadas") if "paginas_visitadas" in data else lead.get("paginas_visitadas"), 0)
@@ -213,8 +227,7 @@ def prever():
     payload.setdefault("email", email)
     payload.setdefault("email_lead", email)
     payload.setdefault("telefone", telefone)
-    if origem:
-        payload.setdefault("origem", origem)
+    payload.setdefault("origem", origem or payload.get("origem", ""))
     payload.setdefault("tempo_site", tempo_site)
     payload.setdefault("paginas_visitadas", paginas_visitadas)
     payload.setdefault("clicou_preco", clicou_preco)
@@ -252,6 +265,9 @@ def prever():
                 if not ok_quota:
                     return json_err(err, 402, **extra)
 
+        cache_delete(f"acao_do_dia:{client_id}")
+        cache_delete_prefix(f"insights:{client_id}:")
+
         return json_ok(
             {
                 "client_id": client_id,
@@ -274,8 +290,11 @@ def prever():
 @limiter.limit("600 per minute", key_func=rate_limit_client_id)
 def dashboard_data():
     client_id = get_client_id_from_request()
-    limit = safe_int(request.args.get("limit"), settings.DEFAULT_LIMIT)
-    limit = max(10, min(limit, 1000))
+    page = safe_int(request.args.get("page"), 1)
+    per_page = safe_int(request.args.get("limit"), settings.DEFAULT_LIMIT)
+    per_page = max(10, min(per_page, 200))
+    page = max(1, page)
+    offset = (page - 1) * per_page
 
     if not client_id:
         return json_err("client_id obrigatório", 400)
@@ -284,7 +303,8 @@ def dashboard_data():
     if not ok_auth:
         return json_err(msg, 403, code="auth_required")
 
-    rows = fetch_recent_leads(client_id, limit=limit)
+    total_leads = count_leads(client_id)
+    rows = fetch_recent_leads(client_id, limit=per_page, offset=offset)
     convertidos, negados, pendentes = count_status(rows)
     top_origens_rows = top_origens(client_id, days=30, limit=6)
     hot_leads = hot_leads_today(client_id, limit=20)
@@ -300,6 +320,9 @@ def dashboard_data():
             "convertidos": convertidos,
             "negados": negados,
             "pendentes": pendentes,
+            "page": page,
+            "per_page": per_page,
+            "total_leads": total_leads,
             "top_origens_30d": top_origens_rows,
             "hot_leads_today": hot_leads,
             "hot_leads_today_tz": "America/Sao_Paulo",
@@ -330,6 +353,8 @@ def confirmar_venda():
                     "UPDATE leads SET virou_cliente=1, updated_at=NOW() WHERE client_id=%s AND id=%s",
                     (client_id, lead_id),
                 )
+        cache_delete(f"acao_do_dia:{client_id}")
+        cache_delete_prefix(f"insights:{client_id}:")
         return json_ok({"client_id": client_id, "lead_id": lead_id, "virou_cliente": 1})
     finally:
         conn.close()
@@ -356,6 +381,8 @@ def negar_venda():
                     "UPDATE leads SET virou_cliente=0, updated_at=NOW() WHERE client_id=%s AND id=%s",
                     (client_id, lead_id),
                 )
+        cache_delete(f"acao_do_dia:{client_id}")
+        cache_delete_prefix(f"insights:{client_id}:")
         return json_ok({"client_id": client_id, "lead_id": lead_id, "virou_cliente": 0})
     finally:
         conn.close()
@@ -372,11 +399,11 @@ def metrics():
     try:
         with conn:
             with conn.cursor(row_factory=dict_row) as cur:
-                cur.execute("SELECT COUNT(*) AS total FROM leads;")
+                cur.execute("SELECT COUNT(*) AS total FROM leads WHERE deleted_at IS NULL;")
                 total = int(cur.fetchone()["total"])
-                cur.execute("SELECT COUNT(*) AS labeled FROM leads WHERE virou_cliente IS NOT NULL;")
+                cur.execute("SELECT COUNT(*) AS labeled FROM leads WHERE deleted_at IS NULL AND virou_cliente IS NOT NULL;")
                 labeled = int(cur.fetchone()["labeled"])
-                cur.execute("SELECT COUNT(*) AS pending FROM leads WHERE virou_cliente IS NULL;")
+                cur.execute("SELECT COUNT(*) AS pending FROM leads WHERE deleted_at IS NULL AND virou_cliente IS NULL;")
                 pending = int(cur.fetchone()["pending"])
         return json_ok(
             {
@@ -404,6 +431,11 @@ def insights():
     if not ok_auth:
         return json_err(msg, 403, code="auth_required")
 
+    cache_key = f"insights:{client_id}:{days}"
+    cached = cache_get_json(cache_key)
+    if cached:
+        return json_ok(cached)
+
     threshold = get_threshold(client_id)
     since = now_utc() - timedelta(days=days)
 
@@ -416,7 +448,7 @@ def insights():
                     """
                     SELECT probabilidade, virou_cliente, created_at
                     FROM leads
-                    WHERE client_id=%s AND created_at >= %s
+                    WHERE client_id=%s AND deleted_at IS NULL AND created_at >= %s
                     ORDER BY created_at ASC
                     """,
                     (client_id, since),
@@ -465,22 +497,22 @@ def insights():
     den_all = sum(1 for r in labeled_all if float(r["virou_cliente"]) == 0.0)
     overall_rate = (conv_all / len(labeled_all)) if labeled_all else 0.0
 
-    return json_ok(
-        {
-            "client_id": client_id,
-            "threshold": float(threshold),
-            "overall": {
-                "window_total": len(rows),
-                "labeled": len(labeled_all),
-                "converted": conv_all,
-                "denied": den_all,
-                "conversion_rate": round(float(overall_rate), 4),
-            },
-            "bands": bands,
-            "series": series,
-            "window_days": days,
-        }
-    )
+    payload = {
+        "client_id": client_id,
+        "threshold": float(threshold),
+        "overall": {
+            "window_total": len(rows),
+            "labeled": len(labeled_all),
+            "converted": conv_all,
+            "denied": den_all,
+            "conversion_rate": round(float(overall_rate), 4),
+        },
+        "bands": bands,
+        "series": series,
+        "window_days": days,
+    }
+    cache_set_json(cache_key, payload)
+    return json_ok(payload)
 
 
 @leads_bp.get("/leads_export.csv")
@@ -503,7 +535,7 @@ def leads_export():
                     SELECT nome, email_lead, telefone, tempo_site, paginas_visitadas, clicou_preco,
                            probabilidade, score, created_at, virou_cliente
                     FROM leads
-                    WHERE client_id=%s
+                    WHERE client_id=%s AND deleted_at IS NULL
                     ORDER BY created_at DESC
                     """,
                     (client_id,),
@@ -707,6 +739,8 @@ def seed_test_leads():
                     (inserted, client_id),
                 )
 
+        cache_delete(f"acao_do_dia:{client_id}")
+        cache_delete_prefix(f"insights:{client_id}:")
         return json_ok(
             {
                 "client_id": client_id,
@@ -745,7 +779,7 @@ def funnels():
                       COUNT(*) FILTER (WHERE (probabilidade IS NOT NULL AND probabilidade < 0.35)
                                      OR (score IS NOT NULL AND score < 35)) AS cold
                     FROM leads
-                    WHERE client_id=%s
+                    WHERE client_id=%s AND deleted_at IS NULL
                     """,
                     (client_id,),
                 )
@@ -773,6 +807,11 @@ def acao_do_dia():
     if not ok_auth:
         return json_err(msg, 403, code="auth_required")
 
+    cache_key = f"acao_do_dia:{client_id}"
+    cached = cache_get_json(cache_key)
+    if cached:
+        return json_ok(cached)
+
     conn = db()
     try:
         with conn:
@@ -782,7 +821,7 @@ def acao_do_dia():
                     SELECT id, nome, email_lead, telefone, origem,
                            score, probabilidade, created_at, virou_cliente
                     FROM leads
-                    WHERE client_id=%s
+                    WHERE client_id=%s AND deleted_at IS NULL
                     ORDER BY COALESCE(probabilidade, score / 100.0) DESC NULLS LAST,
                              created_at DESC
                     LIMIT 30
@@ -806,7 +845,9 @@ def acao_do_dia():
                     "temperatura": lead_temperature(item.get("probabilidade"), item.get("score")),
                 }
             )
-        return json_ok({"client_id": client_id, "rows": res})
+        payload = {"client_id": client_id, "rows": res}
+        cache_set_json(cache_key, payload)
+        return json_ok(payload)
     finally:
         conn.close()
 
@@ -834,7 +875,7 @@ def lead_explain():
                     """
                     SELECT tempo_site, paginas_visitadas, clicou_preco, probabilidade
                     FROM leads
-                    WHERE client_id=%s AND id=%s
+                    WHERE client_id=%s AND id=%s AND deleted_at IS NULL
                     """,
                     (client_id, lead_id),
                 )

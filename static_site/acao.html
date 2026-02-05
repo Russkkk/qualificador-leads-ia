@@ -284,6 +284,8 @@
       return {
         client_id: clientId.trim(),
         api_key: apiKey.trim(),
+        client_id: localStorage.getItem("leadrank_client_id") || localStorage.getItem("client_id") || localStorage.getItem("LR_CLIENT_ID") || "",
+        api_key: localStorage.getItem("leadrank_api_key") || localStorage.getItem("api_key") || localStorage.getItem("LR_API_KEY") || "",
       };
     }
 
@@ -291,6 +293,9 @@
       const { client_id, api_key } = getAuth();
       const headers = {};
       if (client_id) headers["X-CLIENT-ID"] = client_id;
+      const headers = {
+        "X-CLIENT-ID": client_id,
+      };
       if (api_key) headers["X-API-KEY"] = api_key;
       const res = await fetch(BACKEND + path, { headers });
       const data = await res.json().catch(() => ({}));
@@ -304,6 +309,8 @@
         "Content-Type": "application/json",
       };
       if (client_id) headers["X-CLIENT-ID"] = client_id;
+        "X-CLIENT-ID": client_id,
+      };
       if (api_key) headers["X-API-KEY"] = api_key;
       const res = await fetch(BACKEND + path, {
         method: "POST",

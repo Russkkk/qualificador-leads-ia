@@ -1,222 +1,299 @@
 <!doctype html>
 <html lang="pt-BR">
-<head>
-  <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>LeadRank - Qualificador de Leads com IA</title>
-  <meta name="description" content="Priorize leads quentes automaticamente e aumente suas vendas com ranking diário e IA. Teste grátis por 14 dias.">
-  <meta name="robots" content="index, follow">
-  <link rel="canonical" href="https://qualificador-leads-ia.onrender.com/">
-  <meta property="og:title" content="LeadRank - Qualificador de Leads com IA">
-  <meta property="og:description" content="Ranking diário de leads com IA para acelerar o seu time comercial.">
-  <meta property="og:image" content="https://images.unsplash.com/photo-1521737604893-d14cc237f11d?auto=format&fit=crop&w=1200&q=80">
-  <meta property="og:url" content="https://qualificador-leads-ia.onrender.com/">
-  <meta property="og:type" content="website">
-  <meta name="twitter:card" content="summary_large_image">
-  <meta name="twitter:title" content="LeadRank - Qualificador de Leads com IA">
-  <meta name="twitter:description" content="Priorize leads quentes automaticamente e aumente suas vendas.">
-  <meta name="twitter:image" content="https://images.unsplash.com/photo-1521737604893-d14cc237f11d?auto=format&fit=crop&w=1200&q=80">
-  <meta name="theme-color" content="#4f7cff">
-  <link rel="icon" href="assets/favicon.svg">
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link rel="stylesheet" href="styles.css" />
-</head>
-<body data-active-nav="home">
-  <template id="header-actions-template">
-    <a class="btn btn--ghost" href="pricing.html">Ver planos</a>
-    <a class="btn" href="#lead-capture">Começar teste grátis</a>
-  </template>
-  <div class="page">
-    <div data-include="site-header"></div>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>LeadRank | Qualificador de Leads com IA</title>
+    <meta
+      name="description"
+      content="Qualifique leads automaticamente com IA e entregue ao time comercial uma fila diária de leads quentes. Teste grátis por 14 dias."
+    />
+    <meta name="robots" content="index, follow" />
+    <link rel="canonical" href="https://qualificador-leads-ia.onrender.com/" />
+    <meta property="og:title" content="LeadRank | Qualificador de Leads com IA" />
+    <meta
+      property="og:description"
+      content="Acelere sua equipe com ranking diário de leads quentes e integrações rápidas com CRM e WhatsApp."
+    />
+    <meta
+      property="og:image"
+      content="https://images.unsplash.com/photo-1551434678-e076c223a692?auto=format&fit=crop&w=1200&q=80"
+    />
+    <meta property="og:url" content="https://qualificador-leads-ia.onrender.com/" />
+    <meta property="og:type" content="website" />
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content="LeadRank | Qualificador de Leads com IA" />
+    <meta
+      name="twitter:description"
+      content="Fila diária de leads quentes, scoring inteligente e feedback do time comercial."
+    />
+    <meta
+      name="twitter:image"
+      content="https://images.unsplash.com/photo-1551434678-e076c223a692?auto=format&fit=crop&w=1200&q=80"
+    />
+    <meta name="theme-color" content="#4F46E5" />
+    <link
+      rel="icon"
+      href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='12' fill='%234F46E5'/%3E%3Ctext x='50%25' y='54%25' text-anchor='middle' font-size='32' font-family='Arial' fill='white'%3ELR%3C/text%3E%3C/svg%3E"
+    />
+    <script src="https://cdn.tailwindcss.com"></script>
+  </head>
+  <body class="bg-slate-950 text-slate-100">
+    <header class="mx-auto flex w-full max-w-5xl items-center justify-between px-6 py-6">
+      <a class="flex items-center gap-3 text-lg font-semibold" href="index.html">
+        <span class="flex h-10 w-10 items-center justify-center rounded-xl bg-indigo-600 text-white">
+          LR
+        </span>
+        LeadRank
+      </a>
+      <nav class="hidden items-center gap-6 text-sm text-slate-200 md:flex">
+        <a class="hover:text-white" href="#como-funciona">Como funciona</a>
+        <a class="hover:text-white" href="#demo">Demo</a>
+        <a class="hover:text-white" href="#beneficios">Benefícios</a>
+        <a class="hover:text-white" href="#lead-capture">Teste grátis</a>
+      </nav>
+      <a
+        class="rounded-full bg-white px-4 py-2 text-sm font-semibold text-slate-900 shadow-lg shadow-indigo-500/20 hover:bg-slate-200"
+        href="onboarding.html"
+      >
+        Começar teste grátis
+      </a>
+    </header>
 
-    <main>
-      <section class="hero" id="inicio">
-        <div>
-          <p class="eyebrow">IA para qualificar leads em tempo real</p>
-          <h1>Deixe a IA dizer quem é lead quente hoje.</h1>
-          <p class="subtitle">
+    <main class="mx-auto w-full max-w-5xl px-6 pb-16">
+      <section class="grid gap-10 pb-16 pt-10 lg:grid-cols-[1.1fr_0.9fr]">
+        <div class="space-y-6">
+          <span class="inline-flex items-center gap-2 rounded-full bg-indigo-500/10 px-4 py-2 text-xs font-semibold text-indigo-200">
+            <i data-lucide="sparkles" class="h-4 w-4"></i>
+            Qualificação automática de leads
+          </span>
+          <h1 class="text-4xl font-bold tracking-tight text-white md:text-5xl">
+            Deixe a IA dizer quem é lead quente hoje.
+          </h1>
+          <p class="text-base text-slate-200 md:text-lg">
             O LeadRank conecta seus canais, calcula intenção e fit automaticamente e entrega um ranking diário
-            para o time agir com velocidade.
+            para o time agir com velocidade. Mais reuniões marcadas, menos esforço perdido.
           </p>
-          <div class="hero__actions">
-            <a class="btn" href="#lead-capture">Começar teste grátis 14 dias</a>
-            <a class="btn btn--ghost" href="#demo">Ver demo</a>
+          <div class="flex flex-wrap gap-4">
+            <a
+              class="rounded-full bg-indigo-500 px-6 py-3 text-sm font-semibold text-white shadow-lg shadow-indigo-500/30 hover:bg-indigo-400"
+              href="onboarding.html"
+            >
+              Começar teste grátis 14 dias
+            </a>
+            <a
+              class="rounded-full border border-white/20 px-6 py-3 text-sm font-semibold text-white hover:border-white/40"
+              href="#demo"
+            >
+              Ver demo
+            </a>
           </div>
-          <div class="hero__stats">
-            <div>
-              <strong>+3x em agendamentos</strong>
-              <span>Priorize rápido e aumente conversões</span>
+          <div class="grid gap-4 pt-6 sm:grid-cols-3">
+            <div class="rounded-2xl border border-white/10 bg-white/5 p-4">
+              <p class="text-sm font-semibold text-white">+3x em agendamentos</p>
+              <p class="text-xs text-slate-300">Priorize rápido e aumente conversões.</p>
             </div>
-            <div>
-              <strong>Ranking diário</strong>
-              <span>Lista pronta para ligar todos os dias</span>
+            <div class="rounded-2xl border border-white/10 bg-white/5 p-4">
+              <p class="text-sm font-semibold text-white">Ranking diário</p>
+              <p class="text-xs text-slate-300">Lista pronta para ligar todos os dias.</p>
             </div>
-            <div>
-              <strong>Setup em minutos</strong>
-              <span>Conecte CRM, WhatsApp e formulários</span>
+            <div class="rounded-2xl border border-white/10 bg-white/5 p-4">
+              <p class="text-sm font-semibold text-white">Setup em minutos</p>
+              <p class="text-xs text-slate-300">Conecte CRM, WhatsApp e formulários.</p>
             </div>
           </div>
         </div>
-        <div class="card card--hero">
-          <div class="card__header">
-            <h2>Resumo da plataforma</h2>
-            <span class="pill pill--muted">Lead scoring inteligente</span>
-          </div>
-          <ul class="list">
-            <li>
-              <span>Score automático com IA a partir dos seus sinais</span>
-              <span class="pill pill--success">+ precisão</span>
-            </li>
-            <li>
-              <span>Fila “Ação do dia” com quem ligar primeiro</span>
-              <span class="pill pill--success">+ foco</span>
-            </li>
-            <li>
-              <span>Feedback do time para melhorar o modelo</span>
-              <span class="pill pill--success">+ aprendizado</span>
-            </li>
-          </ul>
-          <p class="subtitle">Sem cartão de crédito. Cancele quando quiser.</p>
-        </div>
-      </section>
-
-      <section class="section" id="como-funciona">
-        <div class="section__header">
-          <h2>Como funciona</h2>
-          <p class="subtitle">Da captura até o ranking diário em 4 passos.</p>
-        </div>
-        <div class="features__grid">
-          <article class="feature">
-            <i data-lucide="plug"></i>
-            <h3>1. Conectar</h3>
-            <p>Conecte formulários, CRM ou WhatsApp para centralizar os leads.</p>
-          </article>
-          <article class="feature">
-            <i data-lucide="sparkles"></i>
-            <h3>2. Score inteligente</h3>
-            <p>A IA analisa comportamento e fit para priorizar automaticamente.</p>
-          </article>
-          <article class="feature">
-            <i data-lucide="phone-call"></i>
-            <h3>3. Ligar pros quentes</h3>
-            <p>Seu time recebe a lista dos leads mais quentes primeiro.</p>
-          </article>
-          <article class="feature">
-            <i data-lucide="refresh-cw"></i>
-            <h3>4. Feedback contínuo</h3>
-            <p>Marque resultados e a IA aprende para melhorar o ranking.</p>
-          </article>
-        </div>
-      </section>
-
-      <section class="section" id="demo">
-        <div class="section__header">
-          <h2>Veja o LeadRank em ação</h2>
-          <p class="subtitle">Uma visão geral rápida do dashboard e do ranking diário.</p>
-        </div>
-        <div class="card">
-          <a
-            class="video-placeholder"
-            href="https://www.youtube.com/watch?v=dQw4w9WgXcQ"
-            target="_blank"
-            rel="noreferrer"
-          >
-            <div class="video-placeholder__overlay">
-              <span class="video-placeholder__play">▶</span>
-              <span>Assistir demo no YouTube</span>
+        <div class="rounded-3xl border border-white/10 bg-white/5 p-6 shadow-xl shadow-indigo-500/10">
+          <div class="space-y-4">
+            <div class="flex items-center justify-between">
+              <h2 class="text-lg font-semibold text-white">Resumo da plataforma</h2>
+              <span class="rounded-full bg-emerald-500/20 px-3 py-1 text-xs text-emerald-200">
+                Lead scoring inteligente
+              </span>
             </div>
-          </a>
-          <div class="video-frame">
-            <iframe
-              title="Demo LeadRank"
-              src="https://www.youtube.com/embed/dQw4w9WgXcQ"
-              allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-              allowfullscreen
-            ></iframe>
-          </div>
-          <p class="subtitle">Troque por seu vídeo real quando estiver pronto.</p>
-        </div>
-      </section>
-
-      <section class="section" id="beneficios">
-        <div class="section__header">
-          <h2>Benefícios para o seu time comercial</h2>
-          <p class="subtitle">Resultados rápidos sem mudar toda a operação.</p>
-        </div>
-        <div class="features__grid">
-          <article class="feature">
-            <i data-lucide="trending-up"></i>
-            <h3>Aumente agendamentos em 3x</h3>
-            <p>Foque no lead certo e aumente sua taxa de reuniões marcadas.</p>
-          </article>
-          <article class="feature">
-            <i data-lucide="brain"></i>
-            <h3>IA aprende com feedback</h3>
-            <p>Cada ligação melhora o modelo e refina a priorização automaticamente.</p>
-          </article>
-          <article class="feature">
-            <i data-lucide="shield-check"></i>
-            <h3>Freemium sem risco</h3>
-            <p>Comece grátis e escale apenas quando sua operação estiver pronta.</p>
-          </article>
-        </div>
-      </section>
-
-      <section class="section" id="prova-social">
-        <div class="section__header">
-          <h2>Prova social</h2>
-          <p class="subtitle">Já qualificamos <strong>+8.400 leads</strong> para times de vendas em todo o Brasil.</p>
-        </div>
-        <div class="card">
-          <div class="hero__stats">
-            <div>
-              <strong>NovaTrack</strong>
-              <span>Vendas B2B</span>
-            </div>
-            <div>
-              <strong>PulseCRM</strong>
-              <span>SaaS & Growth</span>
-            </div>
-            <div>
-              <strong>Visão Solar</strong>
-              <span>Energia & Serviços</span>
-            </div>
+            <ul class="space-y-4 text-sm text-slate-200">
+              <li class="flex items-start gap-3">
+                <i data-lucide="check-circle" class="mt-0.5 h-5 w-5 text-emerald-300"></i>
+                Score automático com IA a partir dos seus sinais.
+              </li>
+              <li class="flex items-start gap-3">
+                <i data-lucide="check-circle" class="mt-0.5 h-5 w-5 text-emerald-300"></i>
+                Fila “Ação do dia” com quem ligar primeiro.
+              </li>
+              <li class="flex items-start gap-3">
+                <i data-lucide="check-circle" class="mt-0.5 h-5 w-5 text-emerald-300"></i>
+                Feedback do time para melhorar o modelo continuamente.
+              </li>
+            </ul>
+            <p class="text-xs text-slate-300">Sem cartão de crédito. Cancele quando quiser.</p>
           </div>
         </div>
       </section>
 
-      <section class="section section--form" id="lead-capture">
+      <section class="space-y-8 pb-16" id="como-funciona">
         <div>
-          <h2>Pronto para priorizar leads quentes com IA?</h2>
-          <p class="subtitle">Receba acesso ao teste grátis e ao checklist de integração em até 24 horas úteis.</p>
-          <ul class="checklist">
-            <li><i data-lucide="check"></i>Setup guiado em 15 minutos</li>
-            <li><i data-lucide="check"></i>Integração com CRM e WhatsApp</li>
-            <li><i data-lucide="check"></i>Suporte humano durante o trial</li>
+          <h2 class="text-3xl font-semibold text-white">Como funciona</h2>
+          <p class="text-slate-300">Da captura até o ranking diário em 4 passos simples.</p>
+        </div>
+        <div class="grid gap-6 md:grid-cols-2">
+          <article class="rounded-2xl border border-white/10 bg-white/5 p-5">
+            <i data-lucide="plug" class="h-6 w-6 text-indigo-300"></i>
+            <h3 class="mt-4 text-lg font-semibold">1. Conectar</h3>
+            <p class="text-sm text-slate-300">
+              Conecte formulários, CRM ou WhatsApp para centralizar os leads.
+            </p>
+          </article>
+          <article class="rounded-2xl border border-white/10 bg-white/5 p-5">
+            <i data-lucide="sparkles" class="h-6 w-6 text-indigo-300"></i>
+            <h3 class="mt-4 text-lg font-semibold">2. Score inteligente</h3>
+            <p class="text-sm text-slate-300">
+              A IA analisa comportamento e fit para priorizar automaticamente.
+            </p>
+          </article>
+          <article class="rounded-2xl border border-white/10 bg-white/5 p-5">
+            <i data-lucide="phone-call" class="h-6 w-6 text-indigo-300"></i>
+            <h3 class="mt-4 text-lg font-semibold">3. Ligar pros quentes</h3>
+            <p class="text-sm text-slate-300">
+              Seu time recebe a lista dos leads mais quentes primeiro.
+            </p>
+          </article>
+          <article class="rounded-2xl border border-white/10 bg-white/5 p-5">
+            <i data-lucide="refresh-cw" class="h-6 w-6 text-indigo-300"></i>
+            <h3 class="mt-4 text-lg font-semibold">4. Feedback contínuo</h3>
+            <p class="text-sm text-slate-300">
+              Marque resultados e a IA aprende para melhorar o ranking.
+            </p>
+          </article>
+        </div>
+      </section>
+
+      <section class="space-y-8 pb-16" id="demo">
+        <div>
+          <h2 class="text-3xl font-semibold text-white">Veja o LeadRank em ação</h2>
+          <p class="text-slate-300">
+            Mostre o dashboard com ranking diário e as integrações principais.
+          </p>
+        </div>
+        <div class="overflow-hidden rounded-3xl border border-white/10 bg-white/5">
+          <img
+            src="https://images.unsplash.com/photo-1521737604893-d14cc237f11d?auto=format&fit=crop&w=1200&q=80"
+            alt="Dashboard de vendas com ranking de leads"
+            class="h-64 w-full object-cover sm:h-80"
+          />
+          <div class="space-y-3 p-6">
+            <div class="flex items-center gap-3 text-sm text-slate-200">
+              <i data-lucide="play-circle" class="h-5 w-5 text-indigo-300"></i>
+              Substitua por seu vídeo ou embed do YouTube quando estiver pronto.
+            </div>
+            <a
+              class="inline-flex items-center gap-2 rounded-full border border-white/20 px-4 py-2 text-xs font-semibold text-white hover:border-white/40"
+              href="https://www.youtube.com/"
+              target="_blank"
+              rel="noreferrer"
+            >
+              Ver vídeo exemplo
+              <i data-lucide="arrow-up-right" class="h-4 w-4"></i>
+            </a>
+          </div>
+        </div>
+      </section>
+
+      <section class="space-y-8 pb-16" id="beneficios">
+        <div>
+          <h2 class="text-3xl font-semibold text-white">Benefícios para o time comercial</h2>
+          <p class="text-slate-300">Resultados rápidos sem mudar toda a operação.</p>
+        </div>
+        <div class="grid gap-6 md:grid-cols-3">
+          <article class="rounded-2xl border border-white/10 bg-white/5 p-5">
+            <i data-lucide="trending-up" class="h-6 w-6 text-indigo-300"></i>
+            <h3 class="mt-4 text-lg font-semibold">Mais agendamentos</h3>
+            <p class="text-sm text-slate-300">
+              Foque no lead certo e aumente sua taxa de reuniões marcadas.
+            </p>
+          </article>
+          <article class="rounded-2xl border border-white/10 bg-white/5 p-5">
+            <i data-lucide="brain" class="h-6 w-6 text-indigo-300"></i>
+            <h3 class="mt-4 text-lg font-semibold">IA aprende com feedback</h3>
+            <p class="text-sm text-slate-300">
+              Cada ligação melhora o modelo e refina a priorização automaticamente.
+            </p>
+          </article>
+          <article class="rounded-2xl border border-white/10 bg-white/5 p-5">
+            <i data-lucide="shield-check" class="h-6 w-6 text-indigo-300"></i>
+            <h3 class="mt-4 text-lg font-semibold">Freemium sem risco</h3>
+            <p class="text-sm text-slate-300">
+              Comece grátis e escale apenas quando sua operação estiver pronta.
+            </p>
+          </article>
+        </div>
+      </section>
+
+      <section
+        class="grid gap-10 rounded-3xl border border-white/10 bg-white/5 p-8 md:grid-cols-[1.1fr_0.9fr]"
+        id="lead-capture"
+      >
+        <div class="space-y-4">
+          <h2 class="text-3xl font-semibold text-white">Pronto para priorizar leads quentes com IA?</h2>
+          <p class="text-slate-300">
+            Receba acesso ao teste grátis e ao checklist de integração em até 24 horas úteis.
+          </p>
+          <ul class="space-y-3 text-sm text-slate-200">
+            <li class="flex items-center gap-2">
+              <i data-lucide="check" class="h-4 w-4 text-emerald-300"></i>
+              Setup guiado em 15 minutos.
+            </li>
+            <li class="flex items-center gap-2">
+              <i data-lucide="check" class="h-4 w-4 text-emerald-300"></i>
+              Integração com CRM, Zapier, Make e Webhooks.
+            </li>
+            <li class="flex items-center gap-2">
+              <i data-lucide="check" class="h-4 w-4 text-emerald-300"></i>
+              Suporte humano durante o trial.
+            </li>
           </ul>
         </div>
         <form
-          class="lead-form"
-          id="leadForm"
+          class="space-y-4 rounded-2xl border border-white/10 bg-slate-950/40 p-6"
           action="https://formspree.io/f/SEU_FORM_ID"
           method="POST"
         >
-          <label>
+          <label class="block text-sm font-semibold text-slate-200">
             Nome completo
-            <input type="text" name="name" placeholder="Seu nome" required />
+            <input
+              class="mt-2 w-full rounded-xl border border-white/10 bg-slate-900 px-4 py-3 text-sm text-white placeholder:text-slate-500 focus:border-indigo-400 focus:outline-none"
+              type="text"
+              name="name"
+              placeholder="Seu nome"
+              required
+            />
           </label>
-          <label>
+          <label class="block text-sm font-semibold text-slate-200">
             E-mail corporativo
-            <input type="email" name="email" placeholder="voce@empresa.com" required />
+            <input
+              class="mt-2 w-full rounded-xl border border-white/10 bg-slate-900 px-4 py-3 text-sm text-white placeholder:text-slate-500 focus:border-indigo-400 focus:outline-none"
+              type="email"
+              name="email"
+              placeholder="voce@empresa.com"
+              required
+            />
           </label>
-          <label>
-            Time / empresa
-            <input type="text" name="company" placeholder="Nome da empresa" required />
+          <label class="block text-sm font-semibold text-slate-200">
+            Empresa
+            <input
+              class="mt-2 w-full rounded-xl border border-white/10 bg-slate-900 px-4 py-3 text-sm text-white placeholder:text-slate-500 focus:border-indigo-400 focus:outline-none"
+              type="text"
+              name="company"
+              placeholder="Nome da empresa"
+              required
+            />
           </label>
-          <label>
+          <label class="block text-sm font-semibold text-slate-200">
             Volume mensal de leads
-            <select name="volume" required>
+            <select
+              class="mt-2 w-full rounded-xl border border-white/10 bg-slate-900 px-4 py-3 text-sm text-white focus:border-indigo-400 focus:outline-none"
+              name="volume"
+              required
+            >
               <option value="">Selecione</option>
               <option value="ate-200">Até 200</option>
               <option value="200-1000">200 - 1.000</option>
@@ -224,28 +301,49 @@
               <option value="5000+">5.000+</option>
             </select>
           </label>
-          <input type="hidden" name="source" value="landing-page" />
-          <button class="btn btn--block" type="submit">Quero meu teste grátis</button>
-          <p class="form-disclaimer text-muted">
-            * Substitua <strong>SEU_FORM_ID</strong> pelo ID do Formspree ou troque o action para Web3Forms/Getform.
+          <button
+            class="w-full rounded-full bg-indigo-500 px-6 py-3 text-sm font-semibold text-white shadow-lg shadow-indigo-500/30 hover:bg-indigo-400"
+            type="submit"
+          >
+            Quero meu teste grátis
+          </button>
+          <p class="text-xs text-slate-400">
+            Cadastre seu Formspree em <strong>formspree.io</strong> e substitua <strong>SEU_FORM_ID</strong>
+            no action do formulário.
           </p>
-          <p class="form-status" id="formStatus" role="status" aria-live="polite"></p>
         </form>
       </section>
 
-      <section class="cta" id="cta-final">
+      <section class="mt-16 flex flex-col items-start justify-between gap-6 rounded-3xl bg-indigo-500 p-8 text-white md:flex-row md:items-center">
         <div>
-          <h2>Seu time merece falar com os leads certos primeiro.</h2>
-          <p class="subtitle">Teste grátis por 14 dias e acelere o pipeline ainda esta semana.</p>
+          <h2 class="text-3xl font-semibold">Seu time merece falar com os leads certos primeiro.</h2>
+          <p class="text-indigo-100">
+            Teste grátis por 14 dias e acelere o pipeline ainda esta semana.
+          </p>
         </div>
-        <a class="btn" href="#lead-capture">Começar teste grátis</a>
+        <a
+          class="rounded-full bg-white px-6 py-3 text-sm font-semibold text-indigo-600 shadow-lg"
+          href="onboarding.html"
+        >
+          Começar teste grátis
+        </a>
       </section>
     </main>
 
-    <div data-include="site-footer"></div>
-  </div>
-  <script src="https://unpkg.com/lucide@latest"></script>
-  <script src="partials/site-shell.js"></script>
-  <script src="lead-form.js"></script>
-</body>
+    <footer class="border-t border-white/10 py-10 text-sm text-slate-400">
+      <div class="mx-auto flex w-full max-w-5xl flex-col gap-4 px-6 md:flex-row md:items-center md:justify-between">
+        <p>© 2024 LeadRank. Todos os direitos reservados.</p>
+        <div class="flex items-center gap-4">
+          <a class="hover:text-white" href="privacidade.html">Privacidade</a>
+          <a class="hover:text-white" href="termos.html">Termos</a>
+          <a class="hover:text-white" href="onboarding.html">Criar conta</a>
+        </div>
+      </div>
+    </footer>
+
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <script>
+      lucide.createIcons();
+    </script>
+  </body>
 </html>

@@ -24,6 +24,22 @@ const generatePassword = () => {
   result += pick(symbols);
   result += pick("0123456789");
   return result;
+const saveLeadLocally = (payload) => {
+  const stored = localStorage.getItem("leadrank_leads");
+  const leads = stored ? JSON.parse(stored) : [];
+  leads.push({
+    ...payload,
+    createdAt: new Date().toISOString(),
+  });
+  localStorage.setItem("leadrank_leads", JSON.stringify(leads));
+};
+
+const serializeForm = (form) => {
+  const data = {};
+  new FormData(form).forEach((value, key) => {
+    data[key] = value;
+  });
+  return data;
 };
 
 if (leadForm) {
@@ -39,6 +55,17 @@ if (leadForm) {
       showStatus("Criando sua conta...", "warning");
 
       const response = await fetch(`${BACKEND}/signup`, {
+      if (!leadForm.action || leadForm.action.includes("SEU_FORM_ID")) {
+        saveLeadLocally(serializeForm(leadForm));
+        leadForm.reset();
+        showStatus(
+          "Lead salvo localmente para teste. Configure o endpoint (Formspree/Web3Forms) para envios reais.",
+          "warning"
+        );
+        return;
+      }
+
+      const response = await fetch(leadForm.action, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",

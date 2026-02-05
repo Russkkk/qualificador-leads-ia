@@ -144,5 +144,223 @@
 
   <script src="partials/site-shell.js"></script>
   <script type="module" src="/src/onboarding/main.js"></script>
+
+  <script>
+    const BACKEND = (window.BACKEND_URL || "https://qualificador-leads-ia.onrender.com").replace(/\/$/, "");
+
+    const panels = document.querySelectorAll("[data-step-panel]");
+    const stepperItems = document.querySelectorAll(".stepper__item");
+    const toggleLogin = document.getElementById("toggleLogin");
+    const signupForm = document.getElementById("signupForm");
+    const loginForm = document.getElementById("loginForm");
+    const submitBtn = document.getElementById("submitBtn");
+    const loginBtn = document.getElementById("loginBtn");
+    const loading = document.getElementById("loading");
+    const successDiv = document.getElementById("success");
+    const errorDiv = document.getElementById("error");
+    const apiKeyValue = document.getElementById("apiKeyValue");
+    const copyApiKeyBtn = document.getElementById("copyApiKey");
+    const seedMessage = document.getElementById("seedMessage");
+    const seedFiveBtn = document.getElementById("seedFive");
+    const seedFiveMsg = document.getElementById("seedFiveMsg");
+    const goDashboard = document.getElementById("goDashboard");
+
+    let currentStep = 1;
+    let authState = { clientId: "", apiKey: "" };
+
+    const qs = (key) => new URLSearchParams(location.search).get(key) || "";
+
+    function setStep(step) {
+      currentStep = step;
+      panels.forEach((panel) => {
+        panel.classList.toggle("is-active", Number(panel.dataset.stepPanel) === step);
+      });
+      stepperItems.forEach((item) => {
+        item.classList.toggle("is-active", Number(item.dataset.step) === step);
+      });
+    }
+
+    function showError(message) {
+      errorDiv.textContent = message;
+      errorDiv.style.display = "block";
+    }
+
+    function setAuth(clientId, apiKey) {
+      authState = { clientId, apiKey };
+      if (clientId) {
+        localStorage.setItem("leadrank_client_id", clientId);
+        localStorage.setItem("client_id", clientId);
+        localStorage.setItem("LR_CLIENT_ID", clientId);
+      }
+      if (apiKey) {
+        localStorage.setItem("leadrank_api_key", apiKey);
+        localStorage.setItem("api_key", apiKey);
+        localStorage.setItem("LR_API_KEY", apiKey);
+      }
+      apiKeyValue.textContent = apiKey || "—";
+      goDashboard.href = "acao.html";
+    }
+
+    async function seedLeads(count, messageTarget) {
+      if (!authState.clientId || !authState.apiKey) return;
+      try {
+        const res = await fetch(BACKEND + "/seed_test_leads", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            "X-API-KEY": authState.apiKey,
+            "X-CLIENT-ID": authState.clientId,
+          },
+          body: JSON.stringify({ client_id: authState.clientId, n: count }),
+        });
+        if (!res.ok) throw new Error("Falha ao gerar leads");
+        if (messageTarget) {
+          messageTarget.className = "alert alert--success";
+          messageTarget.textContent = "Leads de teste enviados! Veja agora na Ação do Dia";
+          messageTarget.style.display = "block";
+        }
+      } catch (err) {
+        if (messageTarget) {
+          messageTarget.className = "alert alert--error";
+          messageTarget.textContent = "Não foi possível enviar leads de teste.";
+          messageTarget.style.display = "block";
+        }
+      }
+    }
+
+    function toggleToLogin() {
+      signupForm.style.display = "none";
+      loginForm.style.display = "grid";
+      toggleLogin.textContent = "Criar conta";
+      toggleLogin.dataset.mode = "login";
+    }
+
+    function toggleToSignup() {
+      signupForm.style.display = "grid";
+      loginForm.style.display = "none";
+      toggleLogin.textContent = "Entrar";
+      toggleLogin.dataset.mode = "signup";
+    }
+
+    toggleLogin.addEventListener("click", (event) => {
+      event.preventDefault();
+      if (toggleLogin.dataset.mode === "login") {
+        toggleToSignup();
+      } else {
+        toggleToLogin();
+      }
+    });
+
+    document.getElementById("toIntegrations").addEventListener("click", () => setStep(3));
+    document.getElementById("toFinish").addEventListener("click", () => setStep(4));
+
+    copyApiKeyBtn.addEventListener("click", () => {
+      if (!authState.apiKey) return;
+      navigator.clipboard?.writeText(authState.apiKey);
+      copyApiKeyBtn.textContent = "Copiado!";
+      setTimeout(() => (copyApiKeyBtn.textContent = "Copiar"), 1600);
+    });
+
+    seedFiveBtn.addEventListener("click", async () => {
+      seedFiveMsg.style.display = "none";
+      await seedLeads(5, seedFiveMsg);
+    });
+
+    if (loginForm) {
+      loginForm.addEventListener("submit", async (event) => {
+        event.preventDefault();
+        const email = document.getElementById("login_email").value.trim().toLowerCase();
+        const password = document.getElementById("login_password").value.trim();
+
+        if (!email || !password) {
+          showError("Email e senha são obrigatórios");
+          return;
+        }
+
+        loginBtn.disabled = true;
+        loading.style.display = "block";
+        errorDiv.style.display = "none";
+        successDiv.style.display = "none";
+
+        try {
+          const res = await fetch(BACKEND + "/login", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ email, password }),
+          });
+          const data = await res.json().catch(() => ({}));
+
+          if (!res.ok) {
+            throw new Error(data.error || data.message || "Erro no login");
+          }
+
+          const apiKeyHeader = res.headers.get("X-API-KEY") || "";
+          setAuth(data.client_id, apiKeyHeader);
+          successDiv.innerHTML = "✅ Login feito!";
+          successDiv.style.display = "block";
+          setStep(4);
+        } catch (err) {
+          showError(err.message || "Erro de conexão. Tente novamente.");
+        } finally {
+          loginBtn.disabled = false;
+          loading.style.display = "none";
+        }
+      });
+    }
+
+    signupForm.addEventListener("submit", async (event) => {
+      event.preventDefault();
+
+      const nome = document.getElementById("nome").value.trim();
+      const email = document.getElementById("email").value.trim().toLowerCase();
+      const empresa = document.getElementById("empresa").value.trim();
+      const telefone = document.getElementById("telefone").value.trim();
+      const password = document.getElementById("password").value.trim();
+
+      if (!nome || !email) {
+        showError("Nome e email são obrigatórios");
+        return;
+      }
+      if (!password || password.length < 6) {
+        showError("A senha deve ter pelo menos 6 caracteres.");
+        return;
+      }
+
+      submitBtn.disabled = true;
+      loading.style.display = "block";
+      errorDiv.style.display = "none";
+      successDiv.style.display = "none";
+
+      try {
+        const res = await fetch(BACKEND + "/signup", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ nome, email, empresa, telefone, password }),
+        });
+        const data = await res.json().catch(() => ({}));
+
+        if (!res.ok) {
+          throw new Error(data.error || data.message || "Erro ao criar conta");
+        }
+
+        const apiKeyHeader = res.headers.get("X-API-KEY") || "";
+        setAuth(data.client_id, apiKeyHeader);
+        successDiv.textContent = "✅ Conta criada! Gerando sua API Key...";
+        successDiv.style.display = "block";
+
+        await seedLeads(10, seedMessage);
+        setStep(2);
+      } catch (err) {
+        showError(err.message || "Erro de conexão. Tente novamente.");
+      } finally {
+        submitBtn.disabled = false;
+        loading.style.display = "none";
+      }
+    });
+
+    if (qs("mode") === "login") {
+      toggleToLogin();
+    }
+  </script>
 </body>
 </html>

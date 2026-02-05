@@ -20,6 +20,7 @@ import hmac
 import logging
 import traceback
 import re
+from pathlib import Path
 from datetime import datetime, timezone, timedelta
 from typing import Any, Dict, List, Optional, Tuple
 
@@ -420,6 +421,7 @@ def _verify_password(stored: str, password: str) -> bool:
 # =========================
 _SCHEMA_READY = False
 _SCHEMA_LOCK = None  # lazy lock
+_MIGRATIONS_DIR = Path(__file__).resolve().parent / "migrations"
 
 
 def _ensure_schema_once() -> Tuple[bool, str]:
@@ -441,169 +443,35 @@ def _ensure_schema_once() -> Tuple[bool, str]:
 
 
 def _ensure_schema():
-    """
-    Cria/migra tabelas para ser compatível com:
-    - versões antigas com leads em colunas "nome/email/telefone/..."
-    - versões novas com payload JSONB, score/label/updated_at
-    - clients antigos com api_key NOT NULL (corrigimos)
-    """
+    """Aplica migrações versionadas do diretório migrations/."""
     conn = _db()
     try:
         with conn:
             with conn.cursor() as cur:
-                # -------------------------
-                # LEADS
-                # -------------------------
                 cur.execute("""
-                    CREATE TABLE IF NOT EXISTS leads (
-                        id BIGSERIAL PRIMARY KEY,
-                        client_id TEXT NOT NULL,
-                        -- colunas "clássicas" (dashboard atual)
-                        nome TEXT,
-                        email_lead TEXT,
-                        telefone TEXT,
-                        origem TEXT,
-                        tempo_site INTEGER,
-                        paginas_visitadas INTEGER,
-                        clicou_preco INTEGER,
-                        probabilidade DOUBLE PRECISION,
-                        virou_cliente DOUBLE PRECISION,
-                        -- colunas "SaaS" (futuro)
-                        payload JSONB NOT NULL DEFAULT '{}'::jsonb,
-                        score INTEGER,
-                        label INTEGER,
-                        created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
-                        updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
+                    CREATE TABLE IF NOT EXISTS schema_migrations (
+                        version TEXT PRIMARY KEY,
+                        applied_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
                     );
                 """)
-                cur.execute("CREATE INDEX IF NOT EXISTS idx_leads_client_created ON leads(client_id, created_at DESC);")
-                cur.execute("CREATE INDEX IF NOT EXISTS idx_leads_client_label ON leads(client_id, virou_cliente);")
+                cur.execute("SELECT version FROM schema_migrations;")
+                applied = {row[0] for row in (cur.fetchall() or [])}
 
-                # migrações (se leads já existia)
-                cur.execute("ALTER TABLE leads ADD COLUMN IF NOT EXISTS client_id TEXT;")
-                cur.execute("ALTER TABLE leads ADD COLUMN IF NOT EXISTS nome TEXT;")
-                cur.execute("ALTER TABLE leads ADD COLUMN IF NOT EXISTS email_lead TEXT;")
-                cur.execute("ALTER TABLE leads ADD COLUMN IF NOT EXISTS telefone TEXT;")
-                cur.execute("ALTER TABLE leads ADD COLUMN IF NOT EXISTS origem TEXT;")
-                cur.execute("ALTER TABLE leads ADD COLUMN IF NOT EXISTS tempo_site INTEGER;")
-                cur.execute("ALTER TABLE leads ADD COLUMN IF NOT EXISTS paginas_visitadas INTEGER;")
-                cur.execute("ALTER TABLE leads ADD COLUMN IF NOT EXISTS clicou_preco INTEGER;")
-                cur.execute("ALTER TABLE leads ADD COLUMN IF NOT EXISTS probabilidade DOUBLE PRECISION;")
-                cur.execute("ALTER TABLE leads ADD COLUMN IF NOT EXISTS virou_cliente DOUBLE PRECISION;")
-                cur.execute("ALTER TABLE leads ADD COLUMN IF NOT EXISTS payload JSONB NOT NULL DEFAULT '{}'::jsonb;")
-                cur.execute("ALTER TABLE leads ADD COLUMN IF NOT EXISTS score INTEGER;")
-                cur.execute("ALTER TABLE leads ADD COLUMN IF NOT EXISTS label INTEGER;")
-                cur.execute("ALTER TABLE leads ADD COLUMN IF NOT EXISTS created_at TIMESTAMPTZ NOT NULL DEFAULT NOW();")
-                cur.execute("ALTER TABLE leads ADD COLUMN IF NOT EXISTS updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW();")
+                if not _MIGRATIONS_DIR.exists():
+                    raise RuntimeError("Diretório migrations/ não encontrado.")
 
-                # -------------------------
-                # CLIENTS
-                # -------------------------
-                cur.execute("""
-                    CREATE TABLE IF NOT EXISTS clients (
-                        client_id TEXT PRIMARY KEY,
-                        -- perfil (opcional, usado no /signup)
-                        nome TEXT,
-                        email TEXT,
-                        empresa TEXT,
-                        telefone TEXT,
-                        valid_until TIMESTAMPTZ,
-                        password_hash TEXT,
-                        last_login_at TIMESTAMPTZ,
-                        -- auth / plan
-                        api_key TEXT,
-                        plan TEXT NOT NULL DEFAULT 'trial',
-                        status TEXT NOT NULL DEFAULT 'active',
-                        -- uso mensal
-                        usage_month TEXT NOT NULL DEFAULT '',
-                        leads_used_month INTEGER NOT NULL DEFAULT 0,
-                        created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
-                        updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
-                    );
-                """)
-
-                cur.execute("ALTER TABLE clients ADD COLUMN IF NOT EXISTS api_key TEXT;")
-                cur.execute("ALTER TABLE clients ADD COLUMN IF NOT EXISTS nome TEXT;")
-                cur.execute("ALTER TABLE clients ADD COLUMN IF NOT EXISTS email TEXT;")
-                cur.execute("ALTER TABLE clients ADD COLUMN IF NOT EXISTS empresa TEXT;")
-                cur.execute("ALTER TABLE clients ADD COLUMN IF NOT EXISTS telefone TEXT;")
-                cur.execute("ALTER TABLE clients ADD COLUMN IF NOT EXISTS valid_until TIMESTAMPTZ;")
-                cur.execute("ALTER TABLE clients ADD COLUMN IF NOT EXISTS password_hash TEXT;")
-                cur.execute("ALTER TABLE clients ADD COLUMN IF NOT EXISTS last_login_at TIMESTAMPTZ;")
-
-                # bancos antigos podem ter api_key NOT NULL -> drop
-                try:
-                    cur.execute("ALTER TABLE clients ALTER COLUMN api_key DROP NOT NULL;")
-                except Exception:
-                    pass
-
-                cur.execute("ALTER TABLE clients ADD COLUMN IF NOT EXISTS plan TEXT NOT NULL DEFAULT 'trial';")
-                cur.execute("ALTER TABLE clients ADD COLUMN IF NOT EXISTS status TEXT NOT NULL DEFAULT 'active';")
-                cur.execute("ALTER TABLE clients ADD COLUMN IF NOT EXISTS usage_month TEXT;")
-                cur.execute("ALTER TABLE clients ADD COLUMN IF NOT EXISTS leads_used_month INTEGER NOT NULL DEFAULT 0;")
-                cur.execute("ALTER TABLE clients ADD COLUMN IF NOT EXISTS created_at TIMESTAMPTZ NOT NULL DEFAULT NOW();")
-                cur.execute("ALTER TABLE clients ADD COLUMN IF NOT EXISTS updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW();")
-
-                mk = _month_key()
-                # normaliza NULLs antigos
-                cur.execute("UPDATE clients SET usage_month=%s WHERE usage_month IS NULL OR usage_month='';", (mk,))
-                cur.execute("UPDATE clients SET api_key='' WHERE api_key IS NULL;")
-                cur.execute("UPDATE clients SET updated_at=NOW() WHERE updated_at IS NULL;")
-
-                cur.execute("CREATE UNIQUE INDEX IF NOT EXISTS idx_clients_api_key ON clients(api_key) WHERE api_key <> '';")
-                try:
-                    cur.execute("CREATE UNIQUE INDEX IF NOT EXISTS idx_clients_email_unique ON clients(email) WHERE email IS NOT NULL AND email<>'';")
-                except Exception:
-                    pass
-                cur.execute("CREATE UNIQUE INDEX IF NOT EXISTS idx_clients_email ON clients(email) WHERE email IS NOT NULL AND email <> '';")
-
-                # -------------------------
-                # THRESHOLDS / MODEL_META (para insights/treino)
-                # -------------------------
-                cur.execute("""
-                    CREATE TABLE IF NOT EXISTS thresholds (
-                        client_id TEXT PRIMARY KEY,
-                        threshold DOUBLE PRECISION NOT NULL,
-                        updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
-                    );
-                """)
-                cur.execute("""
-                    CREATE TABLE IF NOT EXISTS model_meta (
-                        client_id TEXT PRIMARY KEY,
-                        can_train BOOLEAN NOT NULL DEFAULT FALSE,
-                        labeled_count INTEGER NOT NULL DEFAULT 0,
-                        classes_rotuladas TEXT NOT NULL DEFAULT '[]',
-                        updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
-                    );
-                """)
-                # -------------------------
-                # SUBSCRIPTIONS / BILLING EVENTS (Premium/Billing)
-                # -------------------------
-                cur.execute("""
-                    CREATE TABLE IF NOT EXISTS subscriptions (
-                        client_id TEXT PRIMARY KEY,
-                        provider TEXT NOT NULL DEFAULT 'manual',
-                        status TEXT NOT NULL DEFAULT 'inactive',
-                        plan TEXT NOT NULL DEFAULT 'trial',
-                        current_period_start TIMESTAMPTZ,
-                        current_period_end TIMESTAMPTZ,
-                        cancel_at_period_end BOOLEAN NOT NULL DEFAULT FALSE,
-                        updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
-                    );
-                """)
-                cur.execute("""
-                    CREATE TABLE IF NOT EXISTS billing_events (
-                        id BIGSERIAL PRIMARY KEY,
-                        provider TEXT NOT NULL DEFAULT 'manual',
-                        event_type TEXT NOT NULL,
-                        client_id TEXT,
-                        payload JSONB NOT NULL DEFAULT '{}'::jsonb,
-                        created_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
-                    );
-                """)
-                cur.execute("CREATE INDEX IF NOT EXISTS idx_billing_events_client_created ON billing_events(client_id, created_at DESC);")
-
-
+                for path in sorted(_MIGRATIONS_DIR.glob("*.sql")):
+                    version = path.stem.split("_", 1)[0]
+                    if version in applied:
+                        continue
+                    sql_text = path.read_text(encoding="utf-8")
+                    statements = [stmt.strip() for stmt in sql_text.split(";") if stmt.strip()]
+                    for stmt in statements:
+                        cur.execute(stmt)
+                    cur.execute(
+                        "INSERT INTO schema_migrations (version) VALUES (%s)",
+                        (version,),
+                    )
     finally:
         conn.close()
 

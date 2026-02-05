@@ -11,7 +11,7 @@ from psycopg.rows import dict_row
 from extensions import limiter
 from services import settings
 from services.auth_service import gen_api_key, require_client_auth
-from services.db import db, ensure_client_row, ensure_schema, ensure_schema_once, get_active_leads_query
+from services.db import db, ensure_client_row, get_active_leads_query
 from services.demo_service import bump_demo_counter, demo_rate_limited, require_demo_key
 from services.cache import cache_delete, cache_delete_prefix, cache_get_json, cache_set_json
 from services.lead_service import (
@@ -53,7 +53,6 @@ def criar_cliente():
     if plan not in settings.PLAN_CATALOG:
         plan = "trial"
 
-    ensure_schema_once()
     row = ensure_client_row(client_id, plan=plan)
 
     api_key = (row.get("api_key") or "").strip()
@@ -301,8 +300,11 @@ def prever():
             }
         )
     except (psycopg.errors.UndefinedColumn, psycopg.errors.NotNullViolation):
-        ensure_schema()
-        return prever()
+        return json_err(
+            "Esquema do banco desatualizado. Rode as migrations do Alembic.",
+            500,
+            code="schema_outdated",
+        )
     finally:
         conn.close()
 
@@ -415,7 +417,6 @@ def metrics():
     if not settings.DATABASE_URL:
         return json_ok({"db": False, "reason": "DATABASE_URL ausente", "ts": iso(now_utc())})
 
-    ensure_schema_once()
     conn = db()
     try:
         with conn:
@@ -465,7 +466,6 @@ def insights():
     threshold = get_threshold(client_id)
     since = now_utc() - timedelta(days=days)
 
-    ensure_schema_once()
     conn = db()
     try:
         with conn:

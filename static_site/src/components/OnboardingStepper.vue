@@ -43,7 +43,7 @@
           </label>
           <label>
             Senha
-            <input v-model="signup.password" type="password" required minlength="6" placeholder="Mínimo 6 caracteres" />
+            <input v-model="signup.password" type="password" required minlength="10" placeholder="Mínimo 10 caracteres" />
           </label>
           <button class="btn btn--block" type="submit" :disabled="loading">Criar conta</button>
           <p v-if="error" class="alert alert--error">{{ error }}</p>

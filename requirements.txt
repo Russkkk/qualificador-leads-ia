@@ -1,6 +1,7 @@
 flask==3.0.3
 flask-cors==4.0.1
 flask-limiter==3.8.0
+flask-login==0.6.3
 pandas
 scikit-learn==1.5.1
 gunicorn
@@ -8,3 +9,4 @@ numpy==2.0.1
 werkzeug
 requests==2.32.3
 psycopg[binary]==3.2.3
+python-dotenv==1.0.1

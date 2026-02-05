@@ -62,7 +62,18 @@ def _gen_api_key(client_id: str) -> str:
 def _hash_password(password: str) -> str:
     return generate_password_hash(password, method=f"pbkdf2:sha256:{PBKDF2_ITERATIONS}")
 
-
+    return generate_password_hash(password, method=f"pbkdf2:sha256:{PBKDF2_ITERATIONS}")
+    
+    return generate_password_hash(password, method=f"pbkdf2:sha256:{PBKDF2_ITERATIONS}")
+def _pbkdf2_hash(password: str, salt: bytes | None = None, iterations: int = 310_000) -> str:
+    """
+    Retorna string no formato:
+      pbkdf2_sha256$<iterations>$<salt_hex>$<hash_hex>
+    """
+    salt = salt or secrets.token_bytes(16)
+    dk = hashlib.pbkdf2_hmac("sha256", password.encode("utf-8"), salt, iterations)
+    return f"pbkdf2_sha256${iterations}${salt.hex()}${dk.hex()}"
+  
 def ensure_schema(conn):
     with conn.cursor() as cur:
         cur.execute(

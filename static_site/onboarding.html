@@ -368,8 +368,8 @@
         showError("Nome e email são obrigatórios");
         return;
       }
-      if (!password || password.length < 6) {
-        showError("A senha deve ter pelo menos 6 caracteres.");
+      if (!password || password.length < 10) {
+        showError("A senha deve ter pelo menos 10 caracteres.");
         return;
       }
 

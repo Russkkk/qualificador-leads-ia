@@ -108,9 +108,15 @@ body[data-theme="light"] .site-header {
   width: 38px;
   height: 38px;
   border-radius: 12px;
-  background: linear-gradient(135deg, var(--primary), #6ee7ff);
-  color: #0d1025;
-  font-weight: 700;
+  background: rgba(34, 197, 94, 0.15);
+  border: 1px solid rgba(34, 197, 94, 0.35);
+  box-shadow: 0 8px 20px rgba(15, 118, 110, 0.35);
+}
+
+.brand__logo img {
+  width: 28px;
+  height: 28px;
+  display: block;
 }
 
 .site-nav {

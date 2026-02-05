@@ -35,6 +35,7 @@ from services.utils import (
     safe_float,
     safe_int,
 )
+from services.validation import sanitize_name, sanitize_origin, sanitize_phone
 
 leads_bp = Blueprint("leads", __name__)
 
@@ -156,6 +157,17 @@ def set_plan():
 @limiter.limit(prever_rate_limit, key_func=rate_limit_client_id)
 @limiter.limit("600 per minute", key_func=rate_limit_client_id)
 def prever():
+    raw_payload = request.get_data(cache=True, as_text=False) or b""
+    max_bytes = settings.MAX_PREVER_PAYLOAD_BYTES
+    if max_bytes and len(raw_payload) > max_bytes:
+        return json_err(
+            "Payload muito grande para /prever.",
+            413,
+            code="payload_too_large",
+            limit_bytes=max_bytes,
+            size_bytes=len(raw_payload),
+        )
+
     data = request.get_json(silent=True) or {}
     client_id = get_client_id_from_request()
     if not client_id:
@@ -185,11 +197,11 @@ def prever():
         )
 
     lead = data.get("lead") or {}
-    nome = (data.get("nome") or lead.get("nome") or "").strip()
+    nome = sanitize_name(data.get("nome") or lead.get("nome") or "")
     email = (data.get("email_lead") or data.get("email") or lead.get("email_lead") or lead.get("email") or "").strip()
-    telefone = (data.get("telefone") or lead.get("telefone") or "").strip()
+    telefone = sanitize_phone(data.get("telefone") or lead.get("telefone") or "")
 
-    origem = (data.get("origem") or lead.get("origem") or lead.get("source") or "").strip()
+    origem = sanitize_origin(data.get("origem") or lead.get("origem") or lead.get("source") or "")
 
     tempo_site = safe_int(data.get("tempo_site") if "tempo_site" in data else lead.get("tempo_site"), 0)
     paginas_visitadas = safe_int(data.get("paginas_visitadas") if "paginas_visitadas" in data else lead.get("paginas_visitadas"), 0)
@@ -213,8 +225,7 @@ def prever():
     payload.setdefault("email", email)
     payload.setdefault("email_lead", email)
     payload.setdefault("telefone", telefone)
-    if origem:
-        payload.setdefault("origem", origem)
+    payload.setdefault("origem", origem or payload.get("origem", ""))
     payload.setdefault("tempo_site", tempo_site)
     payload.setdefault("paginas_visitadas", paginas_visitadas)
     payload.setdefault("clicou_preco", clicou_preco)
@@ -372,11 +383,11 @@ def metrics():
     try:
         with conn:
             with conn.cursor(row_factory=dict_row) as cur:
-                cur.execute("SELECT COUNT(*) AS total FROM leads;")
+                cur.execute("SELECT COUNT(*) AS total FROM leads WHERE deleted_at IS NULL;")
                 total = int(cur.fetchone()["total"])
-                cur.execute("SELECT COUNT(*) AS labeled FROM leads WHERE virou_cliente IS NOT NULL;")
+                cur.execute("SELECT COUNT(*) AS labeled FROM leads WHERE deleted_at IS NULL AND virou_cliente IS NOT NULL;")
                 labeled = int(cur.fetchone()["labeled"])
-                cur.execute("SELECT COUNT(*) AS pending FROM leads WHERE virou_cliente IS NULL;")
+                cur.execute("SELECT COUNT(*) AS pending FROM leads WHERE deleted_at IS NULL AND virou_cliente IS NULL;")
                 pending = int(cur.fetchone()["pending"])
         return json_ok(
             {
@@ -416,7 +427,7 @@ def insights():
                     """
                     SELECT probabilidade, virou_cliente, created_at
                     FROM leads
-                    WHERE client_id=%s AND created_at >= %s
+                    WHERE client_id=%s AND deleted_at IS NULL AND created_at >= %s
                     ORDER BY created_at ASC
                     """,
                     (client_id, since),
@@ -503,7 +514,7 @@ def leads_export():
                     SELECT nome, email_lead, telefone, tempo_site, paginas_visitadas, clicou_preco,
                            probabilidade, score, created_at, virou_cliente
                     FROM leads
-                    WHERE client_id=%s
+                    WHERE client_id=%s AND deleted_at IS NULL
                     ORDER BY created_at DESC
                     """,
                     (client_id,),
@@ -745,7 +756,7 @@ def funnels():
                       COUNT(*) FILTER (WHERE (probabilidade IS NOT NULL AND probabilidade < 0.35)
                                      OR (score IS NOT NULL AND score < 35)) AS cold
                     FROM leads
-                    WHERE client_id=%s
+                    WHERE client_id=%s AND deleted_at IS NULL
                     """,
                     (client_id,),
                 )
@@ -782,7 +793,7 @@ def acao_do_dia():
                     SELECT id, nome, email_lead, telefone, origem,
                            score, probabilidade, created_at, virou_cliente
                     FROM leads
-                    WHERE client_id=%s
+                    WHERE client_id=%s AND deleted_at IS NULL
                     ORDER BY COALESCE(probabilidade, score / 100.0) DESC NULLS LAST,
                              created_at DESC
                     LIMIT 30
@@ -834,7 +845,7 @@ def lead_explain():
                     """
                     SELECT tempo_site, paginas_visitadas, clicou_preco, probabilidade
                     FROM leads
-                    WHERE client_id=%s AND id=%s
+                    WHERE client_id=%s AND id=%s AND deleted_at IS NULL
                     """,
                     (client_id, lead_id),
                 )

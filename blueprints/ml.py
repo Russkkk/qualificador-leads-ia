@@ -64,7 +64,7 @@ def recalc_pending():
                     """
                     SELECT id, tempo_site, paginas_visitadas, clicou_preco
                     FROM leads
-                    WHERE client_id=%s AND virou_cliente IS NULL
+                    WHERE client_id=%s AND deleted_at IS NULL AND virou_cliente IS NULL
                     ORDER BY created_at DESC
                     LIMIT %s
                     """,

@@ -1,4 +1,3 @@
-import logging
 import traceback
 from datetime import datetime, timezone
 from typing import Any, Dict, Optional
@@ -6,11 +5,14 @@ from typing import Any, Dict, Optional
 from flask import jsonify, request
 
 from services import settings
+from structlog import get_logger
+
+logger = get_logger()
 
 
 def log_exception(message: str) -> str:
     trace = traceback.format_exc()
-    logging.exception(message)
+    logger.exception(message)
     return trace
 
 

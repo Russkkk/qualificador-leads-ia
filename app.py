@@ -1,7 +1,4 @@
-import logging
-import os
-
-from flask import Flask
+from flask import Flask, request
 from flask_cors import CORS
 from werkzeug.exceptions import HTTPException
 
@@ -12,6 +9,7 @@ from blueprints.core import core_bp
 from blueprints.leads import leads_bp
 from blueprints.ml import ml_bp
 from extensions import limiter, login_manager
+from services.logging_config import configure_logging, init_sentry
 from services import settings
 from services.auth_service import load_user
 from services.db import ensure_schema_once
@@ -22,8 +20,8 @@ app = Flask(__name__)
 app.secret_key = settings.FLASK_SECRET_KEY or "dev-secret"
 
 CORS(app, resources={r"/*": {"origins": settings.ALLOWED_ORIGINS}})
-log_level = getattr(logging, os.getenv("LOG_LEVEL", "INFO").upper(), logging.INFO)
-logging.basicConfig(level=log_level)
+configure_logging()
+init_sentry()
 
 limiter.init_app(app)
 login_manager.init_app(app)
@@ -52,6 +50,19 @@ def handle_exception(err: Exception):
     if settings.DEBUG_MODE or settings.INCLUDE_TRACEBACK:
         payload["trace"] = trace
     return json_err("Erro interno do servidor", 500, **payload)
+
+
+@app.after_request
+def apply_security_headers(response):
+    response.headers.setdefault("X-Content-Type-Options", "nosniff")
+    if settings.CSP_POLICY:
+        response.headers.setdefault("Content-Security-Policy", settings.CSP_POLICY)
+    if settings.ENABLE_HSTS and request.is_secure:
+        response.headers.setdefault(
+            "Strict-Transport-Security",
+            f"max-age={settings.HSTS_MAX_AGE}; includeSubDomains; preload",
+        )
+    return response
 
 
 app.register_blueprint(core_bp)

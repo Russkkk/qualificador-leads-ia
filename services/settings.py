@@ -25,6 +25,10 @@ KIWIFY_WEBHOOK_TOKEN = config.KIWIFY_WEBHOOK_TOKEN
 
 FLASK_SECRET_KEY = os.getenv("FLASK_SECRET_KEY", "")
 
+
+def _bool(value: str) -> bool:
+    return str(value or "").strip().lower() in {"1", "true", "yes", "on"}
+
 ALLOWED_ORIGINS = [
     "https://qualificador-leads-ia.onrender.com",
     "https://leadrank.com.br",
@@ -45,6 +49,28 @@ PLAN_CATALOG = {
     "pro": {"price_brl_month": 179, "setup_fee_brl": 0, "lead_limit_month": 5000},
     "vip": {"price_brl_month": 279, "setup_fee_brl": 0, "lead_limit_month": 20000},
 }
+
+MAX_PREVER_PAYLOAD_BYTES = int(os.getenv("MAX_PREVER_PAYLOAD_BYTES", "51200"))
+ENABLE_HSTS = _bool(os.getenv("ENABLE_HSTS", "true"))
+HSTS_MAX_AGE = int(os.getenv("HSTS_MAX_AGE", "31536000"))
+
+SENTRY_DSN = os.getenv("SENTRY_DSN", "").strip()
+SENTRY_ENVIRONMENT = os.getenv("SENTRY_ENVIRONMENT", "").strip()
+SENTRY_TRACES_SAMPLE_RATE = float(os.getenv("SENTRY_TRACES_SAMPLE_RATE", "0.0"))
+
+DEFAULT_CSP = (
+    "default-src 'self'; "
+    "base-uri 'self'; "
+    "object-src 'none'; "
+    "frame-ancestors 'none'; "
+    "img-src 'self' data: https:; "
+    "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; "
+    "font-src 'self' https://fonts.gstatic.com; "
+    "script-src 'self' https://cdn.jsdelivr.net; "
+    "connect-src 'self' https://qualificador-leads-ia.onrender.com https://leadrank.com.br; "
+    "frame-src https://www.youtube.com"
+)
+CSP_POLICY = os.getenv("CSP_POLICY", DEFAULT_CSP)
 
 DEFAULT_LIMIT = 200
 DEFAULT_THRESHOLD = 0.35

@@ -156,8 +156,7 @@ def set_plan():
 
 
 @leads_bp.post("/prever")
-@limiter.limit(prever_rate_limit, key_func=rate_limit_client_id)
-@limiter.limit("600 per minute", key_func=rate_limit_client_id)
+@limiter.limit("60 per minute", key_func=rate_limit_client_id)
 def prever():
     raw_payload = request.get_data(cache=True, as_text=False) or b""
     max_bytes = settings.MAX_PREVER_PAYLOAD_BYTES
@@ -309,7 +308,7 @@ def prever():
 
 
 @leads_bp.get("/dashboard_data")
-@limiter.limit("600 per minute", key_func=rate_limit_client_id)
+@limiter.limit("30 per minute", key_func=rate_limit_client_id)
 def dashboard_data():
     client_id = get_client_id_from_request()
     page = safe_int(request.args.get("page"), 1)

@@ -2,6 +2,7 @@ import re
 
 from flask import Flask, request
 from flask_cors import CORS
+from flask_limiter.errors import RateLimitExceeded
 from werkzeug.exceptions import HTTPException
 
 from blueprints.admin import admin_bp
@@ -36,6 +37,13 @@ def load_user_callback(user_id: str):
 
 @app.errorhandler(Exception)
 def handle_exception(err: Exception):
+    if isinstance(err, RateLimitExceeded):
+        return json_err(
+            "Muitas requisições. Tente novamente em instantes.",
+            429,
+            error_code="rate_limit",
+            error_type=err.__class__.__name__,
+        )
     if isinstance(err, HTTPException):
         return json_err(
             err.description,

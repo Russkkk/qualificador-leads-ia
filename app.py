@@ -16,8 +16,10 @@ import random
 import string
 import secrets
 import hashlib
+import hmac
 import logging
 import traceback
+import re
 from datetime import datetime, timezone, timedelta
 from typing import Any, Dict, List, Optional, Tuple
 
@@ -25,6 +27,7 @@ from werkzeug.security import generate_password_hash, check_password_hash
 
 from flask import Flask, request, jsonify, Response
 from flask_cors import CORS
+from flask_limiter import Limiter
 from werkzeug.exceptions import HTTPException
 
 import psycopg
@@ -64,14 +67,17 @@ KIWIFY_WEBHOOK_TOKEN = os.environ.get("KIWIFY_WEBHOOK_TOKEN", "").strip()  # tok
 
 # ajuste aqui seus domínios permitidos no CORS
 ALLOWED_ORIGINS = [
-    "null",  # permite testar abrindo HTML via file://
     "https://qualificador-leads-ia.onrender.com",   # Static Site
-    "https://qualificador-leads-i-a.onrender.com",  # Web Service (se chamar a si mesmo)
-    "http://localhost:8000",
-    "http://127.0.0.1:8000",
-    "http://localhost",
-    "http://127.0.0.1",
+    "https://leadrank.com.br",
+    r"^https://.*\.onrender\.com$",
 ]
+if DEBUG_MODE:
+    ALLOWED_ORIGINS.extend([
+        "http://localhost:8000",
+        "http://127.0.0.1:8000",
+        "http://localhost",
+        "http://127.0.0.1",
+    ])
 
 PLAN_CATALOG = {
     # Campos:
@@ -88,6 +94,7 @@ PLAN_CATALOG = {
 DEFAULT_LIMIT = 200
 DEFAULT_THRESHOLD = 0.35
 MIN_LABELED_TO_TRAIN = 4
+PBKDF2_ITERATIONS = 390_000
 
 # rate-limit simples de demo pública (por IP/mês)
 _DEMO_RL: Dict[str, int] = {}
@@ -311,6 +318,16 @@ def _get_api_key_from_headers() -> str:
         key = key[7:].strip()
     return key
 
+def _get_client_id_from_request() -> str:
+    client_id = _get_header("X-CLIENT-ID")
+    if client_id:
+        return client_id
+    data = request.get_json(silent=True) or {}
+    client_id = (data.get("client_id") or "").strip()
+    if client_id:
+        return client_id
+    return (request.form.get("client_id") or "").strip()
+
 def _client_ip() -> str:
     if TRUST_PROXY:
         forwarded = (request.headers.get("X-Forwarded-For") or "").split(",")[0].strip()
@@ -321,6 +338,76 @@ def _client_ip() -> str:
 def _check_demo_key() -> bool:
     ok, _ = _require_demo_key()
     return ok
+
+def _rate_limit_client_id() -> str:
+    return _get_client_id_from_request() or _client_ip()
+
+def _prever_rate_limit() -> str:
+    client_id = _get_client_id_from_request()
+    if not client_id:
+        return "20 per minute"
+    try:
+        row = _ensure_client_row(client_id, plan="trial")
+        plan = (row.get("plan") or "trial").strip().lower()
+    except Exception:
+        plan = "trial"
+    if plan in ("trial", "demo"):
+        return "20 per minute"
+    return "600 per minute"
+
+limiter = Limiter(
+    key_func=_client_ip,
+    app=app,
+    default_limits=[],
+)
+
+def _validate_password_strength(password: str) -> Tuple[bool, str]:
+    if len(password) < 10:
+        return False, "Senha deve ter no mínimo 10 caracteres."
+    if not re.search(r"[A-Z]", password):
+        return False, "Senha deve conter pelo menos 1 letra maiúscula."
+    if not re.search(r"[a-z]", password):
+        return False, "Senha deve conter pelo menos 1 letra minúscula."
+    if not re.search(r"\d", password):
+        return False, "Senha deve conter pelo menos 1 número."
+    if not re.search(r"[^A-Za-z0-9]", password):
+        return False, "Senha deve conter pelo menos 1 símbolo."
+    return True, ""
+
+def _hash_password(password: str) -> str:
+    return generate_password_hash(password, method=f"pbkdf2:sha256:{PBKDF2_ITERATIONS}")
+
+def _verify_legacy_pbkdf2(stored: str, password: str) -> bool:
+    """
+    Legacy format: pbkdf2_sha256$<iterations>$<salt_hex>$<hash_hex>
+    """
+    try:
+        algo, iter_s, salt_hex, hash_hex = stored.split("$", 3)
+        if algo != "pbkdf2_sha256":
+            return False
+        iterations = int(iter_s)
+        salt = bytes.fromhex(salt_hex)
+        expected = bytes.fromhex(hash_hex)
+        candidate = hashlib.pbkdf2_hmac("sha256", password.encode("utf-8"), salt, iterations)
+        return hmac.compare_digest(candidate, expected)
+    except Exception:
+        return False
+
+def _needs_rehash(stored: str) -> bool:
+    if stored.startswith("pbkdf2_sha256$"):
+        return True
+    if stored.startswith("pbkdf2:sha256:"):
+        try:
+            iterations = int(stored.split(":", 2)[2].split("$", 1)[0])
+            return iterations < PBKDF2_ITERATIONS
+        except Exception:
+            return True
+    return True
+
+def _verify_password(stored: str, password: str) -> bool:
+    if stored.startswith("pbkdf2_sha256$"):
+        return _verify_legacy_pbkdf2(stored, password)
+    return check_password_hash(stored, password)
 
 
 # =========================
@@ -596,10 +683,6 @@ def _require_client_auth(client_id: str) -> Tuple[bool, Dict[str, Any], str]:
         return True, row, ""
 
     got = _get_api_key_from_headers()
-    if not got:
-        data = request.get_json(silent=True) or {}
-        got = (data.get("api_key") or "").strip()
-
     if got != expected:
         return False, row, "api_key inválida ou ausente."
     return True, row, ""
@@ -803,14 +886,17 @@ def _best_threshold(rows: List[Dict[str, Any]]) -> float:
 # Routes
 # =========================
 @app.get("/")
+@limiter.limit("100 per minute")
 def root():
     return jsonify({"ok": True, "service": "LeadRank backend", "ts": _iso(_now_utc())})
 
 @app.get("/health")
+@limiter.limit("100 per minute")
 def health():
     return jsonify({"ok": True, "ts": _iso(_now_utc())})
 
 @app.get("/health_db")
+@limiter.limit("100 per minute")
 def health_db():
     if not DATABASE_URL:
         return jsonify({"ok": True, "db": False, "error": "DATABASE_URL missing", "ts": _iso(_now_utc())})
@@ -818,6 +904,7 @@ def health_db():
     return jsonify({"ok": ok, "db": ok, "error": err, "ts": _iso(_now_utc())})
 
 @app.get("/pricing")
+@limiter.limit("100 per minute")
 def pricing():
     """Retorna o catálogo de plans (para UI)."""
     return _json_ok({
@@ -828,6 +915,7 @@ def pricing():
     })
     
 @app.route('/signup', methods=['POST'])
+@limiter.limit("5 per minute")
 def signup():
     """
     Cria workspace trial a partir de nome/email/empresa/telefone + senha.
@@ -842,8 +930,9 @@ def signup():
 
     if not email or '@' not in email:
         return jsonify({"ok": False, "success": False, "error": "Email válido é obrigatório"}), 400
-    if not password or len(password) < 6:
-        return jsonify({"ok": False, "success": False, "error": "Senha deve ter no mínimo 6 caracteres"}), 400
+    ok_pw, pw_msg = _validate_password_strength(password or "")
+    if not ok_pw:
+        return jsonify({"ok": False, "success": False, "error": pw_msg}), 400
 
     _ensure_schema_once()
 
@@ -865,7 +954,7 @@ def signup():
                 api_key = _gen_api_key(client_id)
                 mk = _month_key()
                 valid_until = _now_utc() + timedelta(days=14)
-                pw_hash = generate_password_hash(password)
+                pw_hash = _hash_password(password)
 
                 cur.execute("""
                     INSERT INTO clients (
@@ -879,15 +968,17 @@ def signup():
                     api_key, mk, pw_hash
                 ))
 
-        return jsonify({
+        response = jsonify({
             "ok": True,
             "success": True,
             "client_id": client_id,
-            "api_key": api_key,
             "plan": "trial",
             "valid_until": _iso(valid_until),
             "message": "Conta trial criada com sucesso!"
         })
+        response.headers["X-API-KEY"] = api_key
+        response.headers["Authorization"] = f"Bearer {api_key}"
+        return response
     except Exception as e:
         trace = _log_exception("signup failed")
         return jsonify({
@@ -902,8 +993,9 @@ def signup():
 
 
 @app.route('/login', methods=['POST'])
+@limiter.limit("5 per minute")
 def login():
-    """Login com email+senha. Retorna client_id + api_key."""
+    """Login com email+senha. Retorna client_id e envia api_key via header."""
     data = request.get_json(silent=True) or request.form or {}
     email = (data.get('email') or '').strip().lower()
     password = (data.get('password') or data.get('senha') or '').strip()
@@ -927,8 +1019,15 @@ def login():
                 if not pw_hash:
                     return jsonify({"ok": False, "success": False, "error": "Conta sem senha. Use o suporte."}), 400
 
-                if not check_password_hash(pw_hash, password):
+                if not _verify_password(pw_hash, password):
                     return jsonify({"ok": False, "success": False, "error": "Email ou senha inválidos"}), 401
+
+                if _needs_rehash(pw_hash):
+                    new_hash = _hash_password(password)
+                    cur.execute(
+                        "UPDATE clients SET password_hash=%s, updated_at=NOW() WHERE client_id=%s",
+                        (new_hash, row["client_id"]),
+                    )
 
                 api_key = (row.get('api_key') or '').strip()
                 if not api_key:
@@ -937,16 +1036,18 @@ def login():
 
                 cur.execute("UPDATE clients SET last_login_at=NOW(), updated_at=NOW() WHERE client_id=%s", (row['client_id'],))
 
-        return jsonify({
+        response = jsonify({
             "ok": True,
             "success": True,
             "client_id": row.get("client_id"),
-            "api_key": api_key,
             "plan": (row.get('plan') or 'trial'),
             "status": (row.get('status') or 'active'),
             "valid_until": _iso(row.get('valid_until')),
             "message": "Login realizado com sucesso."
         })
+        response.headers["X-API-KEY"] = api_key
+        response.headers["Authorization"] = f"Bearer {api_key}"
+        return response
     except Exception as e:
         trace = _log_exception("login failed")
         return jsonify({
@@ -1001,8 +1102,9 @@ def criar_cliente():
     })
 
 @app.get("/client_meta")
+@limiter.limit("600 per minute", key_func=_rate_limit_client_id)
 def client_meta():
-    client_id = (request.args.get("client_id") or "").strip()
+    client_id = _get_client_id_from_request()
     if not client_id:
         return _json_err("client_id obrigatório", 400)
 
@@ -1067,6 +1169,7 @@ def set_plan():
         conn.close()
 
 @app.post("/prever")
+@limiter.limit(_prever_rate_limit, key_func=_rate_limit_client_id)
 def prever():
     """
     POST /prever
@@ -1083,7 +1186,7 @@ def prever():
       }
     """
     data = request.get_json(silent=True) or {}
-    client_id = (data.get("client_id") or "").strip()
+    client_id = _get_client_id_from_request()
     if not client_id:
         return _json_err("client_id obrigatório", 400)
 
@@ -1183,8 +1286,9 @@ def prever():
 
 
 @app.get("/dashboard_data")
+@limiter.limit("600 per minute", key_func=_rate_limit_client_id)
 def dashboard_data():
-    client_id = (request.args.get("client_id") or "").strip()
+    client_id = _get_client_id_from_request()
     limit = _safe_int(request.args.get("limit"), DEFAULT_LIMIT)
     limit = max(10, min(limit, 1000))
 
@@ -1221,9 +1325,10 @@ def dashboard_data():
 
 
 @app.post("/confirmar_venda")
+@limiter.limit("600 per minute", key_func=_rate_limit_client_id)
 def confirmar_venda():
     data = request.get_json(silent=True) or {}
-    client_id = (data.get("client_id") or "").strip()
+    client_id = _get_client_id_from_request()
     lead_id = _safe_int(data.get("lead_id"), 0)
     if not client_id or not lead_id:
         return _json_err("client_id e lead_id obrigatórios", 400)
@@ -1246,9 +1351,10 @@ def confirmar_venda():
 
 
 @app.post("/negar_venda")
+@limiter.limit("600 per minute", key_func=_rate_limit_client_id)
 def negar_venda():
     data = request.get_json(silent=True) or {}
-    client_id = (data.get("client_id") or "").strip()
+    client_id = _get_client_id_from_request()
     lead_id = _safe_int(data.get("lead_id"), 0)
     if not client_id or not lead_id:
         return _json_err("client_id e lead_id obrigatórios", 400)
@@ -1271,6 +1377,7 @@ def negar_venda():
 
 
 @app.get("/metrics")
+@limiter.limit("100 per minute")
 def metrics():
     """Métricas simples (debug/monitoramento)."""
     if not DATABASE_URL:
@@ -1293,12 +1400,13 @@ def metrics():
 
 
 @app.get("/recalc_pending")
+@limiter.limit("600 per minute", key_func=_rate_limit_client_id)
 def recalc_pending():
     """Recalcula probabilidade para pendentes com base nos rotulados (requer numpy/sklearn)."""
     if not _HAS_ML:
         return _json_err("Dependências ML ausentes (numpy/scikit-learn).", 501, code="ml_missing")
 
-    client_id = (request.args.get("client_id") or "").strip()
+    client_id = _get_client_id_from_request()
     limit = _safe_int(request.args.get("limit"), 500)
     limit = max(10, min(limit, 5000))
     if not client_id:
@@ -1353,13 +1461,14 @@ def recalc_pending():
 
 
 @app.post("/auto_threshold")
+@limiter.limit("600 per minute", key_func=_rate_limit_client_id)
 def auto_threshold():
     """Calcula e salva threshold que maximiza F1 (requer numpy/sklearn)."""
     if not _HAS_ML:
         return _json_err("Dependências ML ausentes (numpy/scikit-learn).", 501, code="ml_missing")
 
     data = request.get_json(silent=True) or {}
-    client_id = (data.get("client_id") or "").strip()
+    client_id = _get_client_id_from_request()
     if not client_id:
         return _json_err("client_id obrigatório", 400)
 
@@ -1400,9 +1509,10 @@ def auto_threshold():
 
 
 @app.get("/insights")
+@limiter.limit("600 per minute", key_func=_rate_limit_client_id)
 def insights():
     """Insights para dashboard (conversão por faixa e série diária)."""
-    client_id = (request.args.get("client_id") or "").strip()
+    client_id = _get_client_id_from_request()
     days = _safe_int(request.args.get("days"), 14)
     days = max(7, min(days, 90))
     if not client_id:
@@ -1490,9 +1600,10 @@ def insights():
 
 
 @app.get("/leads_export.csv")
+@limiter.limit("600 per minute", key_func=_rate_limit_client_id)
 def leads_export_csv():
     """Export CSV server-side. Útil para CRM / planilha."""
-    client_id = (request.args.get("client_id") or "").strip()
+    client_id = _get_client_id_from_request()
     limit = _safe_int(request.args.get("limit"), 5000)
     limit = max(10, min(limit, 20000))
     if not client_id:
@@ -1547,6 +1658,7 @@ def leads_export_csv():
 
 
 @app.post("/demo_public")
+@limiter.limit("100 per minute")
 def demo_public():
     """Demo pública controlada (SEM DEMO_KEY) com rate-limit por IP/mês."""
     mk = _month_key()
@@ -1611,6 +1723,7 @@ def demo_public():
 
 
 @app.post("/seed_demo")
+@limiter.limit("100 per minute")
 def seed_demo():
     """Gera dados demo para um client_id (protegido por DEMO_KEY)."""
     ok, err = _require_demo_key()
@@ -1671,10 +1784,11 @@ def seed_demo():
 
 
 @app.post("/seed_test_leads")
+@limiter.limit("600 per minute", key_func=_rate_limit_client_id)
 def seed_test_leads():
     """Gera leads de teste para um client_id autenticado."""
     data = request.get_json(silent=True) or {}
-    client_id = (data.get("client_id") or "").strip()
+    client_id = _get_client_id_from_request()
     n = max(1, min(_safe_int(data.get("count"), 10), 50))
 
     if not client_id:
@@ -1821,6 +1935,7 @@ def _upsert_subscription(client_id: str, plan: str, status: str, provider: str =
 # Opção B: Operação / Cronless reset + Billing
 # =========================
 @app.post("/admin/reset_month")
+@limiter.limit("100 per minute")
 def admin_reset_month():
     if not _admin_required():
         return _json_err("Unauthorized (DEMO_KEY)", 403)
@@ -1844,8 +1959,9 @@ def admin_reset_month():
 
 
 @app.get("/billing_status")
+@limiter.limit("600 per minute", key_func=_rate_limit_client_id)
 def billing_status():
-    client_id = (request.args.get("client_id") or "").strip()
+    client_id = _get_client_id_from_request()
     if not client_id:
         return _json_err("client_id obrigatório", 400)
 
@@ -1876,6 +1992,7 @@ def billing_status():
 
 
 @app.post("/billing/checkout")
+@limiter.limit("600 per minute", key_func=_rate_limit_client_id)
 def billing_checkout():
     """
     Cria uma sessão de checkout (Stripe) se configurado.
@@ -1883,7 +2000,7 @@ def billing_checkout():
     Requer X-API-KEY do workspace.
     """
     data = request.get_json(silent=True) or {}
-    client_id = (data.get("client_id") or "").strip()
+    client_id = _get_client_id_from_request()
     plan = (data.get("plan") or "").strip().lower()
     success_url = (data.get("success_url") or "").strip()
     cancel_url = (data.get("cancel_url") or "").strip()
@@ -1927,6 +2044,7 @@ def billing_checkout():
 
 
 @app.post("/billing/webhook")
+@limiter.limit("100 per minute")
 def billing_webhook():
     """
     Webhook genérico (Stripe/MercadoPago/etc.) com segredo simples.
@@ -2049,6 +2167,7 @@ def _kiwify_event_to_status(event_type: str) -> str:
 
 
 @app.post("/kiwify/webhook")
+@limiter.limit("100 per minute")
 def kiwify_webhook():
     """Recebe eventos da Kiwify e aplica status/plan no seu app."""
     payload = request.get_json(silent=True) or {}
@@ -2106,8 +2225,9 @@ def kiwify_webhook():
 # Opção C: Recursos Premium (métricas + explicação)
 # =========================
 @app.get("/funnels")
+@limiter.limit("600 per minute", key_func=_rate_limit_client_id)
 def funnels():
-    client_id = (request.args.get("client_id") or "").strip()
+    client_id = _get_client_id_from_request()
     if not client_id:
         return _json_err("client_id obrigatório", 400)
 
@@ -2152,12 +2272,13 @@ def funnels():
 
 
 @app.get("/acao_do_dia")
+@limiter.limit("600 per minute", key_func=_rate_limit_client_id)
 def acao_do_dia():
     """Retorna um resumo do dia + lista priorizada de leads para ação (mais quentes primeiro).
 
     Compatibilidade: além de `items`, também retorna `action_list` (alias).
     """
-    client_id = (request.args.get("client_id") or "").strip()
+    client_id = _get_client_id_from_request()
     limit = _safe_int(request.args.get("limit"), 50)
     limit = max(10, min(limit, 200))
     if not client_id:
@@ -2261,8 +2382,9 @@ def acao_do_dia():
     finally:
         conn.close()
 @app.get("/lead_explain")
+@limiter.limit("600 per minute", key_func=_rate_limit_client_id)
 def lead_explain():
-    client_id = (request.args.get("client_id") or "").strip()
+    client_id = _get_client_id_from_request()
     lead_id = _safe_int(request.args.get("lead_id"), 0)
     if not client_id or not lead_id:
         return _json_err("client_id e lead_id obrigatórios", 400)

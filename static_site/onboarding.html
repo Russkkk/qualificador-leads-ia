@@ -143,8 +143,6 @@
   </div>
 
   <script src="partials/site-shell.js"></script>
-  <script type="module" src="/src/onboarding/main.js"></script>
-
   <script>
     const BACKEND = (window.BACKEND_URL || "https://qualificador-leads-ia.onrender.com").replace(/\/$/, "");
 
@@ -242,29 +240,42 @@
       toggleLogin.dataset.mode = "signup";
     }
 
-    toggleLogin.addEventListener("click", (event) => {
-      event.preventDefault();
-      if (toggleLogin.dataset.mode === "login") {
-        toggleToSignup();
-      } else {
-        toggleToLogin();
-      }
-    });
+    if (toggleLogin) {
+      toggleLogin.addEventListener("click", (event) => {
+        event.preventDefault();
+        if (toggleLogin.dataset.mode === "login") {
+          toggleToSignup();
+        } else {
+          toggleToLogin();
+        }
+      });
+    }
 
-    document.getElementById("toIntegrations").addEventListener("click", () => setStep(3));
-    document.getElementById("toFinish").addEventListener("click", () => setStep(4));
+    const toIntegrations = document.getElementById("toIntegrations");
+    if (toIntegrations) {
+      toIntegrations.addEventListener("click", () => setStep(3));
+    }
 
-    copyApiKeyBtn.addEventListener("click", () => {
-      if (!authState.apiKey) return;
-      navigator.clipboard?.writeText(authState.apiKey);
-      copyApiKeyBtn.textContent = "Copiado!";
-      setTimeout(() => (copyApiKeyBtn.textContent = "Copiar"), 1600);
-    });
+    const toFinish = document.getElementById("toFinish");
+    if (toFinish) {
+      toFinish.addEventListener("click", () => setStep(4));
+    }
 
-    seedFiveBtn.addEventListener("click", async () => {
-      seedFiveMsg.style.display = "none";
-      await seedLeads(5, seedFiveMsg);
-    });
+    if (copyApiKeyBtn) {
+      copyApiKeyBtn.addEventListener("click", () => {
+        if (!authState.apiKey) return;
+        navigator.clipboard?.writeText(authState.apiKey);
+        copyApiKeyBtn.textContent = "Copiado!";
+        setTimeout(() => (copyApiKeyBtn.textContent = "Copiar"), 1600);
+      });
+    }
+
+    if (seedFiveBtn) {
+      seedFiveBtn.addEventListener("click", async () => {
+        if (seedFiveMsg) seedFiveMsg.style.display = "none";
+        await seedLeads(5, seedFiveMsg);
+      });
+    }
 
     if (loginForm) {
       loginForm.addEventListener("submit", async (event) => {
@@ -308,7 +319,8 @@
       });
     }
 
-    signupForm.addEventListener("submit", async (event) => {
+    if (signupForm) {
+      signupForm.addEventListener("submit", async (event) => {
       event.preventDefault();
 
       const nome = document.getElementById("nome").value.trim();
@@ -356,7 +368,8 @@
         submitBtn.disabled = false;
         loading.style.display = "none";
       }
-    });
+      });
+    }
 
     if (qs("mode") === "login") {
       toggleToLogin();

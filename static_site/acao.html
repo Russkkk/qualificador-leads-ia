@@ -49,6 +49,15 @@
     const recalcMsg = el("recalcMsg");
     let allItems = [];
     let accuracyChart = null;
+    const ICONS = {
+      check: `<svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M20 6 9 17l-5-5"/></svg>`,
+      x: `<svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M18 6 6 18M6 6l12 12"/></svg>`,
+      clock: `<svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 3"/></svg>`,
+      flame: `<svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M8.5 14.5A2.5 2.5 0 0 0 11 17a2 2 0 0 0 2-2c0-1.53-1.5-2.6-1.5-4A2.5 2.5 0 0 1 14 8.5c0-3-2.5-5.5-6-6 1 1.5 1 4.5-1 6-1.5 1.1-3 2.6-3 5a6 6 0 0 0 6 6 6 6 0 0 0 6-6c0-1.8-.4-2.8-1.6-4.4 0 1.5-1 2.5-2.4 3.4-1.2.8-2.5 1.8-2.5 3.5"/></svg>`,
+      thermometer: `<svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 2a2 2 0 0 0-2 2v10a4 4 0 1 0 4 0V4a2 2 0 0 0-2-2z"/></svg>`,
+      snow: `<svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 2v20"/><path d="M5.5 5.5l13 13"/><path d="M5.5 18.5l13-13"/></svg>`,
+      alert: `<svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M10.29 3.86 1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><path d="M12 9v4"/><path d="M12 17h.01"/></svg>`,
+    };
 
     let summaryState = { hot: 0, warm: 0, cold: 0, converted_today: 0 };
 
@@ -298,14 +307,14 @@
       if (usagePercent >= 90) {
         variant = {
           className: "alert--danger",
-          text: "🚨 Você está a um passo de pausar novos leads. Faça upgrade para não perder oportunidades.",
+          text: `${ICONS.alert} Você está a um passo de pausar novos leads. Faça upgrade para não perder oportunidades.`,
           primary: { label: "Upgrade imediato", href: "pricing.html" },
           secondary: { label: "Falar com suporte", href: "mailto:suporte@leadrank.com" },
         };
       } else if (usagePercent >= 70) {
         variant = {
           className: "alert--warning",
-          text: "⚠️ Sua Ação do Dia pode começar a ficar incompleta. Quer manter a lista diária sempre cheia?",
+          text: `${ICONS.alert} Sua Ação do Dia pode começar a ficar incompleta. Quer manter a lista diária sempre cheia?`,
           primary: { label: "Fazer upgrade agora", href: "pricing.html" },
           secondary: { label: "Ver capacidade", href: "pricing.html#capacity" },
         };
@@ -318,7 +327,7 @@
       upgradeBanner.innerHTML = `
         <div>
           <strong>Capacidade em uso: ${Math.round(usagePercent)}%</strong>
-          <p>${variant.text}</p>
+          <p class="icon-button">${variant.text}</p>
           <div class="upgrade-banner__actions">
             <a class="btn btn--small" href="${variant.primary.href}">${variant.primary.label}</a>
             <a class="btn btn--ghost btn--small" href="${variant.secondary.href}">${variant.secondary.label}</a>
@@ -359,7 +368,14 @@
       }
       const rows = items.map((item) => {
         const temperature = normalizeTempLabel(item.temperatura);
-        const tempLabel = temperature === "hot" ? "🔥 Quente" : temperature === "warm" ? "🟡 Morno" : temperature === "cold" ? "❄️ Frio" : "—";
+        const tempLabel =
+          temperature === "hot"
+            ? `${ICONS.flame} Quente`
+            : temperature === "warm"
+              ? `${ICONS.thermometer} Morno`
+              : temperature === "cold"
+                ? `${ICONS.snow} Frio`
+                : "—";
         const prob = item.probabilidade != null ? Math.round(item.probabilidade * 100) + "%" : "—";
         const score = item.score != null ? item.score : "—";
         return `
@@ -374,7 +390,7 @@
               <span class="pill pill--muted">${item.origem || "—"}</span>
             </td>
             <td data-label="Temperatura">
-              <span class="pill pill--muted">${tempLabel}</span>
+              <span class="pill pill--muted icon-button">${tempLabel}</span>
             </td>
             <td data-label="Score/Prob">
               <div class="table-metric">
@@ -385,9 +401,9 @@
             <td data-label="Criado em">${item.created_at ? new Date(item.created_at).toLocaleDateString("pt-BR") : "—"}</td>
             <td data-label="Ações">
               <div class="button-group lead-actions">
-                <button class="btn btn--tiny" type="button" data-action="convert" data-id="${item.id}" aria-label="Marcar ${item.nome || "lead"} como virou cliente">✅ Virou</button>
-                <button class="btn btn--tiny btn--ghost" type="button" data-action="deny" data-id="${item.id}" aria-label="Marcar ${item.nome || "lead"} como não virou">❌ Não virou</button>
-                <button class="btn btn--tiny btn--ghost" type="button" data-action="later" data-id="${item.id}" aria-label="Lembrar depois do lead ${item.nome || "sem nome"}">⏳ Depois</button>
+                <button class="btn btn--tiny icon-button" type="button" data-action="convert" data-id="${item.id}" aria-label="Marcar ${item.nome || "lead"} como virou cliente">${ICONS.check} Virou</button>
+                <button class="btn btn--tiny btn--ghost icon-button" type="button" data-action="deny" data-id="${item.id}" aria-label="Marcar ${item.nome || "lead"} como não virou">${ICONS.x} Não virou</button>
+                <button class="btn btn--tiny btn--ghost icon-button" type="button" data-action="later" data-id="${item.id}" aria-label="Lembrar depois do lead ${item.nome || "sem nome"}">${ICONS.clock} Depois</button>
               </div>
             </td>
           </tr>
@@ -607,7 +623,7 @@
       {
         id: "lead-actions",
         title: "Marque o resultado em 1 clique",
-        text: "Depois do contato, marque ✅ ou ❌. Isso melhora a priorização automaticamente.",
+        text: "Depois do contato, marque Virou ou Não virou. Isso melhora a priorização automaticamente.",
         requireAction: true,
         target: () => document.querySelector(".lead-actions"),
         fallback: () => document.querySelector(".demo-lead-actions"),
@@ -687,6 +703,23 @@
 
     function ensureDemoLeadRow() {
       if (document.querySelector(".lead-row")) return;
+      if (Array.isArray(allItems) && allItems.length) {
+        if (searchInput) searchInput.value = "";
+        if (chips.length) {
+          const nextFilter =
+            allItems.some((item) => normalizeTempLabel(item.temperatura) === "hot")
+              ? "hot"
+              : allItems.some((item) => normalizeTempLabel(item.temperatura) === "warm")
+                ? "warm"
+                : allItems.some((item) => normalizeTempLabel(item.temperatura) === "cold")
+                  ? "cold"
+                  : "pendente";
+          setActiveChip(nextFilter);
+        } else {
+          renderTable(allItems);
+        }
+        if (document.querySelector(".lead-row")) return;
+      }
       demoState.prevActionState = actionList?.dataset.state || "loading";
       setActionState("ready");
       const demoRow = document.createElement("div");
@@ -697,9 +730,9 @@
           <span class="text-muted">WhatsApp • agora</span>
         </div>
         <div class="lead-actions demo-lead-actions">
-          <button class="btn btn--tiny" type="button" data-action="convert">✅ Virou</button>
-          <button class="btn btn--tiny btn--ghost" type="button" data-action="deny">❌ Não virou</button>
-          <button class="btn btn--tiny btn--ghost" type="button" data-action="later">⏳ Depois</button>
+          <button class="btn btn--tiny icon-button" type="button" data-action="convert">${ICONS.check} Virou</button>
+          <button class="btn btn--tiny btn--ghost icon-button" type="button" data-action="deny">${ICONS.x} Não virou</button>
+          <button class="btn btn--tiny btn--ghost icon-button" type="button" data-action="later">${ICONS.clock} Depois</button>
         </div>
       `;
       leadsTableWrap.innerHTML = "";
@@ -785,7 +818,7 @@
       if (step.requireAction) {
         demoState.actionDone = false;
         demoState.btnNext.disabled = true;
-        demoState.helper.textContent = "Clique em ✅ ou ❌ para continuar.";
+        demoState.helper.textContent = "Clique em Virou ou Não virou para continuar.";
       } else {
         demoState.btnNext.disabled = false;
       }

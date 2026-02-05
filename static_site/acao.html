@@ -7,10 +7,10 @@
   <meta name="description" content="Priorize leads quentes automaticamente e aumente suas vendas. Teste grátis 14 dias.">
   <meta property="og:title" content="LeadRank - Qualificador de Leads com IA">
   <meta property="og:description" content="Priorize leads quentes automaticamente e aumente suas vendas. Teste grátis 14 dias.">
-  <meta property="og:image" content="https://via.placeholder.com/1200x630/4f7cff/ffffff?text=LeadRank">
+  <meta property="og:image" content="assets/og-image.svg">
   <meta property="og:url" content="https://leadrank.com.br/">
   <meta name="theme-color" content="#4f7cff">
-  <link rel="icon" href="https://via.placeholder.com/32/4f7cff/ffffff?text=LR">
+  <link rel="icon" href="assets/favicon.svg">
   <link rel="stylesheet" href="styles.css" />
 </head>
 <body>
@@ -205,7 +205,7 @@
 
   <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
   <script>
-    const BACKEND = (window.BACKEND_URL || "https://qualificador-leads-i-a.onrender.com").replace(/\/$/, "");
+    const BACKEND = (window.BACKEND_URL || "https://qualificador-leads-ia.onrender.com").replace(/\/$/, "");
 
     const el = (id) => document.getElementById(id);
     const msg = el("actionMsg");
@@ -270,32 +270,40 @@
       });
     }
 
-    function qs(name) {
-      return new URLSearchParams(location.search).get(name) || "";
-    }
-
     function getAuth() {
+      const clientId =
+        localStorage.getItem("leadrank_client_id") ||
+        localStorage.getItem("client_id") ||
+        localStorage.getItem("LR_CLIENT_ID") ||
+        "";
+      const apiKey =
+        localStorage.getItem("leadrank_api_key") ||
+        localStorage.getItem("api_key") ||
+        localStorage.getItem("LR_API_KEY") ||
+        "";
       return {
-        client_id: qs("client_id") || localStorage.getItem("leadrank_client_id") || localStorage.getItem("client_id") || localStorage.getItem("LR_CLIENT_ID") || "",
-        api_key: qs("api_key") || localStorage.getItem("leadrank_api_key") || localStorage.getItem("api_key") || localStorage.getItem("LR_API_KEY") || "",
+        client_id: clientId.trim(),
+        api_key: apiKey.trim(),
       };
     }
 
     async function api(path) {
       const { client_id, api_key } = getAuth();
-      const url = new URL(BACKEND + path);
-      url.searchParams.set("client_id", client_id);
       const headers = {};
+      if (client_id) headers["X-CLIENT-ID"] = client_id;
       if (api_key) headers["X-API-KEY"] = api_key;
-      const res = await fetch(url.toString(), { headers });
+      const res = await fetch(BACKEND + path, { headers });
       const data = await res.json().catch(() => ({}));
       if (!res.ok) throw new Error(data.error || data.message || ("HTTP " + res.status));
       return data;
     }
 
     async function apiPost(path, body) {
-      const { api_key } = getAuth();
-      const headers = { "Content-Type": "application/json" };
+      const { api_key, client_id } = getAuth();
+      const headers = {
+        "Content-Type": "application/json",
+      };
+      if (client_id) headers["X-CLIENT-ID"] = client_id;
       if (api_key) headers["X-API-KEY"] = api_key;
       const res = await fetch(BACKEND + path, {
         method: "POST",
@@ -380,7 +388,7 @@
         try {
           data = await api("/insights");
         } catch (err) {
-          data = await api("/auto_threshold");
+          data = await apiPost("/auto_threshold", { client_id });
         }
         const hotAccuracy =
           data?.hot_accuracy ??
@@ -413,6 +421,7 @@
           headers: {
             "Content-Type": "application/json",
             "X-API-KEY": api_key,
+            "X-CLIENT-ID": client_id,
           },
           body: JSON.stringify({ client_id, n: 10 }),
         });
@@ -593,14 +602,35 @@
 
     el("btnExport").onclick = () => {
       const { client_id, api_key } = getAuth();
-      if (!client_id) return setMsg("alert--error", "Informe seu workspace para exportar.");
-      const url = new URL(BACKEND + "/leads_export.csv");
-      url.searchParams.set("client_id", client_id);
-      if (api_key) {
-        setMsg("alert--error", "Para exportar com Chave de integração, faça o download via API ou desative a exigência.");
-        return;
+      if (!client_id || !api_key) {
+        return setMsg("alert--error", "Conecte seu workspace com sua chave para exportar.");
       }
-      window.location.href = url.toString();
+      fetch(BACKEND + "/leads_export.csv", {
+        headers: {
+          "X-CLIENT-ID": client_id,
+          "X-API-KEY": api_key,
+        },
+      })
+        .then((resp) => {
+          if (!resp.ok) throw new Error("Falha ao exportar");
+          const disposition = resp.headers.get("Content-Disposition") || "";
+          const match = /filename="([^"]+)"/i.exec(disposition);
+          const filename = match?.[1] || `leadrank_${client_id}.csv`;
+          return resp.blob().then((blob) => ({ blob, filename }));
+        })
+        .then(({ blob, filename }) => {
+          const url = URL.createObjectURL(blob);
+          const link = document.createElement("a");
+          link.href = url;
+          link.download = filename;
+          document.body.appendChild(link);
+          link.click();
+          link.remove();
+          URL.revokeObjectURL(url);
+        })
+        .catch(() => {
+          setMsg("alert--error", "Não foi possível exportar agora.");
+        });
     };
 
     const seedBtn = document.querySelector("[data-seed10]");
@@ -880,9 +910,16 @@
       const tooltip = demoState.tooltip;
       const isMobile = window.matchMedia("(max-width: 768px)").matches;
       tooltip.classList.toggle("tour-tooltip--mobile", isMobile);
-      if (isMobile || !target) {
+      if (isMobile) {
         tooltip.style.top = "";
         tooltip.style.left = "";
+        tooltip.style.transform = "";
+        return;
+      }
+      if (!target) {
+        tooltip.style.top = "50%";
+        tooltip.style.left = "50%";
+        tooltip.style.transform = "translate(-50%, -50%)";
         return;
       }
       const rect = target.getBoundingClientRect();
@@ -899,6 +936,7 @@
       if (left < margin) left = margin;
       tooltip.style.top = `${Math.max(top, margin)}px`;
       tooltip.style.left = `${left}px`;
+      tooltip.style.transform = "";
     }
 
     function updateStepUI(step, index) {
@@ -927,6 +965,9 @@
       }
       if (step.requireAction) ensureDemoLeadRow();
       const target = resolveTarget(step);
+      if (target) {
+        target.scrollIntoView({ behavior: "smooth", block: "center" });
+      }
       if (!step.isFinal && !target) {
         goToStep(index + 1);
         return;
@@ -943,7 +984,6 @@
       demoState.active = true;
       demoState.overlay.style.display = "block";
       demoState.tooltip.style.display = "block";
-      localStorage.removeItem(DEMO_KEY);
       goToStep(0);
     }
 
@@ -958,9 +998,7 @@
     }
 
     function endDemo(completed) {
-      if (completed) {
-        localStorage.setItem(DEMO_KEY, "true");
-      }
+      localStorage.setItem(DEMO_KEY, "true");
       demoState.active = false;
       if (demoState.overlay) demoState.overlay.style.display = "none";
       if (demoState.tooltip) demoState.tooltip.style.display = "none";

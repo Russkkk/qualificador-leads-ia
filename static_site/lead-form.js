@@ -24,6 +24,8 @@ const generatePassword = () => {
   result += pick(symbols);
   result += pick("0123456789");
   return result;
+};
+
 const saveLeadLocally = (payload) => {
   const stored = localStorage.getItem("leadrank_leads");
   const leads = stored ? JSON.parse(stored) : [];
@@ -53,19 +55,7 @@ if (leadForm) {
     try {
       if (submitBtn) submitBtn.disabled = true;
       showStatus("Criando sua conta...", "warning");
-
       const response = await fetch(`${BACKEND}/signup`, {
-      if (!leadForm.action || leadForm.action.includes("SEU_FORM_ID")) {
-        saveLeadLocally(serializeForm(leadForm));
-        leadForm.reset();
-        showStatus(
-          "Lead salvo localmente para teste. Configure o endpoint (Formspree/Web3Forms) para envios reais.",
-          "warning"
-        );
-        return;
-      }
-
-      const response = await fetch(leadForm.action, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -104,7 +94,11 @@ if (leadForm) {
         "success"
       );
     } catch (error) {
-      showStatus("Falha de conexão. Verifique sua internet e tente de novo.", "error");
+      saveLeadLocally(serializeForm(leadForm));
+      showStatus(
+        "Falha de conexão. Salvamos o lead localmente para não perder o contato.",
+        "warning"
+      );
     } finally {
       if (submitBtn) submitBtn.disabled = false;
     }

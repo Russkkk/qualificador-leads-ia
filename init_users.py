@@ -35,7 +35,10 @@ INIT_USER_EMAIL = (os.environ.get("INIT_USER_EMAIL") or "admin@leadrank.local").
 INIT_USER_PASSWORD = (os.environ.get("INIT_USER_PASSWORD") or "Admin@12345").strip()
 INIT_USER_CLIENT_ID = (os.environ.get("INIT_USER_CLIENT_ID") or "admin").strip()
 INIT_USER_PLAN = (os.environ.get("INIT_USER_PLAN") or "trial").strip().lower()
-PBKDF2_ITERATIONS = 390_000
+try:
+    from services.settings import PBKDF2_ITERATIONS
+except Exception:
+    PBKDF2_ITERATIONS = 390_000
 
 # se já existir, NÃO sobrescreve senha por padrão
 FORCE_RESET_PASSWORD = (os.environ.get("FORCE_RESET_PASSWORD") or "").strip().lower() in ("1", "true", "yes")
@@ -50,30 +53,13 @@ def _month_key(dt=None):
     return dt.strftime("%Y-%m")
 
 
-def _sha256(s: str) -> str:
-    return hashlib.sha256(s.encode("utf-8")).hexdigest()
-
-
 def _gen_api_key(client_id: str) -> str:
     raw = f"{client_id}:{secrets.token_urlsafe(24)}:{time.time()}"
-    return "sk_live_" + _sha256(raw)[:32]
+    return "sk_live_" + hashlib.sha256(raw.encode("utf-8")).hexdigest()[:32]
 
 
 def _hash_password(password: str) -> str:
     return generate_password_hash(password, method=f"pbkdf2:sha256:{PBKDF2_ITERATIONS}")
-
-    return generate_password_hash(password, method=f"pbkdf2:sha256:{PBKDF2_ITERATIONS}")
-    
-    return generate_password_hash(password, method=f"pbkdf2:sha256:{PBKDF2_ITERATIONS}")
-def _pbkdf2_hash(password: str, salt: bytes | None = None, iterations: int = 310_000) -> str:
-    """
-    Retorna string no formato:
-      pbkdf2_sha256$<iterations>$<salt_hex>$<hash_hex>
-    """
-    salt = salt or secrets.token_bytes(16)
-    dk = hashlib.pbkdf2_hmac("sha256", password.encode("utf-8"), salt, iterations)
-    return f"pbkdf2_sha256${iterations}${salt.hex()}${dk.hex()}"
-  
 def ensure_schema(conn):
     with conn.cursor() as cur:
         cur.execute(

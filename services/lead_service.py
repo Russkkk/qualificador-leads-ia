@@ -5,7 +5,7 @@ from zoneinfo import ZoneInfo
 from psycopg.rows import dict_row
 
 from services import settings
-from services.db import db, ensure_client_row, ensure_schema_once
+from services.db import db, ensure_client_row, ensure_schema_once, get_active_leads_query
 from services.utils import iso, safe_float, safe_int
 
 _SP_TZ = ZoneInfo("America/Sao_Paulo")
@@ -36,13 +36,13 @@ def top_origens(client_id: str, days: int = 30, limit: int = 6):
     try:
         with conn:
             with conn.cursor(row_factory=dict_row) as cur:
+                active_leads_query = get_active_leads_query()
                 cur.execute(
-                    """
+                    f"""
                     SELECT COALESCE(NULLIF(TRIM(origem), ''), 'desconhecida') AS origem,
                            COUNT(*)::int AS total
-                    FROM leads
-                    WHERE client_id=%s
-                      AND deleted_at IS NULL
+                    {active_leads_query}
+                      AND client_id=%s
                       AND created_at >= (NOW() - (%s || ' days')::interval)
                     GROUP BY 1
                     ORDER BY total DESC, origem ASC
@@ -61,13 +61,13 @@ def hot_leads_today(client_id: str, limit: int = 20):
     try:
         with conn:
             with conn.cursor(row_factory=dict_row) as cur:
+                active_leads_query = get_active_leads_query()
                 cur.execute(
-                    """
+                    f"""
                     SELECT id, nome, telefone, email_lead, origem,
                            probabilidade, score, created_at, virou_cliente
-                    FROM leads
-                    WHERE client_id=%s
-                      AND deleted_at IS NULL
+                    {active_leads_query}
+                      AND client_id=%s
                       AND created_at >= %s AND created_at <= %s
                       AND (
                             (probabilidade IS NOT NULL AND probabilidade >= 0.70)
@@ -131,13 +131,13 @@ def fetch_recent_leads(
     try:
         with conn:
             with conn.cursor(row_factory=dict_row) as cur:
+                active_leads_query = get_active_leads_query()
                 cur.execute(
-                    """
+                    f"""
                     SELECT id, client_id, nome, email_lead, telefone, tempo_site, paginas_visitadas, clicou_preco,
                            probabilidade, virou_cliente, created_at
-                    FROM leads
-                    WHERE client_id=%s
-                      AND deleted_at IS NULL
+                    {active_leads_query}
+                      AND client_id=%s
                     ORDER BY created_at DESC
                     LIMIT %s
                     OFFSET %s
@@ -155,12 +155,12 @@ def count_leads(client_id: str) -> int:
     try:
         with conn:
             with conn.cursor(row_factory=dict_row) as cur:
+                active_leads_query = get_active_leads_query()
                 cur.execute(
-                    """
+                    f"""
                     SELECT COUNT(*)::int AS total
-                    FROM leads
-                    WHERE client_id=%s
-                      AND deleted_at IS NULL
+                    {active_leads_query}
+                      AND client_id=%s
                     """,
                     (client_id,),
                 )
@@ -183,11 +183,13 @@ def get_labeled_rows(client_id: str) -> List[Dict[str, Any]]:
     try:
         with conn:
             with conn.cursor(row_factory=dict_row) as cur:
+                active_leads_query = get_active_leads_query()
                 cur.execute(
-                    """
+                    f"""
                     SELECT id, tempo_site, paginas_visitadas, clicou_preco, probabilidade, virou_cliente
-                    FROM leads
-                    WHERE client_id=%s AND deleted_at IS NULL AND virou_cliente IS NOT NULL
+                    {active_leads_query}
+                      AND client_id=%s
+                      AND virou_cliente IS NOT NULL
                     ORDER BY created_at DESC
                     """,
                     (client_id,),

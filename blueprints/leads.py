@@ -11,7 +11,7 @@ from psycopg.rows import dict_row
 from extensions import limiter
 from services import settings
 from services.auth_service import gen_api_key, require_client_auth
-from services.db import db, ensure_client_row, ensure_schema, ensure_schema_once
+from services.db import db, ensure_client_row, ensure_schema, ensure_schema_once, get_active_leads_query
 from services.demo_service import bump_demo_counter, demo_rate_limited, require_demo_key
 from services.cache import cache_delete, cache_delete_prefix, cache_get_json, cache_set_json
 from services.lead_service import (
@@ -399,11 +399,16 @@ def metrics():
     try:
         with conn:
             with conn.cursor(row_factory=dict_row) as cur:
-                cur.execute("SELECT COUNT(*) AS total FROM leads WHERE deleted_at IS NULL;")
+                active_leads_query = get_active_leads_query()
+                cur.execute(f"SELECT COUNT(*) AS total {active_leads_query};")
                 total = int(cur.fetchone()["total"])
-                cur.execute("SELECT COUNT(*) AS labeled FROM leads WHERE deleted_at IS NULL AND virou_cliente IS NOT NULL;")
+                cur.execute(
+                    f"SELECT COUNT(*) AS labeled {active_leads_query} AND virou_cliente IS NOT NULL;"
+                )
                 labeled = int(cur.fetchone()["labeled"])
-                cur.execute("SELECT COUNT(*) AS pending FROM leads WHERE deleted_at IS NULL AND virou_cliente IS NULL;")
+                cur.execute(
+                    f"SELECT COUNT(*) AS pending {active_leads_query} AND virou_cliente IS NULL;"
+                )
                 pending = int(cur.fetchone()["pending"])
         return json_ok(
             {
@@ -444,11 +449,13 @@ def insights():
     try:
         with conn:
             with conn.cursor(row_factory=dict_row) as cur:
+                active_leads_query = get_active_leads_query()
                 cur.execute(
-                    """
+                    f"""
                     SELECT probabilidade, virou_cliente, created_at
-                    FROM leads
-                    WHERE client_id=%s AND deleted_at IS NULL AND created_at >= %s
+                    {active_leads_query}
+                      AND client_id=%s
+                      AND created_at >= %s
                     ORDER BY created_at ASC
                     """,
                     (client_id, since),
@@ -530,12 +537,13 @@ def leads_export():
     try:
         with conn:
             with conn.cursor(row_factory=dict_row) as cur:
+                active_leads_query = get_active_leads_query()
                 cur.execute(
-                    """
+                    f"""
                     SELECT nome, email_lead, telefone, tempo_site, paginas_visitadas, clicou_preco,
                            probabilidade, score, created_at, virou_cliente
-                    FROM leads
-                    WHERE client_id=%s AND deleted_at IS NULL
+                    {active_leads_query}
+                      AND client_id=%s
                     ORDER BY created_at DESC
                     """,
                     (client_id,),
@@ -769,8 +777,9 @@ def funnels():
     try:
         with conn:
             with conn.cursor(row_factory=dict_row) as cur:
+                active_leads_query = get_active_leads_query()
                 cur.execute(
-                    """
+                    f"""
                     SELECT
                       COUNT(*) FILTER (WHERE (probabilidade IS NOT NULL AND probabilidade >= 0.70)
                                      OR (score IS NOT NULL AND score >= 70)) AS hot,
@@ -778,8 +787,8 @@ def funnels():
                                      OR (score IS NOT NULL AND score >= 35 AND score < 70)) AS warm,
                       COUNT(*) FILTER (WHERE (probabilidade IS NOT NULL AND probabilidade < 0.35)
                                      OR (score IS NOT NULL AND score < 35)) AS cold
-                    FROM leads
-                    WHERE client_id=%s AND deleted_at IS NULL
+                    {active_leads_query}
+                      AND client_id=%s
                     """,
                     (client_id,),
                 )
@@ -816,12 +825,13 @@ def acao_do_dia():
     try:
         with conn:
             with conn.cursor(row_factory=dict_row) as cur:
+                active_leads_query = get_active_leads_query()
                 cur.execute(
-                    """
+                    f"""
                     SELECT id, nome, email_lead, telefone, origem,
                            score, probabilidade, created_at, virou_cliente
-                    FROM leads
-                    WHERE client_id=%s AND deleted_at IS NULL
+                    {active_leads_query}
+                      AND client_id=%s
                     ORDER BY COALESCE(probabilidade, score / 100.0) DESC NULLS LAST,
                              created_at DESC
                     LIMIT 30
@@ -871,11 +881,13 @@ def lead_explain():
     try:
         with conn:
             with conn.cursor(row_factory=dict_row) as cur:
+                active_leads_query = get_active_leads_query()
                 cur.execute(
-                    """
+                    f"""
                     SELECT tempo_site, paginas_visitadas, clicou_preco, probabilidade
-                    FROM leads
-                    WHERE client_id=%s AND id=%s AND deleted_at IS NULL
+                    {active_leads_query}
+                      AND client_id=%s
+                      AND id=%s
                     """,
                     (client_id, lead_id),
                 )

@@ -34,6 +34,7 @@ ALLOWED_ORIGINS = [
     "https://leadrank.com.br",
     r"^https://.*\.onrender\.com$",
 ]
+ALLOWED_ORIGINS = [origin for origin in ALLOWED_ORIGINS if origin != "null"]
 if DEBUG_MODE:
     ALLOWED_ORIGINS.extend([
         "http://localhost:8000",

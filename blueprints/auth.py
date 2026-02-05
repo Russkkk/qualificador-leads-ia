@@ -21,8 +21,7 @@ auth_bp = Blueprint("auth", __name__)
 
 
 @auth_bp.post("/signup")
-@limiter.limit("5 per minute")
-@limiter.limit("100 per minute")
+@limiter.limit("5 per hour")
 def signup():
     data = request.get_json(silent=True) or request.form or {}
     nome = (data.get("nome") or "").strip()
@@ -102,8 +101,7 @@ def signup():
 
 
 @auth_bp.post("/login")
-@limiter.limit("5 per minute")
-@limiter.limit("100 per minute")
+@limiter.limit("10 per 5 minute")
 def login():
     data = request.get_json(silent=True) or request.form or {}
     email = (data.get("email") or "").strip().lower()

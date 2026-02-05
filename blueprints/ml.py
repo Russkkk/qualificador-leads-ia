@@ -2,6 +2,7 @@ from flask import Blueprint, request
 
 from extensions import limiter
 from services.auth_service import require_client_auth
+from services.db import get_active_leads_query
 from services.lead_service import get_labeled_rows, get_threshold, set_threshold, update_probabilities
 from services.ml_service import HAS_ML, best_threshold, can_train, compute_precision_recall, features_from_row, predict_for_rows, train_pipeline
 from services.utils import get_client_id_from_request, json_err, json_ok, rate_limit_client_id, safe_int
@@ -60,11 +61,13 @@ def recalc_pending():
     try:
         with conn:
             with conn.cursor(row_factory=dict_row) as cur:
+                active_leads_query = get_active_leads_query()
                 cur.execute(
-                    """
+                    f"""
                     SELECT id, tempo_site, paginas_visitadas, clicou_preco
-                    FROM leads
-                    WHERE client_id=%s AND deleted_at IS NULL AND virou_cliente IS NULL
+                    {active_leads_query}
+                      AND client_id=%s
+                      AND virou_cliente IS NULL
                     ORDER BY created_at DESC
                     LIMIT %s
                     """,

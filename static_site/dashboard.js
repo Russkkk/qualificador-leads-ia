@@ -14,6 +14,14 @@
   function getClientId() {
     return localStorage.getItem("client_id") || "";
   }
+  function authHeaders() {
+    const apiKey = getApiKey();
+    const clientId = getClientId();
+    return {
+      "X-API-KEY": apiKey,
+      "X-CLIENT-ID": clientId
+    };
+  }
 
   function setState(state) {
     const wrap = $("#actionList") || $(".action-list");
@@ -113,8 +121,8 @@
 
     setState("loading");
     try {
-      const resp = await fetch(`${BACKEND}/acao_do_dia?client_id=${encodeURIComponent(clientId)}`, {
-        headers: { "X-API-KEY": apiKey }
+      const resp = await fetch(`${BACKEND}/acao_do_dia`, {
+        headers: authHeaders()
       });
 
       if (!resp.ok) throw new Error(`HTTP ${resp.status}`);
@@ -150,7 +158,8 @@
             method: "POST",
             headers: {
               "Content-Type": "application/json",
-              "X-API-KEY": apiKey
+              "X-API-KEY": apiKey,
+              "X-CLIENT-ID": clientId
             },
             body: JSON.stringify({ client_id: clientId, n: 10 })
           });
@@ -163,10 +172,30 @@
 
     const exportBtn = document.querySelector("[data-export]");
     if (exportBtn) {
-      exportBtn.addEventListener("click", () => {
+      exportBtn.addEventListener("click", async () => {
         const clientId = getClientId();
-        if (!clientId) return;
-        window.open(`${BACKEND}/leads_export.csv?client_id=${encodeURIComponent(clientId)}`, "_blank");
+        const apiKey = getApiKey();
+        if (!clientId || !apiKey) return;
+        try {
+          const resp = await fetch(`${BACKEND}/leads_export.csv`, {
+            headers: authHeaders()
+          });
+          if (!resp.ok) throw new Error(`HTTP ${resp.status}`);
+          const blob = await resp.blob();
+          const disposition = resp.headers.get("Content-Disposition") || "";
+          const match = /filename="([^"]+)"/i.exec(disposition);
+          const filename = match?.[1] || `leadrank_${clientId}.csv`;
+          const url = URL.createObjectURL(blob);
+          const link = document.createElement("a");
+          link.href = url;
+          link.download = filename;
+          document.body.appendChild(link);
+          link.click();
+          link.remove();
+          URL.revokeObjectURL(url);
+        } catch (err) {
+          console.warn("Export falhou", err);
+        }
       });
     }
   }

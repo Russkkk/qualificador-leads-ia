@@ -270,32 +270,31 @@
       });
     }
 
-    function qs(name) {
-      return new URLSearchParams(location.search).get(name) || "";
-    }
-
     function getAuth() {
       return {
-        client_id: qs("client_id") || localStorage.getItem("leadrank_client_id") || localStorage.getItem("client_id") || localStorage.getItem("LR_CLIENT_ID") || "",
-        api_key: qs("api_key") || localStorage.getItem("leadrank_api_key") || localStorage.getItem("api_key") || localStorage.getItem("LR_API_KEY") || "",
+        client_id: localStorage.getItem("leadrank_client_id") || localStorage.getItem("client_id") || localStorage.getItem("LR_CLIENT_ID") || "",
+        api_key: localStorage.getItem("leadrank_api_key") || localStorage.getItem("api_key") || localStorage.getItem("LR_API_KEY") || "",
       };
     }
 
     async function api(path) {
       const { client_id, api_key } = getAuth();
-      const url = new URL(BACKEND + path);
-      url.searchParams.set("client_id", client_id);
-      const headers = {};
+      const headers = {
+        "X-CLIENT-ID": client_id,
+      };
       if (api_key) headers["X-API-KEY"] = api_key;
-      const res = await fetch(url.toString(), { headers });
+      const res = await fetch(BACKEND + path, { headers });
       const data = await res.json().catch(() => ({}));
       if (!res.ok) throw new Error(data.error || data.message || ("HTTP " + res.status));
       return data;
     }
 
     async function apiPost(path, body) {
-      const { api_key } = getAuth();
-      const headers = { "Content-Type": "application/json" };
+      const { api_key, client_id } = getAuth();
+      const headers = {
+        "Content-Type": "application/json",
+        "X-CLIENT-ID": client_id,
+      };
       if (api_key) headers["X-API-KEY"] = api_key;
       const res = await fetch(BACKEND + path, {
         method: "POST",
@@ -413,6 +412,7 @@
           headers: {
             "Content-Type": "application/json",
             "X-API-KEY": api_key,
+            "X-CLIENT-ID": client_id,
           },
           body: JSON.stringify({ client_id, n: 10 }),
         });
@@ -593,14 +593,35 @@
 
     el("btnExport").onclick = () => {
       const { client_id, api_key } = getAuth();
-      if (!client_id) return setMsg("alert--error", "Informe seu workspace para exportar.");
-      const url = new URL(BACKEND + "/leads_export.csv");
-      url.searchParams.set("client_id", client_id);
-      if (api_key) {
-        setMsg("alert--error", "Para exportar com Chave de integração, faça o download via API ou desative a exigência.");
-        return;
+      if (!client_id || !api_key) {
+        return setMsg("alert--error", "Conecte seu workspace com sua chave para exportar.");
       }
-      window.location.href = url.toString();
+      fetch(BACKEND + "/leads_export.csv", {
+        headers: {
+          "X-CLIENT-ID": client_id,
+          "X-API-KEY": api_key,
+        },
+      })
+        .then((resp) => {
+          if (!resp.ok) throw new Error("Falha ao exportar");
+          const disposition = resp.headers.get("Content-Disposition") || "";
+          const match = /filename="([^"]+)"/i.exec(disposition);
+          const filename = match?.[1] || `leadrank_${client_id}.csv`;
+          return resp.blob().then((blob) => ({ blob, filename }));
+        })
+        .then(({ blob, filename }) => {
+          const url = URL.createObjectURL(blob);
+          const link = document.createElement("a");
+          link.href = url;
+          link.download = filename;
+          document.body.appendChild(link);
+          link.click();
+          link.remove();
+          URL.revokeObjectURL(url);
+        })
+        .catch(() => {
+          setMsg("alert--error", "Não foi possível exportar agora.");
+        });
     };
 
     const seedBtn = document.querySelector("[data-seed10]");

@@ -340,8 +340,7 @@
         localStorage.setItem("LR_API_KEY", apiKey);
       }
       apiKeyValue.textContent = apiKey || "—";
-      const link = `acao.html?client_id=${encodeURIComponent(clientId || "")}&api_key=${encodeURIComponent(apiKey || "")}`;
-      goDashboard.href = link;
+      goDashboard.href = "acao.html";
     }
 
     async function seedLeads(count, messageTarget) {
@@ -352,6 +351,7 @@
           headers: {
             "Content-Type": "application/json",
             "X-API-KEY": authState.apiKey,
+            "X-CLIENT-ID": authState.clientId,
           },
           body: JSON.stringify({ client_id: authState.clientId, n: count }),
         });

@@ -47,6 +47,7 @@ PLAN_CATALOG = {
     "trial": {"price_brl_month": 0, "setup_fee_brl": 0, "lead_limit_month": 100},
     "starter": {"price_brl_month": 79, "setup_fee_brl": 0, "lead_limit_month": 1000},
     "pro": {"price_brl_month": 179, "setup_fee_brl": 0, "lead_limit_month": 5000},
+    "enterprise": {"price_brl_month": 279, "setup_fee_brl": 0, "lead_limit_month": 20000},
     "vip": {"price_brl_month": 279, "setup_fee_brl": 0, "lead_limit_month": 20000},
 }
 

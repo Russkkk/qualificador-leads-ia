@@ -344,6 +344,7 @@ limiter = Limiter(
     key_func=_client_ip,
     app=app,
     default_limits=[],
+    default_limits=["100 per minute"],
 )
 
 def _validate_password_strength(password: str) -> Tuple[bool, str]:

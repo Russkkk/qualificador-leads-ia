@@ -237,6 +237,27 @@ def prever():
         with conn:
             with conn.cursor(row_factory=dict_row) as cur:
                 cur.execute(
+                    "SELECT plan, leads_used_month FROM clients WHERE client_id=%s FOR UPDATE",
+                    (client_id,),
+                )
+                locked_client = cur.fetchone() or {}
+                plan_locked = (locked_client.get("plan") or client_row.get("plan") or "trial").lower()
+                cat_locked = settings.PLAN_CATALOG.get(plan_locked, settings.PLAN_CATALOG["trial"])
+                used_locked = int(locked_client.get("leads_used_month") or 0)
+                limit_locked = int(cat_locked.get("lead_limit_month") or 0)
+                if limit_locked > 0 and used_locked >= limit_locked:
+                    return json_err(
+                        "Limite mensal atingido. Faça upgrade para continuar.",
+                        402,
+                        code="plan_limit",
+                        plan=plan_locked,
+                        used=used_locked,
+                        limit=limit_locked,
+                        price_brl_month=cat_locked.get("price_brl_month"),
+                        setup_fee_brl=cat_locked.get("setup_fee_brl", 0),
+                    )
+
+                cur.execute(
                     """
                     INSERT INTO leads
                       (client_id, nome, email_lead, telefone, origem, tempo_site, paginas_visitadas, clicou_preco,
@@ -261,9 +282,10 @@ def prever():
                     ),
                 )
                 row = cur.fetchone() or {}
-                ok_quota, err, extra = check_quota_and_bump(client_id, client_row)
-                if not ok_quota:
-                    return json_err(err, 402, **extra)
+                cur.execute(
+                    "UPDATE clients SET leads_used_month = leads_used_month + 1, updated_at=NOW() WHERE client_id=%s",
+                    (client_id,),
+                )
 
         cache_delete(f"acao_do_dia:{client_id}")
         cache_delete_prefix(f"insights:{client_id}:")

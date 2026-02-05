@@ -2,7 +2,7 @@ from flask import Blueprint
 
 from extensions import limiter
 from services import settings
-from services.db import ensure_schema_once
+from services.db import db
 from services.utils import iso, json_ok, now_utc
 
 core_bp = Blueprint("core", __name__)
@@ -25,8 +25,18 @@ async def health():
 async def health_db():
     if not settings.DATABASE_URL:
         return json_ok({"db": False, "error": "DATABASE_URL missing", "ts": iso(now_utc())})
-    ok, err = ensure_schema_once()
-    return json_ok({"db": ok, "error": err, "ts": iso(now_utc())})
+    conn = None
+    try:
+        conn = db()
+        with conn:
+            with conn.cursor() as cur:
+                cur.execute("SELECT 1")
+        return json_ok({"db": True, "error": "", "ts": iso(now_utc())})
+    except Exception as exc:
+        return json_ok({"db": False, "error": repr(exc), "ts": iso(now_utc())})
+    finally:
+        if conn is not None:
+            conn.close()
 
 
 @core_bp.get("/pricing")

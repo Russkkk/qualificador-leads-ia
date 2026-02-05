@@ -14,7 +14,7 @@ from services.auth_service import (
     validate_password_strength,
     verify_password,
 )
-from services.db import db, ensure_schema_once
+from services.db import db
 from services.utils import iso, json_err, json_ok, month_key, now_utc
 
 auth_bp = Blueprint("auth", __name__)
@@ -35,8 +35,6 @@ def signup():
     ok_pw, pw_msg = validate_password_strength(password or "")
     if not ok_pw:
         return json_err(pw_msg, 400)
-
-    ensure_schema_once()
 
     conn = db()
     try:
@@ -112,7 +110,6 @@ def login():
     if not password:
         return json_err("Senha é obrigatória", 400)
 
-    ensure_schema_once()
     conn = db()
     try:
         with conn:

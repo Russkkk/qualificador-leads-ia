@@ -15,7 +15,6 @@ from extensions import limiter, login_manager
 from services.logging_config import configure_logging, init_sentry
 from services import settings
 from services.auth_service import load_user
-from services.db import ensure_schema_once
 from services.utils import json_err, log_exception
 
 
@@ -101,8 +100,3 @@ app.register_blueprint(ml_bp)
 app.register_blueprint(billing_bp)
 app.register_blueprint(admin_bp)
 
-
-try:
-    ensure_schema_once()
-except Exception:
-    pass

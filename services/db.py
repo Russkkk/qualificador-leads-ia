@@ -82,8 +82,6 @@ def ensure_schema():
 
 
 def ensure_client_row(client_id: str, plan: str = "trial") -> Dict[str, Any]:
-    ensure_schema_once()
-
     plan = (plan or "trial").strip().lower()
     if plan not in settings.PLAN_CATALOG:
         plan = "trial"

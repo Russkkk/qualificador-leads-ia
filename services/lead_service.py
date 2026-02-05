@@ -5,7 +5,7 @@ from zoneinfo import ZoneInfo
 from psycopg.rows import dict_row
 
 from services import settings
-from services.db import db, ensure_client_row, ensure_schema_once, get_active_leads_query
+from services.db import db, ensure_client_row, get_active_leads_query
 from services.utils import iso, safe_float, safe_int
 
 _SP_TZ = ZoneInfo("America/Sao_Paulo")
@@ -88,7 +88,6 @@ def hot_leads_today(client_id: str, limit: int = 20):
 
 
 def get_threshold(client_id: str) -> float:
-    ensure_schema_once()
     conn = db()
     try:
         with conn:
@@ -103,7 +102,6 @@ def get_threshold(client_id: str) -> float:
 
 
 def set_threshold(client_id: str, threshold: float):
-    ensure_schema_once()
     conn = db()
     try:
         with conn:
@@ -126,7 +124,6 @@ def fetch_recent_leads(
     limit: int = settings.DEFAULT_LIMIT,
     offset: int = 0,
 ) -> List[Dict[str, Any]]:
-    ensure_schema_once()
     conn = db()
     try:
         with conn:
@@ -150,7 +147,6 @@ def fetch_recent_leads(
 
 
 def count_leads(client_id: str) -> int:
-    ensure_schema_once()
     conn = db()
     try:
         with conn:
@@ -178,7 +174,6 @@ def count_status(rows: List[Dict[str, Any]]) -> Tuple[int, int, int]:
 
 
 def get_labeled_rows(client_id: str) -> List[Dict[str, Any]]:
-    ensure_schema_once()
     conn = db()
     try:
         with conn:

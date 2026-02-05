@@ -361,6 +361,10 @@ def _validate_password_strength(password: str) -> Tuple[bool, str]:
     if not re.search(r"[^A-Za-z0-9]", password):
         return False, "Senha deve conter pelo menos 1 símbolo."
     return True, ""
+
+def _hash_password(password: str) -> str:
+    return generate_password_hash(password, method=f"pbkdf2:sha256:{PBKDF2_ITERATIONS}")
+
   
 def _hash_password(password: str) -> str:
     return generate_password_hash(password, method=f"pbkdf2:sha256:{PBKDF2_ITERATIONS}")
@@ -956,15 +960,17 @@ def signup():
                     api_key, mk, pw_hash
                 ))
 
-        return jsonify({
+        response = jsonify({
             "ok": True,
             "success": True,
             "client_id": client_id,
-            "api_key": api_key,
             "plan": "trial",
             "valid_until": _iso(valid_until),
             "message": "Conta trial criada com sucesso!"
         })
+        response.headers["X-API-KEY"] = api_key
+        response.headers["Authorization"] = f"Bearer {api_key}"
+        return response
     except Exception as e:
         trace = _log_exception("signup failed")
         return jsonify({
@@ -981,7 +987,7 @@ def signup():
 @app.route('/login', methods=['POST'])
 @limiter.limit("100 per minute")
 def login():
-    """Login com email+senha. Retorna client_id + api_key."""
+    """Login com email+senha. Retorna client_id e envia api_key via header."""
     data = request.get_json(silent=True) or request.form or {}
     email = (data.get('email') or '').strip().lower()
     password = (data.get('password') or data.get('senha') or '').strip()
@@ -1022,16 +1028,18 @@ def login():
 
                 cur.execute("UPDATE clients SET last_login_at=NOW(), updated_at=NOW() WHERE client_id=%s", (row['client_id'],))
 
-        return jsonify({
+        response = jsonify({
             "ok": True,
             "success": True,
             "client_id": row.get("client_id"),
-            "api_key": api_key,
             "plan": (row.get('plan') or 'trial'),
             "status": (row.get('status') or 'active'),
             "valid_until": _iso(row.get('valid_until')),
             "message": "Login realizado com sucesso."
         })
+        response.headers["X-API-KEY"] = api_key
+        response.headers["Authorization"] = f"Bearer {api_key}"
+        return response
     except Exception as e:
         trace = _log_exception("login failed")
         return jsonify({

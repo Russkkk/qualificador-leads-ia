@@ -110,7 +110,7 @@
           }
 
           const clientId = data.client_id || "";
-          const apiKey = data.api_key || "";
+          const apiKey = res.headers.get("X-API-KEY") || "";
           if (clientId) {
             localStorage.setItem("leadrank_client_id", clientId);
             localStorage.setItem("client_id", clientId);

@@ -436,7 +436,8 @@
             throw new Error(data.error || data.message || "Erro no login");
           }
 
-          setAuth(data.client_id, data.api_key);
+          const apiKeyHeader = res.headers.get("X-API-KEY") || "";
+          setAuth(data.client_id, apiKeyHeader);
           successDiv.innerHTML = "✅ Login feito!";
           successDiv.style.display = "block";
           setStep(4);
@@ -484,7 +485,8 @@
           throw new Error(data.error || data.message || "Erro ao criar conta");
         }
 
-        setAuth(data.client_id, data.api_key);
+        const apiKeyHeader = res.headers.get("X-API-KEY") || "";
+        setAuth(data.client_id, apiKeyHeader);
         successDiv.textContent = "✅ Conta criada! Gerando sua API Key...";
         successDiv.style.display = "block";
 

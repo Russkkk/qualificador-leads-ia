@@ -22,6 +22,12 @@ def db():
     return psycopg.connect(settings.DATABASE_URL, row_factory=dict_row)
 
 
+def get_active_leads_query(alias: str | None = None) -> str:
+    if alias:
+        return f"FROM leads {alias} WHERE {alias}.deleted_at IS NULL"
+    return "FROM leads WHERE deleted_at IS NULL"
+
+
 def ensure_schema_once() -> Tuple[bool, str]:
     global _SCHEMA_READY, _SCHEMA_LOCK
     if _SCHEMA_READY:

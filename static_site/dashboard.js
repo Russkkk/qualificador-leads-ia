@@ -1,5 +1,5 @@
 (function () {
-  const BACKEND = (window.BACKEND_URL || "https://qualificador-leads-i-a.onrender.com").replace(/\/$/, "");
+  const BACKEND = (window.BACKEND_URL || "https://qualificador-leads-ia.onrender.com").replace(/\/$/, "");
 
   function $(sel, root = document) {
     return root.querySelector(sel);
@@ -9,10 +9,18 @@
   }
 
   function getApiKey() {
-    return localStorage.getItem("api_key") || "";
+    return (localStorage.getItem("api_key") || "").trim();
   }
   function getClientId() {
-    return localStorage.getItem("client_id") || "";
+    return (localStorage.getItem("client_id") || "").trim();
+  }
+  function authHeaders() {
+    const apiKey = getApiKey();
+    const clientId = getClientId();
+    const headers = {};
+    if (apiKey) headers["X-API-KEY"] = apiKey;
+    if (clientId) headers["X-CLIENT-ID"] = clientId;
+    return headers;
   }
   function authHeaders() {
     const apiKey = getApiKey();

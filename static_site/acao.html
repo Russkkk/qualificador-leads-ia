@@ -7,10 +7,10 @@
   <meta name="description" content="Priorize leads quentes automaticamente e aumente suas vendas. Teste grátis 14 dias.">
   <meta property="og:title" content="LeadRank - Qualificador de Leads com IA">
   <meta property="og:description" content="Priorize leads quentes automaticamente e aumente suas vendas. Teste grátis 14 dias.">
-  <meta property="og:image" content="https://via.placeholder.com/1200x630/4f7cff/ffffff?text=LeadRank">
+  <meta property="og:image" content="assets/og-image.svg">
   <meta property="og:url" content="https://leadrank.com.br/">
   <meta name="theme-color" content="#4f7cff">
-  <link rel="icon" href="https://via.placeholder.com/32/4f7cff/ffffff?text=LR">
+  <link rel="icon" href="assets/favicon.svg">
   <link rel="stylesheet" href="styles.css" />
 </head>
 <body>
@@ -205,7 +205,7 @@
 
   <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
   <script>
-    const BACKEND = (window.BACKEND_URL || "https://qualificador-leads-i-a.onrender.com").replace(/\/$/, "");
+    const BACKEND = (window.BACKEND_URL || "https://qualificador-leads-ia.onrender.com").replace(/\/$/, "");
 
     const el = (id) => document.getElementById(id);
     const msg = el("actionMsg");
@@ -271,7 +271,19 @@
     }
 
     function getAuth() {
+      const clientId =
+        localStorage.getItem("leadrank_client_id") ||
+        localStorage.getItem("client_id") ||
+        localStorage.getItem("LR_CLIENT_ID") ||
+        "";
+      const apiKey =
+        localStorage.getItem("leadrank_api_key") ||
+        localStorage.getItem("api_key") ||
+        localStorage.getItem("LR_API_KEY") ||
+        "";
       return {
+        client_id: clientId.trim(),
+        api_key: apiKey.trim(),
         client_id: localStorage.getItem("leadrank_client_id") || localStorage.getItem("client_id") || localStorage.getItem("LR_CLIENT_ID") || "",
         api_key: localStorage.getItem("leadrank_api_key") || localStorage.getItem("api_key") || localStorage.getItem("LR_API_KEY") || "",
       };
@@ -279,6 +291,8 @@
 
     async function api(path) {
       const { client_id, api_key } = getAuth();
+      const headers = {};
+      if (client_id) headers["X-CLIENT-ID"] = client_id;
       const headers = {
         "X-CLIENT-ID": client_id,
       };
@@ -293,6 +307,8 @@
       const { api_key, client_id } = getAuth();
       const headers = {
         "Content-Type": "application/json",
+      };
+      if (client_id) headers["X-CLIENT-ID"] = client_id;
         "X-CLIENT-ID": client_id,
       };
       if (api_key) headers["X-API-KEY"] = api_key;
@@ -379,7 +395,7 @@
         try {
           data = await api("/insights");
         } catch (err) {
-          data = await api("/auto_threshold");
+          data = await apiPost("/auto_threshold", { client_id });
         }
         const hotAccuracy =
           data?.hot_accuracy ??
@@ -901,9 +917,16 @@
       const tooltip = demoState.tooltip;
       const isMobile = window.matchMedia("(max-width: 768px)").matches;
       tooltip.classList.toggle("tour-tooltip--mobile", isMobile);
-      if (isMobile || !target) {
+      if (isMobile) {
         tooltip.style.top = "";
         tooltip.style.left = "";
+        tooltip.style.transform = "";
+        return;
+      }
+      if (!target) {
+        tooltip.style.top = "50%";
+        tooltip.style.left = "50%";
+        tooltip.style.transform = "translate(-50%, -50%)";
         return;
       }
       const rect = target.getBoundingClientRect();
@@ -920,6 +943,7 @@
       if (left < margin) left = margin;
       tooltip.style.top = `${Math.max(top, margin)}px`;
       tooltip.style.left = `${left}px`;
+      tooltip.style.transform = "";
     }
 
     function updateStepUI(step, index) {
@@ -948,6 +972,9 @@
       }
       if (step.requireAction) ensureDemoLeadRow();
       const target = resolveTarget(step);
+      if (target) {
+        target.scrollIntoView({ behavior: "smooth", block: "center" });
+      }
       if (!step.isFinal && !target) {
         goToStep(index + 1);
         return;
@@ -964,7 +991,6 @@
       demoState.active = true;
       demoState.overlay.style.display = "block";
       demoState.tooltip.style.display = "block";
-      localStorage.removeItem(DEMO_KEY);
       goToStep(0);
     }
 
@@ -979,9 +1005,7 @@
     }
 
     function endDemo(completed) {
-      if (completed) {
-        localStorage.setItem(DEMO_KEY, "true");
-      }
+      localStorage.setItem(DEMO_KEY, "true");
       demoState.active = false;
       if (demoState.overlay) demoState.overlay.style.display = "none";
       if (demoState.tooltip) demoState.tooltip.style.display = "none";

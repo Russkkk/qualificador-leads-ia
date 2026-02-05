@@ -1,5 +1,7 @@
 const leadForm = document.getElementById("leadForm");
 const formStatus = document.getElementById("formStatus");
+const backendMeta = document.querySelector('meta[name="backend-url"]');
+const BACKEND = (backendMeta?.content || "https://qualificador-leads-ia.onrender.com").replace(/\/$/, "");
 
 if (window.lucide) {
   window.lucide.createIcons();
@@ -11,34 +13,73 @@ const showStatus = (message, tone = "success") => {
   formStatus.dataset.tone = tone;
 };
 
+const generatePassword = () => {
+  const alphabet = "ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnopqrstuvwxyz23456789";
+  const symbols = "!@#$%";
+  const pick = (set) => set[Math.floor(Math.random() * set.length)];
+  let result = "";
+  for (let i = 0; i < 8; i += 1) {
+    result += pick(alphabet);
+  }
+  result += pick(symbols);
+  result += pick("0123456789");
+  return result;
+};
+
 if (leadForm) {
   leadForm.addEventListener("submit", async (event) => {
-    if (!leadForm.action || leadForm.action.includes("SEU_FORM_ID")) {
-      showStatus("Atualize o link do formulário (Formspree/Web3Forms) antes de enviar.", "warning");
-      event.preventDefault();
-      return;
-    }
-
     event.preventDefault();
     const formData = new FormData(leadForm);
+    const payload = Object.fromEntries(formData.entries());
+    const tempPassword = generatePassword();
+    const submitBtn = leadForm.querySelector("button[type='submit']");
 
     try {
-      const response = await fetch(leadForm.action, {
+      if (submitBtn) submitBtn.disabled = true;
+      showStatus("Criando sua conta...", "warning");
+
+      const response = await fetch(`${BACKEND}/signup`, {
         method: "POST",
-        body: formData,
         headers: {
-          Accept: "application/json",
+          "Content-Type": "application/json",
         },
+        body: JSON.stringify({
+          nome: payload.name || "",
+          email: payload.email || "",
+          telefone: payload.telefone || "",
+          password: tempPassword,
+        }),
       });
 
-      if (response.ok) {
-        leadForm.reset();
-        showStatus("Recebido! Vamos entrar em contato com você em até 24h.");
-      } else {
-        showStatus("Não conseguimos enviar agora. Tente novamente em instantes.", "error");
+      const data = await response.json().catch(() => ({}));
+
+      if (!response.ok) {
+        const msg = data?.error || data?.message || "Não conseguimos criar sua conta agora.";
+        showStatus(msg, "error");
+        return;
       }
+
+      const clientId = data?.client_id || "";
+      const apiKey = response.headers.get("X-API-KEY") || "";
+      if (clientId) {
+        localStorage.setItem("leadrank_client_id", clientId);
+        localStorage.setItem("client_id", clientId);
+      }
+      if (apiKey) {
+        localStorage.setItem("leadrank_api_key", apiKey);
+        localStorage.setItem("api_key", apiKey);
+      }
+      localStorage.setItem("leadrank_temp_password", tempPassword);
+
+      leadForm.reset();
+      showStatus(
+        `Conta criada! Senha temporária: ${tempPassword}. Acesse o onboarding para continuar.`,
+        "success"
+      );
     } catch (error) {
       showStatus("Falha de conexão. Verifique sua internet e tente de novo.", "error");
+    } finally {
+      if (submitBtn) submitBtn.disabled = false;
     }
   });
 }

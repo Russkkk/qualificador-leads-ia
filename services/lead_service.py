@@ -42,6 +42,7 @@ def top_origens(client_id: str, days: int = 30, limit: int = 6):
                            COUNT(*)::int AS total
                     FROM leads
                     WHERE client_id=%s
+                      AND deleted_at IS NULL
                       AND created_at >= (NOW() - (%s || ' days')::interval)
                     GROUP BY 1
                     ORDER BY total DESC, origem ASC
@@ -66,6 +67,7 @@ def hot_leads_today(client_id: str, limit: int = 20):
                            probabilidade, score, created_at, virou_cliente
                     FROM leads
                     WHERE client_id=%s
+                      AND deleted_at IS NULL
                       AND created_at >= %s AND created_at <= %s
                       AND (
                             (probabilidade IS NOT NULL AND probabilidade >= 0.70)
@@ -131,6 +133,7 @@ def fetch_recent_leads(client_id: str, limit: int = settings.DEFAULT_LIMIT) -> L
                            probabilidade, virou_cliente, created_at
                     FROM leads
                     WHERE client_id=%s
+                      AND deleted_at IS NULL
                     ORDER BY created_at DESC
                     LIMIT %s
                     """,
@@ -158,7 +161,7 @@ def get_labeled_rows(client_id: str) -> List[Dict[str, Any]]:
                     """
                     SELECT id, tempo_site, paginas_visitadas, clicou_preco, probabilidade, virou_cliente
                     FROM leads
-                    WHERE client_id=%s AND virou_cliente IS NOT NULL
+                    WHERE client_id=%s AND deleted_at IS NULL AND virou_cliente IS NOT NULL
                     ORDER BY created_at DESC
                     """,
                     (client_id,),
@@ -177,7 +180,7 @@ def update_probabilities(client_id: str, ids: List[int], probs: List[float]) -> 
             with conn.cursor() as cur:
                 for lead_id, p in zip(ids, probs):
                     cur.execute(
-                        "UPDATE leads SET probabilidade=%s, updated_at=NOW() WHERE client_id=%s AND id=%s",
+                        "UPDATE leads SET probabilidade=%s, updated_at=NOW() WHERE client_id=%s AND id=%s AND deleted_at IS NULL",
                         (float(p), client_id, int(lead_id)),
                     )
         return len(ids)

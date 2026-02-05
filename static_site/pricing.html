@@ -181,8 +181,21 @@
 
     function normalizePlans(data) {
       if (!data) return fallbackPlans;
-      const rawPlans = Array.isArray(data) ? data : data.plans || data.data || [];
+      let rawPlans = [];
+      if (Array.isArray(data)) {
+        rawPlans = data;
+      } else if (Array.isArray(data.plans)) {
+        rawPlans = data.plans;
+      } else if (data.plans && typeof data.plans === "object") {
+        rawPlans = Object.entries(data.plans).map(([id, meta]) => ({ id, ...(meta || {}) }));
+      } else if (Array.isArray(data.data)) {
+        rawPlans = data.data;
+      } else if (data.data && typeof data.data === "object") {
+        rawPlans = Object.entries(data.data).map(([id, meta]) => ({ id, ...(meta || {}) }));
+      }
+
       if (!rawPlans.length) return fallbackPlans;
+
       return rawPlans.map((plan) => {
         const name = plan.name || plan.nome || "Plano";
         const id = (plan.id || plan.slug || name).toString().toLowerCase();

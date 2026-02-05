@@ -1,9 +1,8 @@
 import hashlib
-import hmac
 import secrets
 from typing import Any, Dict, Optional, Tuple
 
-from werkzeug.security import generate_password_hash, check_password_hash
+from werkzeug.security import check_password_hash, generate_password_hash
 
 from models.user import AuthUser
 from services import settings
@@ -29,23 +28,7 @@ def hash_password(password: str) -> str:
     return generate_password_hash(password, method=f"pbkdf2:sha256:{settings.PBKDF2_ITERATIONS}")
 
 
-def _verify_legacy_pbkdf2(stored: str, password: str) -> bool:
-    try:
-        algo, iter_s, salt_hex, hash_hex = stored.split("$", 3)
-        if algo != "pbkdf2_sha256":
-            return False
-        iterations = int(iter_s)
-        salt = bytes.fromhex(salt_hex)
-        expected = bytes.fromhex(hash_hex)
-        candidate = hashlib.pbkdf2_hmac("sha256", password.encode("utf-8"), salt, iterations)
-        return hmac.compare_digest(candidate, expected)
-    except Exception:
-        return False
-
-
 def needs_rehash(stored: str) -> bool:
-    if stored.startswith("pbkdf2_sha256$"):
-        return True
     if stored.startswith("pbkdf2:sha256:"):
         try:
             iterations = int(stored.split(":", 2)[2].split("$", 1)[0])
@@ -56,8 +39,6 @@ def needs_rehash(stored: str) -> bool:
 
 
 def verify_password(stored: str, password: str) -> bool:
-    if stored.startswith("pbkdf2_sha256$"):
-        return _verify_legacy_pbkdf2(stored, password)
     return check_password_hash(stored, password)
 
 

@@ -4,6 +4,7 @@
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>LeadRank • Criar conta</title>
+  <meta name="backend-url" content="https://qualificador-leads-ia.onrender.com">
   <meta name="description" content="Priorize leads quentes automaticamente e aumente suas vendas. Teste grátis 14 dias.">
   <meta property="og:title" content="LeadRank - Qualificador de Leads com IA">
   <meta property="og:description" content="Priorize leads quentes automaticamente e aumente suas vendas. Teste grátis 14 dias.">
@@ -177,7 +178,8 @@
 
   <script src="partials/site-shell.js"></script>
   <script>
-    const BACKEND = (window.BACKEND_URL || "https://qualificador-leads-ia.onrender.com").replace(/\/$/, "");
+    const backendMeta = document.querySelector('meta[name="backend-url"]');
+    const BACKEND = (backendMeta?.content || "https://qualificador-leads-ia.onrender.com").replace(/\/$/, "");
 
     const panels = document.querySelectorAll("[data-step-panel]");
     const stepperItems = document.querySelectorAll(".stepper__item");

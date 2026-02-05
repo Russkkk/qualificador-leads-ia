@@ -1,4 +1,5 @@
-const backend = (window.BACKEND_URL || "https://qualificador-leads-ia.onrender.com").replace(/\/$/, "");
+const backendMeta = document.querySelector('meta[name="backend-url"]');
+const backend = (backendMeta?.content || "https://qualificador-leads-ia.onrender.com").replace(/\/$/, "");
 
 const getApiKey = () => (localStorage.getItem("api_key") || "").trim();
 const getClientId = () => (localStorage.getItem("client_id") || "").trim();

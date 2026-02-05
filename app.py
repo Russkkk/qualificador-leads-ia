@@ -1412,7 +1412,13 @@ def metrics():
 def recalc_pending():
     """Recalcula probabilidade para pendentes com base nos rotulados (requer numpy/sklearn)."""
     if not _HAS_ML:
-        return _json_err("Dependências ML ausentes (numpy/scikit-learn).", 501, code="ml_missing")
+        return _json_ok({
+            "client_id": _get_client_id_from_request() or "",
+            "can_train": False,
+            "updated": 0,
+            "reason": "Modelo de ML não instalado. Mantendo heurística base.",
+            "code": "ml_missing",
+        })
 
     client_id = _get_client_id_from_request()
     limit = _safe_int(request.args.get("limit"), 500)
@@ -1473,7 +1479,18 @@ def recalc_pending():
 def auto_threshold():
     """Calcula e salva threshold que maximiza F1 (requer numpy/sklearn)."""
     if not _HAS_ML:
-        return _json_err("Dependências ML ausentes (numpy/scikit-learn).", 501, code="ml_missing")
+        client_id = _get_client_id_from_request()
+        threshold = _get_threshold(client_id) if client_id else DEFAULT_THRESHOLD
+        return _json_ok({
+            "client_id": client_id or "",
+            "can_train": False,
+            "threshold": float(threshold),
+            "precision": 0.0,
+            "recall": 0.0,
+            "f1": 0.0,
+            "reason": "Modelo de ML não instalado. Usando heurística base.",
+            "code": "ml_missing",
+        })
 
     data = request.get_json(silent=True) or {}
     client_id = _get_client_id_from_request()

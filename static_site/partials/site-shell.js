@@ -1,0 +1,169 @@
+const loadPartial = async (selector, partialPath) => {
+  const target = document.querySelector(selector);
+  if (!target) {
+    return null;
+  }
+
+  const response = await fetch(partialPath);
+  if (!response.ok) {
+    console.warn(`Não foi possível carregar ${partialPath}.`);
+    return null;
+  }
+
+  const html = await response.text();
+  target.innerHTML = html;
+  return target;
+};
+
+const applyActiveNav = (root, activeNav) => {
+  if (!root || !activeNav) {
+    return;
+  }
+
+  const activeLink = root.querySelector(`[data-nav="${activeNav}"]`);
+  if (activeLink) {
+    activeLink.setAttribute("aria-current", "page");
+  }
+};
+
+const applyHeaderActions = (root) => {
+  const actionsSlot = root?.querySelector("[data-header-actions]");
+  const actionsTemplate = document.getElementById("header-actions-template");
+  if (!actionsSlot || !actionsTemplate) {
+    return;
+  }
+
+  actionsSlot.innerHTML = "";
+  actionsSlot.append(actionsTemplate.content.cloneNode(true));
+};
+
+const ICONS = {
+  moon: `<svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3a7.5 7.5 0 1 0 9 9 9 9 0 1 1-9-9z"/></svg>`,
+  sun: `<svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="4"/><path d="M12 2v2"/><path d="M12 20v2"/><path d="M4.93 4.93l1.41 1.41"/><path d="M17.66 17.66l1.41 1.41"/><path d="M2 12h2"/><path d="M20 12h2"/><path d="M6.34 17.66l-1.41 1.41"/><path d="M19.07 4.93l-1.41 1.41"/></svg>`
+};
+
+const THEME_KEY = "leadrank_theme";
+
+const resolveInitialTheme = () => {
+  const stored = localStorage.getItem(THEME_KEY);
+  if (stored === "light" || stored === "dark") return stored;
+  const prefersDark = window.matchMedia && window.matchMedia("(prefers-color-scheme: dark)").matches;
+  return prefersDark ? "dark" : "light";
+};
+
+const applyTheme = (theme) => {
+  document.body.dataset.theme = theme;
+  localStorage.setItem(THEME_KEY, theme);
+};
+
+const applyThemeToggle = (root) => {
+  const actionsSlot = root?.querySelector("[data-header-actions]");
+  if (!actionsSlot) return;
+
+  const button = document.createElement("button");
+  button.type = "button";
+  button.className = "btn btn--ghost btn--small theme-toggle icon-button";
+
+  const renderLabel = (theme) => {
+    if (theme === "dark") {
+      button.innerHTML = `${ICONS.sun} Claro`;
+    } else {
+      button.innerHTML = `${ICONS.moon} Escuro`;
+    }
+  };
+
+  renderLabel(document.body.dataset.theme || "dark");
+
+  button.addEventListener("click", () => {
+    const nextTheme = document.body.dataset.theme === "dark" ? "light" : "dark";
+    applyTheme(nextTheme);
+    renderLabel(nextTheme);
+  });
+
+  actionsSlot.append(button);
+};
+
+applyTheme(resolveInitialTheme());
+
+
+const scrollToContato = () => {
+  const anchor = document.getElementById("contato");
+  if (!anchor) return false;
+
+  // Scroll after any layout shifts (header injection, fonts, etc.)
+  requestAnimationFrame(() => {
+    anchor.scrollIntoView({ behavior: "smooth", block: "start" });
+
+    const form = document.getElementById("leadForm");
+    const firstField = form?.querySelector("input, textarea, select");
+    if (firstField) {
+      firstField.focus({ preventScroll: true });
+    }
+  });
+
+  return true;
+};
+
+const syncIntentParam = (intent) => {
+  try {
+    const url = new URL(window.location.href);
+    url.searchParams.set("intent", intent);
+    // Preserve current hash if present
+    window.history.replaceState({}, "", url.toString());
+  } catch {
+    // ignore
+  }
+};
+
+const wireIntentLinks = () => {
+  document.addEventListener("click", (event) => {
+    const link = event.target?.closest?.("a[data-intent]");
+    if (!link) return;
+
+    const intent = link.getAttribute("data-intent");
+    if (!intent) return;
+
+    // Keep navigation as in-page anchor (fallback) but also tag the URL with intent.
+    syncIntentParam(intent);
+
+    const href = link.getAttribute("href") || "";
+    if (href.startsWith("#")) {
+      event.preventDefault();
+      // Update hash without jumping abruptly; scroll smoothly.
+      if (href.length > 1) {
+        window.history.replaceState({}, "", `${window.location.pathname}${window.location.search}${href}`);
+      }
+      scrollToContato();
+    }
+  });
+};
+
+const maybeAutoScrollContato = () => {
+  const params = new URLSearchParams(window.location.search);
+  const wantsEnterprise = params.get("intent") === "enterprise";
+  const wantsContatoHash = window.location.hash === "#contato";
+  if (!wantsEnterprise && !wantsContatoHash) return;
+
+  // Give the page a moment to render injected header/footer
+  setTimeout(() => {
+    scrollToContato();
+  }, 80);
+};
+
+document.addEventListener("DOMContentLoaded", async () => {
+  const activeNav = document.body.dataset.activeNav;
+  wireIntentLinks();
+
+  try {
+    const header = await loadPartial("[data-include='site-header']", "partials/site-header.html");
+    applyActiveNav(header, activeNav);
+    applyHeaderActions(header);
+    applyThemeToggle(header);
+    document.dispatchEvent(new CustomEvent("site-shell:header-ready"));
+
+    await loadPartial("[data-include='site-footer']", "partials/site-footer.html");
+    maybeAutoScrollContato();
+  } catch (error) {
+    console.warn("Falha ao carregar o template base.", error);
+  }
+});

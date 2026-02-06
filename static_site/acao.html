@@ -1,397 +1,484 @@
 <!doctype html>
 <html lang="pt-BR">
-<head>
-  <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>LeadRank • Ação do dia</title>
-  <link rel="stylesheet" href="styles.css" />
-</head>
-<body>
-  <div class="page">
-    <header class="site-header">
-      <a class="brand" href="landing.html">
-        <span class="brand__logo">LR</span>
-        <span class="brand__text">LeadRank</span>
-      </a>
-      <nav class="site-nav">
-        <a href="acao.html">Ação do dia</a>
-        <a href="index.html">Dashboard</a>
-        <a href="pricing.html">Planos</a>
-      </nav>
-      <a class="btn btn--ghost" href="onboarding.html?mode=login">Trocar conta</a>
-    </header>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Ação do Dia - LeadRank</title>
+    <meta
+      name="description"
+      content="Priorize seus leads mais quentes e acompanhe a Ação do Dia."
+    />
+    <link
+      rel="icon"
+      href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='12' fill='%234F46E5'/%3E%3Ctext x='50%25' y='54%25' text-anchor='middle' font-size='32' font-family='Arial' fill='white'%3ELR%3C/text%3E%3C/svg%3E"
+    />
+    <link rel="stylesheet" href="styles.css" />
+    <link rel="stylesheet" href="assets/tailwind.css" />
+  </head>
+  <body data-active-nav="acao" class="bg-slate-950 text-slate-100">
+    <template id="header-actions-template">
+      <a class="btn btn--ghost btn--small" href="pricing.html">Upgrade</a>
+      <a class="btn btn--small" href="onboarding.html">Novo lead</a>
+    </template>
+    <div class="page">
+      <div data-include="site-header"></div>
 
-    <main>
-      <section class="dashboard">
-        <div class="card daily-hero">
-          <div class="daily-hero__header">
+      <main class="mx-auto w-full max-w-6xl px-6 pb-16 pt-10">
+        <section class="space-y-6">
+          <div class="flex flex-wrap items-center justify-between gap-4">
             <div>
-              <p class="eyebrow">Resumo do dia</p>
-              <h1 class="daily-hero__title">🔥 Ação do dia</h1>
-              <p class="subtitle">Esses são os leads com maior chance de fechar agora.</p>
+              <p class="text-xs font-semibold uppercase tracking-[0.2em] text-emerald-300">Ação do Dia</p>
+              <h1 class="text-3xl font-semibold text-white sm:text-4xl">Leads prontos para contato</h1>
+              <p class="text-sm text-slate-300">
+                Lista diária baseada em comportamento e fit. Última atualização: hoje, 08:15 (mock demo).
+              </p>
             </div>
-            <div class="pill pill--muted" id="wsPill">workspace: —</div>
-          </div>
-          <div class="daily-hero__grid">
-            <div class="daily-card daily-card--hot">
-              <div class="daily-card__top">
-                <span class="daily-card__icon">🔥</span>
-                <div>
-                  <p class="daily-card__label">Quentes</p>
-                  <p class="daily-card__value" id="dailyHotCount">—</p>
-                </div>
-              </div>
-              <p class="text-muted">Ligue primeiro</p>
-            </div>
-            <div class="daily-card daily-card--warm">
-              <div class="daily-card__top">
-                <span class="daily-card__icon">🟡</span>
-                <div>
-                  <p class="daily-card__label">Mornos</p>
-                  <p class="daily-card__value" id="dailyWarmCount">—</p>
-                </div>
-              </div>
-              <p class="text-muted">Acompanhe hoje</p>
-            </div>
-            <div class="daily-card daily-card--cold">
-              <div class="daily-card__top">
-                <span class="daily-card__icon">❄️</span>
-                <div>
-                  <p class="daily-card__label">Frios</p>
-                  <p class="daily-card__value" id="dailyColdCount">—</p>
-                </div>
-              </div>
-              <p class="text-muted">Nutrir / automação</p>
-            </div>
-            <div class="daily-card daily-card--success">
-              <div class="daily-card__top">
-                <span class="daily-card__icon">✅</span>
-                <div>
-                  <p class="daily-card__label">Convertidos hoje</p>
-                  <p class="daily-card__value" id="dailyConvertedCount">—</p>
-                </div>
-              </div>
-              <p class="text-muted">Feedback do time</p>
+            <div class="flex flex-wrap gap-3">
+              <button class="btn btn--ghost btn--tiny" type="button" id="exportCsv">
+                Exportar CSV
+              </button>
+              <button class="btn btn--tiny" type="button" id="crmSync" disabled title="Em breve. Use 'Copiar mensagem' para seguir contato.">
+                Enviar para CRM
+              </button>
             </div>
           </div>
-        </div>
 
-        <div class="card action-list" data-state="loading">
-          <div class="action-list__header">
-            <h2>📞 Leads para agir agora</h2>
-          </div>
-          <div class="action-list__bar">
-            <div class="chip-group" role="tablist" aria-label="Filtro rápido">
-              <button class="chip chip--active" type="button" data-filter="hot">🔥 Quentes</button>
-              <button class="chip" type="button" data-filter="warm">🟡 Mornos</button>
-              <button class="chip" type="button" data-filter="cold">❄️ Frios</button>
-              <button class="chip" type="button" data-filter="pendente">⏳ Pendentes</button>
-              <button class="chip" type="button" data-filter="convertido">✅ Convertidos</button>
-              <button class="chip" type="button" data-filter="negado">❌ Negados</button>
+          <div class="grid gap-4 md:grid-cols-3">
+            <div class="rounded-2xl border border-white/10 bg-white/5 p-4">
+              <p class="text-xs uppercase tracking-[0.2em] text-slate-400">Leads quentes</p>
+              <p class="mt-2 text-2xl font-semibold text-white">18</p>
+              <p class="text-xs text-slate-300">+12% vs. ontem</p>
             </div>
-            <div class="action-list__controls">
-              <label class="search">
-                <span class="sr-only">Buscar por nome, telefone, origem</span>
-                <input type="search" id="leadSearch" placeholder="Buscar por nome, telefone, origem" />
-              </label>
-              <button class="btn btn--ghost btn--small" type="button" id="btnExport">Exportar CSV</button>
+            <div class="rounded-2xl border border-white/10 bg-white/5 p-4">
+              <p class="text-xs uppercase tracking-[0.2em] text-slate-400">Tempo médio de contato</p>
+              <p class="mt-2 text-2xl font-semibold text-white">2h 14m</p>
+              <p class="text-xs text-slate-300">SLA em dia</p>
+            </div>
+            <div class="rounded-2xl border border-white/10 bg-white/5 p-4">
+              <p class="text-xs uppercase tracking-[0.2em] text-slate-400">Conversões semana</p>
+              <p class="mt-2 text-2xl font-semibold text-white">42%</p>
+              <p class="text-xs text-slate-300">Baseado em mock</p>
             </div>
           </div>
-          <div class="action-list__body">
-            <div class="action-state action-state--loading">
-              <div class="skeleton-grid">
-                <div class="skeleton-card">
-                  <div class="skeleton-line skeleton-line--lg"></div>
-                  <div class="skeleton-line"></div>
-                  <div class="skeleton-pill"></div>
-                </div>
-                <div class="skeleton-card">
-                  <div class="skeleton-line skeleton-line--lg"></div>
-                  <div class="skeleton-line"></div>
-                  <div class="skeleton-pill"></div>
-                </div>
-              </div>
-              <div class="skeleton-table">
-                <div class="skeleton-line skeleton-line--md"></div>
-                <div class="skeleton-line"></div>
-                <div class="skeleton-line"></div>
-              </div>
-            </div>
-            <div class="action-state action-state--empty">
-              <p class="empty-state__title">Você ainda não tem leads suficientes para priorizar.</p>
-              <p class="text-muted">Comece gerando leads de teste ou conecte seu CRM para liberar a priorização diária.</p>
-              <div class="action-list__cta">
-                <a class="btn btn--small" href="index.html#btnSeed10">Gerar 10 leads de teste</a>
-                <a class="btn btn--ghost btn--small" href="onboarding.html#integracao" target="_blank" rel="noreferrer">Ver como integrar</a>
-              </div>
-            </div>
-            <div class="action-state action-state--error">
-              <p class="empty-state__title">Não conseguimos carregar seus leads. Confira sua conexão ou chave de integração.</p>
-              <button class="btn btn--small" type="button" id="btnRetry">Tentar novamente</button>
-            </div>
-            <div class="action-state action-state--ready">
-              <div class="action-list__insights">
-                <p>Leads quentes = maiores chances de fechar agora.</p>
-                <p>Marque o resultado do contato. O LeadRank aprende com seu time.</p>
-                <p>Quanto mais feedback, melhor a priorização.</p>
-              </div>
-              <div class="action-list__table" id="leadsTableWrap"></div>
-            </div>
-          </div>
-          <div class="alert" id="actionMsg"></div>
-        </div>
-      </section>
-    </main>
 
-    <footer class="site-footer">
-      <span>© 2024 LeadRank. Todos os direitos reservados.</span>
-      <div class="footer__links">
-        <a href="landing.html">Início</a>
-        <a href="pricing.html">Planos</a>
-        <a href="onboarding.html">Criar conta</a>
+          <div class="overflow-hidden rounded-3xl border border-white/10 bg-white/5">
+            <div class="flex flex-wrap items-center justify-between gap-4 border-b border-white/10 px-6 py-4">
+              <div class="flex flex-wrap gap-2 text-xs text-slate-300">
+                <button class="filter-chip rounded-full border border-emerald-500/40 px-3 py-1 text-emerald-200" type="button" data-filter="hot" aria-pressed="true">
+                  Hot <span class="filter-count" data-count="hot">(0)</span>
+                </button>
+                <button class="filter-chip rounded-full border border-blue-500/40 px-3 py-1 text-blue-200" type="button" data-filter="medium" aria-pressed="false">
+                  Médio <span class="filter-count" data-count="medium">(0)</span>
+                </button>
+                <button class="filter-chip rounded-full border border-white/20 px-3 py-1 text-slate-200" type="button" data-filter="all" aria-pressed="false">
+                  Todos <span class="filter-count" data-count="all">(0)</span>
+                </button>
+              </div>
+              <div class="flex flex-wrap items-center gap-3">
+                <label class="sr-only" for="leadSearch">Buscar lead</label>
+                <input
+                  class="rounded-full border border-white/10 bg-slate-950/40 px-4 py-2 text-xs text-white placeholder:text-slate-500 focus:border-blue-400 focus:outline-none"
+                  id="leadSearch"
+                  type="search"
+                  placeholder="Buscar por nome ou empresa"
+                />
+                <a class="btn btn--ghost btn--tiny" href="acao.html">
+                  Atualizar lista
+                </a>
+              </div>
+            </div>
+            <div class="alert mx-6 mt-4 rounded-xl border border-white/10 bg-white/5 px-4 py-3 text-xs text-slate-300" id="leadAlert" role="status" aria-live="polite" hidden></div>
+            <div class="px-6 py-6 text-sm text-slate-300" id="leadLoading">
+              Carregando leads priorizados...
+            </div>
+            <div class="px-6 py-6 text-sm text-slate-300" id="leadEmpty" hidden>
+              Nenhum lead encontrado para este filtro.
+              <a class="ml-2 font-semibold text-emerald-300 hover:text-emerald-200" href="onboarding.html">Conectar fonte de leads</a>
+            </div>
+            <div class="overflow-x-auto">
+              <table class="min-w-full text-left text-sm text-slate-200">
+                <thead class="bg-slate-900/60 text-xs uppercase text-slate-400">
+                  <tr>
+                    <th class="px-6 py-4">Lead</th>
+                    <th class="px-6 py-4">Empresa</th>
+                    <th class="px-6 py-4">Score</th>
+                    <th class="px-6 py-4">Interesse</th>
+                    <th class="px-6 py-4">Próxima ação</th>
+                  </tr>
+                </thead>
+                <tbody class="divide-y divide-white/10">
+                  <tr class="lead-row" data-priority="hot" data-name="Mariana Costa" data-email="mariana@datahub.com" data-company="DataHub" data-score="92" data-interest="Webinar + página de preços" data-action="Ligar agora" data-signals="Visitou página de preços 2x; Participou do webinar; Clicou no CTA de demo" data-recommendation="Oi Mariana, vi seu interesse no webinar e na página de preços. Posso te mostrar como priorizar leads hoje?" data-last-event="há 35 min" data-urgency="ok">
+                    <td class="px-6 py-4">
+                      <div class="font-semibold text-white">Mariana Costa</div>
+                      <span class="status-badge mt-1 inline-flex items-center rounded-full border border-emerald-500/30 bg-emerald-500/10 px-2 py-0.5 text-[11px] font-semibold text-emerald-200" data-status-badge hidden>Marcado</span>
+                      <div class="text-xs text-slate-400">mariana@datahub.com</div>
+                    </td>
+                    <td class="px-6 py-4">DataHub</td>
+                    <td class="px-6 py-4">
+                      <span class="rounded-full bg-emerald-500/20 px-3 py-1 text-xs font-semibold text-emerald-200">92</span>
+                    </td>
+                    <td class="px-6 py-4">Webinar + página de preços</td>
+                    <td class="px-6 py-4">
+                      <button class="btn btn--tiny" type="button" data-open-modal="true" disabled title="Em breve. Use o botão de copiar mensagem no detalhe.">
+                        Ligar agora
+                      </button>
+                    </td>
+                  </tr>
+                  <tr class="lead-row" data-priority="hot" data-name="Pedro Lima" data-email="pedro@fintech.io" data-company="Fintech.io" data-score="88" data-interest="Retornou ao pricing 3x" data-action="Agendar demo" data-signals="Retornou ao pricing 3x; Comparou planos; Abriu email de trial" data-recommendation="Oi Pedro, vi que você voltou ao pricing algumas vezes. Que tal marcarmos uma demo rápida?" data-last-event="há 1h 20m" data-urgency="ok">
+                    <td class="px-6 py-4">
+                      <div class="font-semibold text-white">Pedro Lima</div>
+                      <span class="status-badge mt-1 inline-flex items-center rounded-full border border-emerald-500/30 bg-emerald-500/10 px-2 py-0.5 text-[11px] font-semibold text-emerald-200" data-status-badge hidden>Marcado</span>
+                      <div class="text-xs text-slate-400">pedro@fintech.io</div>
+                    </td>
+                    <td class="px-6 py-4">Fintech.io</td>
+                    <td class="px-6 py-4">
+                      <span class="rounded-full bg-emerald-500/20 px-3 py-1 text-xs font-semibold text-emerald-200">88</span>
+                    </td>
+                    <td class="px-6 py-4">Retornou ao pricing 3x</td>
+                    <td class="px-6 py-4">
+                      <button class="btn btn--tiny" type="button" data-open-modal="true" disabled title="Em breve. Use o botão de copiar mensagem no detalhe.">
+                        Agendar demo
+                      </button>
+                    </td>
+                  </tr>
+                  <tr class="lead-row" data-priority="medium" data-name="Carla Souza" data-email="carla@logis.com" data-company="Logis" data-score="79" data-interest="Abriu email + visitou cases" data-action="Enviar follow-up" data-signals="Abriu email; Visitou página de cases; Clicou em integração CRM" data-recommendation="Oi Carla, preparei um resumo dos cases que você visitou. Posso te enviar uma proposta?" data-last-event="há 3h 10m" data-urgency="urgent">
+                    <td class="px-6 py-4">
+                      <div class="font-semibold text-white">Carla Souza</div>
+                      <span class="status-badge mt-1 inline-flex items-center rounded-full border border-emerald-500/30 bg-emerald-500/10 px-2 py-0.5 text-[11px] font-semibold text-emerald-200" data-status-badge hidden>Marcado</span>
+                      <div class="text-xs text-slate-400">carla@logis.com</div>
+                    </td>
+                    <td class="px-6 py-4">Logis</td>
+                    <td class="px-6 py-4">
+                      <span class="rounded-full bg-blue-500/20 px-3 py-1 text-xs font-semibold text-blue-200">79</span>
+                    </td>
+                    <td class="px-6 py-4">Abriu email + visitou cases</td>
+                    <td class="px-6 py-4">
+                      <button class="btn btn--ghost btn--tiny" type="button" data-open-modal="true" disabled title="Em breve. Use o botão de copiar mensagem no detalhe.">
+                        Enviar follow-up
+                      </button>
+                    </td>
+                  </tr>
+                  <tr class="lead-row" data-priority="medium" data-name="Lucas Ribeiro" data-email="lucas@retailmax.com" data-company="RetailMax" data-score="73" data-interest="Solicitou integração CRM" data-action="Qualificar" data-signals="Solicitou integração CRM; Respondeu pesquisa NPS; Visitou página de segurança" data-recommendation="Oi Lucas, vi sua solicitação de integração com CRM. Quer validar se o LeadRank encaixa no seu fluxo?" data-last-event="há 4h 05m" data-urgency="ok">
+                    <td class="px-6 py-4">
+                      <div class="font-semibold text-white">Lucas Ribeiro</div>
+                      <span class="status-badge mt-1 inline-flex items-center rounded-full border border-emerald-500/30 bg-emerald-500/10 px-2 py-0.5 text-[11px] font-semibold text-emerald-200" data-status-badge hidden>Marcado</span>
+                      <div class="text-xs text-slate-400">lucas@retailmax.com</div>
+                    </td>
+                    <td class="px-6 py-4">RetailMax</td>
+                    <td class="px-6 py-4">
+                      <span class="rounded-full bg-blue-500/20 px-3 py-1 text-xs font-semibold text-blue-200">73</span>
+                    </td>
+                    <td class="px-6 py-4">Solicitou integração CRM</td>
+                    <td class="px-6 py-4">
+                      <button class="btn btn--ghost btn--tiny" type="button" data-open-modal="true" disabled title="Em breve. Use o botão de copiar mensagem no detalhe.">
+                        Qualificar
+                      </button>
+                    </td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </section>
+      </main>
+
+      <div class="modal" id="leadModal" aria-hidden="true" role="dialog" aria-modal="true">
+        <div class="modal__backdrop" data-modal-close></div>
+        <div class="modal__content">
+          <div class="modal__header">
+            <div>
+              <p class="text-xs font-semibold uppercase tracking-[0.2em] text-slate-400">Detalhes do lead</p>
+              <h2 class="text-xl font-semibold text-white" id="leadModalName"></h2>
+              <p class="text-sm text-slate-300" id="leadModalCompany"></p>
+            </div>
+            <button class="btn btn--ghost btn--small" type="button" data-modal-close>Fechar</button>
+          </div>
+          <div class="modal__grid">
+            <div>
+              <p class="text-xs uppercase tracking-[0.2em] text-slate-400">Contato</p>
+              <p class="modal__value" id="leadModalEmail"></p>
+            </div>
+            <div>
+              <p class="text-xs uppercase tracking-[0.2em] text-slate-400">Interesse</p>
+              <p class="modal__value" id="leadModalInterest"></p>
+            </div>
+            <div>
+              <p class="text-xs uppercase tracking-[0.2em] text-slate-400">Último evento</p>
+              <p class="modal__value" id="leadModalLastEvent"></p>
+            </div>
+            <div>
+              <p class="text-xs uppercase tracking-[0.2em] text-slate-400">Próxima ação</p>
+              <p class="modal__value" id="leadModalAction"></p>
+            </div>
+            <div class="modal__score rounded-xl border border-white/10 bg-white/5 p-4">
+              <p class="text-xs uppercase tracking-[0.2em] text-slate-400">Score</p>
+              <p class="mt-2 text-3xl font-semibold text-white" id="leadModalScore"></p>
+              <p class="text-xs text-slate-300" id="leadModalUrgency"></p>
+            </div>
+            <div>
+              <p class="text-xs uppercase tracking-[0.2em] text-slate-400">Por que este lead é quente?</p>
+              <ul class="mt-2 space-y-1 text-sm text-slate-300" id="leadModalSignals"></ul>
+            </div>
+            <div>
+              <p class="text-xs uppercase tracking-[0.2em] text-slate-400">Próxima melhor ação</p>
+              <p class="mt-2 text-sm text-slate-300" id="leadModalRecommendation"></p>
+            </div>
+            <div>
+              <p class="text-xs uppercase tracking-[0.2em] text-slate-400">Template de mensagem</p>
+              <textarea class="mt-2 w-full rounded-xl border border-white/10 bg-slate-900/60 px-4 py-3 text-sm text-white" id="leadModalTemplate" rows="3" readonly></textarea>
+            </div>
+          </div>
+          <div class="modal__actions">
+            <button class="btn btn--ghost btn--small" type="button" id="copyLeadMessage">Copiar mensagem</button>
+            <div class="button-group">
+              <button class="btn btn--ghost btn--small" type="button" data-status="Agendou">Agendou</button>
+              <button class="btn btn--ghost btn--small" type="button" data-status="Em negociação">Em negociação</button>
+              <button class="btn btn--ghost btn--small" type="button" data-status="Sem fit">Sem fit</button>
+              <button class="btn btn--ghost btn--small" type="button" data-status="Follow-up">Follow-up</button>
+            </div>
+          </div>
+          <p class="text-xs text-slate-400" id="leadModalStatus"></p>
+        </div>
       </div>
-    </footer>
-  </div>
 
-  <script>
-    const BACKEND = (window.BACKEND_URL || "https://qualificador-leads-i-a.onrender.com").replace(/\/$/, "");
+      <div data-include="site-footer"></div>
+    </div>
+    <script>
+      document.addEventListener("DOMContentLoaded", () => {
+        const filterButtons = Array.from(document.querySelectorAll("[data-filter]"));
+        const filterCounts = Array.from(document.querySelectorAll("[data-count]"));
+        const rows = Array.from(document.querySelectorAll("tbody tr[data-priority]"));
+        const modal = document.getElementById("leadModal");
+        const modalName = document.getElementById("leadModalName");
+        const modalCompany = document.getElementById("leadModalCompany");
+        const modalEmail = document.getElementById("leadModalEmail");
+        const modalInterest = document.getElementById("leadModalInterest");
+        const modalAction = document.getElementById("leadModalAction");
+        const modalScore = document.getElementById("leadModalScore");
+        const modalSignals = document.getElementById("leadModalSignals");
+        const modalRecommendation = document.getElementById("leadModalRecommendation");
+        const modalStatus = document.getElementById("leadModalStatus");
+        const modalLastEvent = document.getElementById("leadModalLastEvent");
+        const modalUrgency = document.getElementById("leadModalUrgency");
+        const copyButton = document.getElementById("copyLeadMessage");
+        const modalTemplate = document.getElementById("leadModalTemplate");
+        const searchInput = document.getElementById("leadSearch");
+        const leadEmpty = document.getElementById("leadEmpty");
+        const leadLoading = document.getElementById("leadLoading");
+        const leadAlert = document.getElementById("leadAlert");
+        const exportCsv = document.getElementById("exportCsv");
+        const crmSync = document.getElementById("crmSync");
+        const statusStorageKey = "leadrankLeadStatus";
+        let activeFilter = "hot";
+        let searchTerm = "";
 
-    const el = (id) => document.getElementById(id);
-    const msg = el("actionMsg");
-    const wsPill = el("wsPill");
-    const leadsTableWrap = el("leadsTableWrap");
-    const searchInput = el("leadSearch");
-    const chips = Array.from(document.querySelectorAll("[data-filter]"));
-    const actionList = document.querySelector(".action-list");
-    let allItems = [];
-
-    let summaryState = { hot: 0, warm: 0, cold: 0, converted_today: 0 };
-
-    let activeFilter = "hot";
-
-    function setMsg(type, text) {
-      msg.className = "alert" + (type ? " " + type : "");
-      msg.style.display = "block";
-      msg.textContent = text;
-    }
-
-    function setActionState(state) {
-      if (!actionList) return;
-      actionList.dataset.state = state;
-    }
-
-    function qs(name) {
-      return new URLSearchParams(location.search).get(name) || "";
-    }
-
-    function getAuth() {
-      return {
-        client_id: qs("client_id") || localStorage.getItem("leadrank_client_id") || localStorage.getItem("client_id") || localStorage.getItem("LR_CLIENT_ID") || "",
-        api_key: qs("api_key") || localStorage.getItem("leadrank_api_key") || localStorage.getItem("api_key") || localStorage.getItem("LR_API_KEY") || "",
-      };
-    }
-
-    async function api(path) {
-      const { client_id, api_key } = getAuth();
-      const url = new URL(BACKEND + path);
-      url.searchParams.set("client_id", client_id);
-      const headers = {};
-      if (api_key) headers["X-API-KEY"] = api_key;
-      const res = await fetch(url.toString(), { headers });
-      const data = await res.json().catch(() => ({}));
-      if (!res.ok) throw new Error(data.error || data.message || ("HTTP " + res.status));
-      return data;
-    }
-
-    async function apiPost(path, body) {
-      const { api_key } = getAuth();
-      const headers = { "Content-Type": "application/json" };
-      if (api_key) headers["X-API-KEY"] = api_key;
-      const res = await fetch(BACKEND + path, {
-        method: "POST",
-        headers,
-        body: JSON.stringify(body),
-      });
-      const data = await res.json().catch(() => ({}));
-      if (!res.ok) throw new Error(data.error || data.message || ("HTTP " + res.status));
-      return data;
-    }
-
-    function renderHero(summary) {
-      el("dailyHotCount").textContent = summary.hot ?? 0;
-      el("dailyWarmCount").textContent = summary.warm ?? 0;
-      el("dailyColdCount").textContent = summary.cold ?? 0;
-      el("dailyConvertedCount").textContent = summary.converted_today ?? 0;
-    }
-
-    function normalizeText(value) {
-      return (value || "").toString().toLowerCase();
-    }
-
-    function applyFilters() {
-      const term = normalizeText(searchInput.value);
-      const filtered = allItems.filter((item) => {
-        const temperature = item.temperatura || "unknown";
-        const status = item.status || "pendente";
-        const matchesFilter = ["hot", "warm", "cold"].includes(activeFilter)
-          ? temperature === activeFilter
-          : status === activeFilter;
-        if (!matchesFilter) return false;
-        if (!term) return true;
-        return [item.nome, item.telefone, item.origem].some((field) => normalizeText(field).includes(term));
-      });
-      renderTable(filtered);
-    }
-
-    function renderTable(items) {
-      if (!items.length) {
-        leadsTableWrap.innerHTML = "<div class='text-muted'>Nenhum lead encontrado com os filtros atuais.</div>";
-        return;
-      }
-      const rows = items.map((item) => {
-        const prob = item.probabilidade != null ? Math.round(item.probabilidade * 100) + "%" : "—";
-        const score = item.score != null ? item.score : "—";
-        return `
-          <tr>
-            <td>${item.nome || "—"}</td>
-            <td>${item.telefone || "—"}</td>
-            <td>${item.origem || "—"}</td>
-            <td>${score}</td>
-            <td>${prob}</td>
-            <td>${item.temperatura || "pendente"}</td>
-            <td>${item.status || "pendente"}</td>
-            <td>${item.created_at ? new Date(item.created_at).toLocaleDateString("pt-BR") : "—"}</td>
-
-            <td>
-              <div class="button-group">
-                <button class="btn btn--tiny" type="button" data-action="convert" data-id="${item.id}">✅</button>
-                <button class="btn btn--tiny btn--ghost" type="button" data-action="deny" data-id="${item.id}">❌</button>
-                <button class="btn btn--tiny btn--ghost" type="button" data-action="later" data-id="${item.id}">⏳</button>
-              </div>
-            </td>
-
-          </tr>
-        `;
-      }).join("");
-
-      leadsTableWrap.innerHTML = `
-        <table class="data-table">
-          <thead>
-            <tr>
-              <th>Nome</th>
-              <th>Telefone</th>
-              <th>Origem</th>
-              <th>Score</th>
-              <th>Probabilidade</th>
-              <th>Temperatura</th>
-              <th>Status</th>
-              <th>Data</th>
-
-              <th>Ações</th>
-
-            </tr>
-          </thead>
-          <tbody>${rows}</tbody>
-        </table>
-      `;
-    }
-
-    function setActiveChip(filter) {
-      activeFilter = filter;
-      chips.forEach((chip) => {
-        chip.classList.toggle("chip--active", chip.dataset.filter === filter);
-      });
-      applyFilters();
-    }
-
-    chips.forEach((chip) => {
-      chip.addEventListener("click", () => setActiveChip(chip.dataset.filter));
-    });
-
-    searchInput.addEventListener("input", () => applyFilters());
-
-    el("btnRetry").onclick = () => loadAction();
-
-    el("btnExport").onclick = () => {
-      const { client_id, api_key } = getAuth();
-      if (!client_id) return setMsg("alert--error", "Informe o client_id.");
-      const url = new URL(BACKEND + "/leads_export.csv");
-      url.searchParams.set("client_id", client_id);
-      if (api_key) {
-        setMsg("alert--error", "Para exportar com API Key, faça o download via API ou desative a exigência.");
-        return;
-      }
-      window.location.href = url.toString();
-    };
-
-    async function loadAction() {
-      msg.style.display = "none";
-      setActionState("loading");
-      const { client_id } = getAuth();
-      wsPill.textContent = "workspace: " + (client_id || "—");
-      if (!client_id) {
-        setActionState("error");
-        setMsg("alert--error", "Informe seu client_id para carregar.");
-        return;
-      }
-      try {
-        const data = await api("/acao_do_dia");
-
-        summaryState = {
-          hot: data.summary?.hot ?? 0,
-          warm: data.summary?.warm ?? 0,
-          cold: data.summary?.cold ?? 0,
-          converted_today: data.summary?.converted_today ?? 0,
+        const loadStatusMap = () => {
+          try {
+            return JSON.parse(localStorage.getItem(statusStorageKey) || "{}");
+          } catch (error) {
+            return {};
+          }
         };
-        renderHero(summaryState);
 
-        renderHero(data.summary || {});
+        const saveStatusMap = (map) => {
+          localStorage.setItem(statusStorageKey, JSON.stringify(map));
+        };
 
-        allItems = data.items || [];
-        if (!allItems.length) {
-          setActionState("empty");
-        } else {
-          setActionState("ready");
-          setActiveChip(activeFilter);
+        const updateRowBadge = (row, status) => {
+          const badge = row.querySelector("[data-status-badge]");
+          if (!badge) return;
+          if (status) {
+            badge.textContent = `Marcado: ${status}`;
+            badge.hidden = false;
+          } else {
+            badge.hidden = true;
+          }
+        };
+
+        const countByPriority = (filteredRows) => {
+          const counts = filteredRows.reduce(
+            (acc, row) => {
+              const priority = row.dataset.priority || "all";
+              acc.all += 1;
+              acc[priority] = (acc[priority] || 0) + 1;
+              return acc;
+            },
+            { hot: 0, medium: 0, all: 0 }
+          );
+          filterCounts.forEach((count) => {
+            const key = count.dataset.count;
+            if (key && counts[key] !== undefined) {
+              count.textContent = `(${counts[key]})`;
+            }
+          });
+        };
+
+        const setActiveFilter = (filter) => {
+          activeFilter = filter;
+          filterButtons.forEach((button) => {
+            const isActive = button.dataset.filter === filter;
+            button.classList.toggle("is-active", isActive);
+            button.setAttribute("aria-pressed", String(isActive));
+          });
+          applyFilters();
+        };
+
+        const applyFilters = () => {
+          const filtered = rows.filter((row) => {
+            const matchesFilter = activeFilter === "all" || row.dataset.priority === activeFilter;
+            const target = `${row.dataset.name || ""} ${row.dataset.company || ""}`.toLowerCase();
+            const matchesSearch = !searchTerm || target.includes(searchTerm);
+            const shouldShow = matchesFilter && matchesSearch;
+            row.style.display = shouldShow ? "" : "none";
+            return shouldShow;
+          });
+          countByPriority(filtered);
+          if (leadEmpty) {
+            leadEmpty.hidden = filtered.length !== 0;
+          }
+        };
+
+        filterButtons.forEach((button) => {
+          button.addEventListener("click", () => setActiveFilter(button.dataset.filter || "all"));
+        });
+
+        if (searchInput) {
+          searchInput.addEventListener("input", (event) => {
+            searchTerm = event.target.value.trim().toLowerCase();
+            applyFilters();
+          });
         }
-        setMsg("alert--success", "Ação do dia carregada.");
-      } catch (err) {
-        setActionState("error");
-        setMsg("alert--error", "Não conseguimos carregar seus leads. Confira sua conexão ou chave de integração.");
-      }
-    }
 
-    leadsTableWrap.addEventListener("click", async (event) => {
-      const button = event.target.closest("[data-action]");
-      if (!button) return;
-      const action = button.dataset.action;
-      const leadId = Number(button.dataset.id || 0);
-      const { client_id } = getAuth();
-      if (!leadId || !client_id) return;
+        const openModal = (row) => {
+          if (!modal || !row) return;
+          modalName.textContent = row.dataset.name || "";
+          modalCompany.textContent = row.dataset.company || "";
+          modalEmail.textContent = row.dataset.email || "";
+          modalInterest.textContent = row.dataset.interest || "";
+          modalAction.textContent = row.dataset.action || "";
+          modalScore.textContent = row.dataset.score || "";
+          modalLastEvent.textContent = row.dataset.lastEvent || "";
+          modalUrgency.textContent =
+            row.dataset.urgency === "urgent" ? "SLA estourado (urgente)" : "SLA em dia";
 
-      try {
-        if (action === "convert") {
-          await apiPost("/confirmar_venda", { client_id, lead_id: leadId });
-          summaryState.converted_today += 1;
-          renderHero(summaryState);
-          allItems = allItems.map((item) =>
-            item.id === leadId ? { ...item, status: "convertido" } : item
-          );
-        } else if (action === "deny") {
-          await apiPost("/negar_venda", { client_id, lead_id: leadId });
-          allItems = allItems.map((item) =>
-            item.id === leadId ? { ...item, status: "negado" } : item
-          );
-        } else if (action === "later") {
-          allItems = allItems.filter((item) => item.id !== leadId);
+          modalSignals.innerHTML = "";
+          const signals = (row.dataset.signals || "").split(";").map((item) => item.trim()).filter(Boolean).slice(0, 3);
+          signals.forEach((signal) => {
+            const li = document.createElement("li");
+            li.textContent = signal;
+            modalSignals.appendChild(li);
+          });
+
+          modalRecommendation.textContent = row.dataset.recommendation || "";
+          if (modalTemplate) {
+            modalTemplate.value = row.dataset.recommendation || "";
+          }
+          modalStatus.textContent = "";
+          modal.classList.add("modal--open");
+          modal.setAttribute("aria-hidden", "false");
+        };
+
+        const closeModal = () => {
+          if (!modal) return;
+          modal.classList.remove("modal--open");
+          modal.setAttribute("aria-hidden", "true");
+        };
+
+        rows.forEach((row) => {
+          row.classList.add("table-row-clickable");
+          row.addEventListener("click", () => openModal(row));
+        });
+
+        const statusMap = loadStatusMap();
+        rows.forEach((row) => {
+          updateRowBadge(row, statusMap[row.dataset.email || ""]);
+        });
+
+        document.querySelectorAll("[data-modal-close]").forEach((button) => {
+          button.addEventListener("click", closeModal);
+        });
+
+        document.addEventListener("keydown", (event) => {
+          if (event.key === "Escape") {
+            closeModal();
+          }
+        });
+
+        document.querySelectorAll("[data-status]").forEach((button) => {
+          button.addEventListener("click", () => {
+            const status = button.dataset.status || "";
+            const email = modalEmail.textContent || "";
+            if (email) {
+              statusMap[email] = status;
+              saveStatusMap(statusMap);
+              const row = rows.find((item) => item.dataset.email === email);
+              if (row) {
+                updateRowBadge(row, status);
+              }
+            }
+            modalStatus.textContent = `Status registrado: ${status}.`;
+          });
+        });
+
+        if (copyButton) {
+          copyButton.addEventListener("click", async () => {
+            const message = modalTemplate ? modalTemplate.value : modalRecommendation.textContent || "";
+            try {
+              await navigator.clipboard.writeText(message);
+              modalStatus.textContent = "Mensagem copiada para a área de transferência.";
+            } catch (error) {
+              modalStatus.textContent = "Não foi possível copiar a mensagem.";
+            }
+          });
+        }
+
+        if (exportCsv) {
+          exportCsv.addEventListener("click", () => {
+            if (!rows.length) {
+              exportCsv.setAttribute("disabled", "true");
+              exportCsv.setAttribute("title", "Disponível quando houver leads reais / integração ativa.");
+              return;
+            }
+            const headers = ["Nome", "Email", "Empresa", "Score", "Interesse", "Prioridade", "Próxima ação", "Último evento", "Status"];
+            const csvRows = rows.map((row) => [
+              row.dataset.name || "",
+              row.dataset.email || "",
+              row.dataset.company || "",
+              row.dataset.score || "",
+              row.dataset.interest || "",
+              row.dataset.priority || "",
+              row.dataset.action || "",
+              row.dataset.lastEvent || "",
+              statusMap[row.dataset.email || ""] || ""
+            ]);
+            const content = [headers, ...csvRows]
+              .map((line) => line.map((item) => `"${String(item).replace(/"/g, "\"\"")}"`).join(","))
+              .join("\n");
+            const blob = new Blob([content], { type: "text/csv;charset=utf-8;" });
+            const url = URL.createObjectURL(blob);
+            const link = document.createElement("a");
+            link.href = url;
+            link.download = "leads-acao-do-dia.csv";
+            link.click();
+            URL.revokeObjectURL(url);
+          });
+        }
+
+        if (crmSync) {
+          crmSync.addEventListener("click", () => {
+            if (leadAlert) {
+              leadAlert.textContent = "Integração com CRM estará disponível em breve. Use o template de mensagem para seguir contato.";
+              leadAlert.hidden = false;
+            }
+          });
+        }
+
+        if (leadLoading) {
+          leadLoading.hidden = true;
         }
         applyFilters();
-      } catch (err) {
-        setMsg("alert--error", "Não foi possível atualizar o lead. Tente novamente.");
-      }
-    });
-
-    loadAction();
-  </script>
-</body>
+      });
+    </script>
+    <script src="partials/site-shell.js"></script>
+  </body>
 </html>

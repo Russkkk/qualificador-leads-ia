@@ -152,6 +152,17 @@ body[data-theme="light"] .site-header {
   box-shadow: 0 12px 30px rgba(79, 124, 255, 0.35);
 }
 
+.btn[disabled] {
+  cursor: not-allowed;
+  opacity: 0.5;
+  box-shadow: none;
+  transform: none;
+}
+
+.btn[disabled]:hover {
+  transform: none;
+}
+
 .btn:hover {
   transform: translateY(-2px);
 }
@@ -201,6 +212,15 @@ body[data-theme="light"] .site-header {
   display: flex;
   flex-wrap: wrap;
   gap: 12px;
+}
+
+.table-row-clickable {
+  cursor: pointer;
+  transition: background 0.2s ease;
+}
+
+.table-row-clickable:hover {
+  background: rgba(255, 255, 255, 0.04);
 }
 
 main {

@@ -34,15 +34,12 @@
               </p>
             </div>
             <div class="flex flex-wrap gap-3">
-              <a class="btn btn--ghost btn--tiny" href="assets/leads-sample.csv" download>
+              <button class="btn btn--ghost btn--tiny" type="button" id="exportCsv">
                 Exportar CSV
-              </a>
-              <a
-                class="btn btn--tiny"
-                href="mailto:privacidade@leadrank.com.br?subject=Integra%C3%A7%C3%A3o%20CRM"
-              >
+              </button>
+              <button class="btn btn--tiny" type="button" id="crmSync" disabled title="Em breve. Use 'Copiar mensagem' para seguir contato.">
                 Enviar para CRM
-              </a>
+              </button>
             </div>
           </div>
 
@@ -77,9 +74,26 @@
                   Todos <span class="filter-count" data-count="all">(0)</span>
                 </button>
               </div>
-              <a class="btn btn--ghost btn--tiny" href="acao.html">
-                Atualizar lista
-              </a>
+              <div class="flex flex-wrap items-center gap-3">
+                <label class="sr-only" for="leadSearch">Buscar lead</label>
+                <input
+                  class="rounded-full border border-white/10 bg-slate-950/40 px-4 py-2 text-xs text-white placeholder:text-slate-500 focus:border-blue-400 focus:outline-none"
+                  id="leadSearch"
+                  type="search"
+                  placeholder="Buscar por nome ou empresa"
+                />
+                <a class="btn btn--ghost btn--tiny" href="acao.html">
+                  Atualizar lista
+                </a>
+              </div>
+            </div>
+            <div class="alert mx-6 mt-4 rounded-xl border border-white/10 bg-white/5 px-4 py-3 text-xs text-slate-300" id="leadAlert" role="status" aria-live="polite" hidden></div>
+            <div class="px-6 py-6 text-sm text-slate-300" id="leadLoading">
+              Carregando leads priorizados...
+            </div>
+            <div class="px-6 py-6 text-sm text-slate-300" id="leadEmpty" hidden>
+              Nenhum lead encontrado para este filtro.
+              <a class="ml-2 font-semibold text-emerald-300 hover:text-emerald-200" href="onboarding.html">Conectar fonte de leads</a>
             </div>
             <div class="overflow-x-auto">
               <table class="min-w-full text-left text-sm text-slate-200">
@@ -93,9 +107,10 @@
                   </tr>
                 </thead>
                 <tbody class="divide-y divide-white/10">
-                  <tr data-priority="hot" data-name="Mariana Costa" data-email="mariana@datahub.com" data-company="DataHub" data-score="92" data-interest="Webinar + página de preços" data-action="Ligar agora" data-signals="Visitou página de preços 2x; Participou do webinar; Clicou no CTA de demo" data-recommendation="Oi Mariana, vi seu interesse no webinar e na página de preços. Posso te mostrar como priorizar leads hoje?" data-last-event="há 35 min" data-urgency="ok">
+                  <tr class="lead-row" data-priority="hot" data-name="Mariana Costa" data-email="mariana@datahub.com" data-company="DataHub" data-score="92" data-interest="Webinar + página de preços" data-action="Ligar agora" data-signals="Visitou página de preços 2x; Participou do webinar; Clicou no CTA de demo" data-recommendation="Oi Mariana, vi seu interesse no webinar e na página de preços. Posso te mostrar como priorizar leads hoje?" data-last-event="há 35 min" data-urgency="ok">
                     <td class="px-6 py-4">
                       <div class="font-semibold text-white">Mariana Costa</div>
+                      <span class="status-badge mt-1 inline-flex items-center rounded-full border border-emerald-500/30 bg-emerald-500/10 px-2 py-0.5 text-[11px] font-semibold text-emerald-200" data-status-badge hidden>Marcado</span>
                       <div class="text-xs text-slate-400">mariana@datahub.com</div>
                     </td>
                     <td class="px-6 py-4">DataHub</td>
@@ -104,14 +119,15 @@
                     </td>
                     <td class="px-6 py-4">Webinar + página de preços</td>
                     <td class="px-6 py-4">
-                      <button class="btn btn--tiny" type="button" data-open-modal="true">
+                      <button class="btn btn--tiny" type="button" data-open-modal="true" disabled title="Em breve. Use o botão de copiar mensagem no detalhe.">
                         Ligar agora
                       </button>
                     </td>
                   </tr>
-                  <tr data-priority="hot" data-name="Pedro Lima" data-email="pedro@fintech.io" data-company="Fintech.io" data-score="88" data-interest="Retornou ao pricing 3x" data-action="Agendar demo" data-signals="Retornou ao pricing 3x; Comparou planos; Abriu email de trial" data-recommendation="Oi Pedro, vi que você voltou ao pricing algumas vezes. Que tal marcarmos uma demo rápida?" data-last-event="há 1h 20m" data-urgency="ok">
+                  <tr class="lead-row" data-priority="hot" data-name="Pedro Lima" data-email="pedro@fintech.io" data-company="Fintech.io" data-score="88" data-interest="Retornou ao pricing 3x" data-action="Agendar demo" data-signals="Retornou ao pricing 3x; Comparou planos; Abriu email de trial" data-recommendation="Oi Pedro, vi que você voltou ao pricing algumas vezes. Que tal marcarmos uma demo rápida?" data-last-event="há 1h 20m" data-urgency="ok">
                     <td class="px-6 py-4">
                       <div class="font-semibold text-white">Pedro Lima</div>
+                      <span class="status-badge mt-1 inline-flex items-center rounded-full border border-emerald-500/30 bg-emerald-500/10 px-2 py-0.5 text-[11px] font-semibold text-emerald-200" data-status-badge hidden>Marcado</span>
                       <div class="text-xs text-slate-400">pedro@fintech.io</div>
                     </td>
                     <td class="px-6 py-4">Fintech.io</td>
@@ -120,14 +136,15 @@
                     </td>
                     <td class="px-6 py-4">Retornou ao pricing 3x</td>
                     <td class="px-6 py-4">
-                      <button class="btn btn--tiny" type="button" data-open-modal="true">
+                      <button class="btn btn--tiny" type="button" data-open-modal="true" disabled title="Em breve. Use o botão de copiar mensagem no detalhe.">
                         Agendar demo
                       </button>
                     </td>
                   </tr>
-                  <tr data-priority="medium" data-name="Carla Souza" data-email="carla@logis.com" data-company="Logis" data-score="79" data-interest="Abriu email + visitou cases" data-action="Enviar follow-up" data-signals="Abriu email; Visitou página de cases; Clicou em integração CRM" data-recommendation="Oi Carla, preparei um resumo dos cases que você visitou. Posso te enviar uma proposta?" data-last-event="há 3h 10m" data-urgency="urgent">
+                  <tr class="lead-row" data-priority="medium" data-name="Carla Souza" data-email="carla@logis.com" data-company="Logis" data-score="79" data-interest="Abriu email + visitou cases" data-action="Enviar follow-up" data-signals="Abriu email; Visitou página de cases; Clicou em integração CRM" data-recommendation="Oi Carla, preparei um resumo dos cases que você visitou. Posso te enviar uma proposta?" data-last-event="há 3h 10m" data-urgency="urgent">
                     <td class="px-6 py-4">
                       <div class="font-semibold text-white">Carla Souza</div>
+                      <span class="status-badge mt-1 inline-flex items-center rounded-full border border-emerald-500/30 bg-emerald-500/10 px-2 py-0.5 text-[11px] font-semibold text-emerald-200" data-status-badge hidden>Marcado</span>
                       <div class="text-xs text-slate-400">carla@logis.com</div>
                     </td>
                     <td class="px-6 py-4">Logis</td>
@@ -136,14 +153,15 @@
                     </td>
                     <td class="px-6 py-4">Abriu email + visitou cases</td>
                     <td class="px-6 py-4">
-                      <button class="btn btn--ghost btn--tiny" type="button" data-open-modal="true">
+                      <button class="btn btn--ghost btn--tiny" type="button" data-open-modal="true" disabled title="Em breve. Use o botão de copiar mensagem no detalhe.">
                         Enviar follow-up
                       </button>
                     </td>
                   </tr>
-                  <tr data-priority="medium" data-name="Lucas Ribeiro" data-email="lucas@retailmax.com" data-company="RetailMax" data-score="73" data-interest="Solicitou integração CRM" data-action="Qualificar" data-signals="Solicitou integração CRM; Respondeu pesquisa NPS; Visitou página de segurança" data-recommendation="Oi Lucas, vi sua solicitação de integração com CRM. Quer validar se o LeadRank encaixa no seu fluxo?" data-last-event="há 4h 05m" data-urgency="ok">
+                  <tr class="lead-row" data-priority="medium" data-name="Lucas Ribeiro" data-email="lucas@retailmax.com" data-company="RetailMax" data-score="73" data-interest="Solicitou integração CRM" data-action="Qualificar" data-signals="Solicitou integração CRM; Respondeu pesquisa NPS; Visitou página de segurança" data-recommendation="Oi Lucas, vi sua solicitação de integração com CRM. Quer validar se o LeadRank encaixa no seu fluxo?" data-last-event="há 4h 05m" data-urgency="ok">
                     <td class="px-6 py-4">
                       <div class="font-semibold text-white">Lucas Ribeiro</div>
+                      <span class="status-badge mt-1 inline-flex items-center rounded-full border border-emerald-500/30 bg-emerald-500/10 px-2 py-0.5 text-[11px] font-semibold text-emerald-200" data-status-badge hidden>Marcado</span>
                       <div class="text-xs text-slate-400">lucas@retailmax.com</div>
                     </td>
                     <td class="px-6 py-4">RetailMax</td>
@@ -152,7 +170,7 @@
                     </td>
                     <td class="px-6 py-4">Solicitou integração CRM</td>
                     <td class="px-6 py-4">
-                      <button class="btn btn--ghost btn--tiny" type="button" data-open-modal="true">
+                      <button class="btn btn--ghost btn--tiny" type="button" data-open-modal="true" disabled title="Em breve. Use o botão de copiar mensagem no detalhe.">
                         Qualificar
                       </button>
                     </td>
@@ -198,12 +216,16 @@
               <p class="text-xs text-slate-300" id="leadModalUrgency"></p>
             </div>
             <div>
-              <p class="text-xs uppercase tracking-[0.2em] text-slate-400">Por que esse lead?</p>
+              <p class="text-xs uppercase tracking-[0.2em] text-slate-400">Por que este lead é quente?</p>
               <ul class="mt-2 space-y-1 text-sm text-slate-300" id="leadModalSignals"></ul>
             </div>
             <div>
-              <p class="text-xs uppercase tracking-[0.2em] text-slate-400">Recomendação</p>
+              <p class="text-xs uppercase tracking-[0.2em] text-slate-400">Próxima melhor ação</p>
               <p class="mt-2 text-sm text-slate-300" id="leadModalRecommendation"></p>
+            </div>
+            <div>
+              <p class="text-xs uppercase tracking-[0.2em] text-slate-400">Template de mensagem</p>
+              <textarea class="mt-2 w-full rounded-xl border border-white/10 bg-slate-900/60 px-4 py-3 text-sm text-white" id="leadModalTemplate" rows="3" readonly></textarea>
             </div>
           </div>
           <div class="modal__actions">
@@ -239,9 +261,42 @@
         const modalLastEvent = document.getElementById("leadModalLastEvent");
         const modalUrgency = document.getElementById("leadModalUrgency");
         const copyButton = document.getElementById("copyLeadMessage");
+        const modalTemplate = document.getElementById("leadModalTemplate");
+        const searchInput = document.getElementById("leadSearch");
+        const leadEmpty = document.getElementById("leadEmpty");
+        const leadLoading = document.getElementById("leadLoading");
+        const leadAlert = document.getElementById("leadAlert");
+        const exportCsv = document.getElementById("exportCsv");
+        const crmSync = document.getElementById("crmSync");
+        const statusStorageKey = "leadrankLeadStatus";
+        let activeFilter = "hot";
+        let searchTerm = "";
 
-        const countByPriority = () => {
-          const counts = rows.reduce(
+        const loadStatusMap = () => {
+          try {
+            return JSON.parse(localStorage.getItem(statusStorageKey) || "{}");
+          } catch (error) {
+            return {};
+          }
+        };
+
+        const saveStatusMap = (map) => {
+          localStorage.setItem(statusStorageKey, JSON.stringify(map));
+        };
+
+        const updateRowBadge = (row, status) => {
+          const badge = row.querySelector("[data-status-badge]");
+          if (!badge) return;
+          if (status) {
+            badge.textContent = `Marcado: ${status}`;
+            badge.hidden = false;
+          } else {
+            badge.hidden = true;
+          }
+        };
+
+        const countByPriority = (filteredRows) => {
+          const counts = filteredRows.reduce(
             (acc, row) => {
               const priority = row.dataset.priority || "all";
               acc.all += 1;
@@ -259,19 +314,40 @@
         };
 
         const setActiveFilter = (filter) => {
+          activeFilter = filter;
           filterButtons.forEach((button) => {
             const isActive = button.dataset.filter === filter;
             button.classList.toggle("is-active", isActive);
             button.setAttribute("aria-pressed", String(isActive));
           });
-          rows.forEach((row) => {
-            row.style.display = filter === "all" || row.dataset.priority === filter ? "" : "none";
+          applyFilters();
+        };
+
+        const applyFilters = () => {
+          const filtered = rows.filter((row) => {
+            const matchesFilter = activeFilter === "all" || row.dataset.priority === activeFilter;
+            const target = `${row.dataset.name || ""} ${row.dataset.company || ""}`.toLowerCase();
+            const matchesSearch = !searchTerm || target.includes(searchTerm);
+            const shouldShow = matchesFilter && matchesSearch;
+            row.style.display = shouldShow ? "" : "none";
+            return shouldShow;
           });
+          countByPriority(filtered);
+          if (leadEmpty) {
+            leadEmpty.hidden = filtered.length !== 0;
+          }
         };
 
         filterButtons.forEach((button) => {
           button.addEventListener("click", () => setActiveFilter(button.dataset.filter || "all"));
         });
+
+        if (searchInput) {
+          searchInput.addEventListener("input", (event) => {
+            searchTerm = event.target.value.trim().toLowerCase();
+            applyFilters();
+          });
+        }
 
         const openModal = (row) => {
           if (!modal || !row) return;
@@ -286,7 +362,7 @@
             row.dataset.urgency === "urgent" ? "SLA estourado (urgente)" : "SLA em dia";
 
           modalSignals.innerHTML = "";
-          const signals = (row.dataset.signals || "").split(";").map((item) => item.trim()).filter(Boolean);
+          const signals = (row.dataset.signals || "").split(";").map((item) => item.trim()).filter(Boolean).slice(0, 3);
           signals.forEach((signal) => {
             const li = document.createElement("li");
             li.textContent = signal;
@@ -294,6 +370,9 @@
           });
 
           modalRecommendation.textContent = row.dataset.recommendation || "";
+          if (modalTemplate) {
+            modalTemplate.value = row.dataset.recommendation || "";
+          }
           modalStatus.textContent = "";
           modal.classList.add("modal--open");
           modal.setAttribute("aria-hidden", "false");
@@ -306,10 +385,13 @@
         };
 
         rows.forEach((row) => {
-          const trigger = row.querySelector("[data-open-modal]");
-          if (trigger) {
-            trigger.addEventListener("click", () => openModal(row));
-          }
+          row.classList.add("table-row-clickable");
+          row.addEventListener("click", () => openModal(row));
+        });
+
+        const statusMap = loadStatusMap();
+        rows.forEach((row) => {
+          updateRowBadge(row, statusMap[row.dataset.email || ""]);
         });
 
         document.querySelectorAll("[data-modal-close]").forEach((button) => {
@@ -324,13 +406,23 @@
 
         document.querySelectorAll("[data-status]").forEach((button) => {
           button.addEventListener("click", () => {
-            modalStatus.textContent = `Status registrado: ${button.dataset.status}.`;
+            const status = button.dataset.status || "";
+            const email = modalEmail.textContent || "";
+            if (email) {
+              statusMap[email] = status;
+              saveStatusMap(statusMap);
+              const row = rows.find((item) => item.dataset.email === email);
+              if (row) {
+                updateRowBadge(row, status);
+              }
+            }
+            modalStatus.textContent = `Status registrado: ${status}.`;
           });
         });
 
         if (copyButton) {
           copyButton.addEventListener("click", async () => {
-            const message = modalRecommendation.textContent || "";
+            const message = modalTemplate ? modalTemplate.value : modalRecommendation.textContent || "";
             try {
               await navigator.clipboard.writeText(message);
               modalStatus.textContent = "Mensagem copiada para a área de transferência.";
@@ -340,8 +432,51 @@
           });
         }
 
-        countByPriority();
-        setActiveFilter("hot");
+        if (exportCsv) {
+          exportCsv.addEventListener("click", () => {
+            if (!rows.length) {
+              exportCsv.setAttribute("disabled", "true");
+              exportCsv.setAttribute("title", "Disponível quando houver leads reais / integração ativa.");
+              return;
+            }
+            const headers = ["Nome", "Email", "Empresa", "Score", "Interesse", "Prioridade", "Próxima ação", "Último evento", "Status"];
+            const csvRows = rows.map((row) => [
+              row.dataset.name || "",
+              row.dataset.email || "",
+              row.dataset.company || "",
+              row.dataset.score || "",
+              row.dataset.interest || "",
+              row.dataset.priority || "",
+              row.dataset.action || "",
+              row.dataset.lastEvent || "",
+              statusMap[row.dataset.email || ""] || ""
+            ]);
+            const content = [headers, ...csvRows]
+              .map((line) => line.map((item) => `"${String(item).replace(/"/g, "\"\"")}"`).join(","))
+              .join("\n");
+            const blob = new Blob([content], { type: "text/csv;charset=utf-8;" });
+            const url = URL.createObjectURL(blob);
+            const link = document.createElement("a");
+            link.href = url;
+            link.download = "leads-acao-do-dia.csv";
+            link.click();
+            URL.revokeObjectURL(url);
+          });
+        }
+
+        if (crmSync) {
+          crmSync.addEventListener("click", () => {
+            if (leadAlert) {
+              leadAlert.textContent = "Integração com CRM estará disponível em breve. Use o template de mensagem para seguir contato.";
+              leadAlert.hidden = false;
+            }
+          });
+        }
+
+        if (leadLoading) {
+          leadLoading.hidden = true;
+        }
+        applyFilters();
       });
     </script>
     <script src="partials/site-shell.js"></script>

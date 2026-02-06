@@ -38,8 +38,8 @@
         </section>
 
         <div class="pricing__grid" id="pricingGrid">
-          <article class="card" data-plan="standard">
-            <span class="pricing__tag">Standard</span>
+          <article class="card" data-plan="pro">
+            <span class="pricing__tag">Pro</span>
             <div class="pricing__price">R$ 179 / mês</div>
             <p class="pricing__capacity">Até 3.000 leads / mês</p>
             <p class="subtitle">Escala com suporte prioritário e relatórios.</p>
@@ -49,9 +49,9 @@
               <li>Relatórios avançados</li>
             </ul>
             <a class="btn btn--block" href="https://pay.kiwify.com.br/xBAB8TZ" target="_blank" rel="noreferrer">
-              Assinar Standard
+              Assinar Pro
             </a>
-            <p class="pricing__microcopy">Standard</p>
+            <p class="pricing__microcopy">Pro</p>
           </article>
           <article class="card" data-plan="enterprise">
             <span class="pricing__tag">Enterprise</span>
@@ -63,7 +63,7 @@
               <li>Integrações customizadas</li>
               <li>SLA dedicado</li>
             </ul>
-            <a class="btn btn--block btn--ghost" href="https://pay.kiwify.com.br/Vq17ohp" target="_blank" rel="noreferrer">
+            <a class="btn btn--block btn--ghost" href="mailto:privacidade@leadrank.com.br?subject=LeadRank%20Enterprise">
               Falar com Vendas
             </a>
             <p class="pricing__microcopy">Enterprise</p>
@@ -152,7 +152,7 @@
     const BACKEND = (window.BACKEND_URL || "https://qualificador-leads-ia.onrender.com").replace(/\/$/, "");
     const KIWIFY_LINKS = {
       pro: "https://pay.kiwify.com.br/xBAB8TZ",
-      enterprise: "https://pay.kiwify.com.br/Vq17ohp"
+      enterprise: "mailto:privacidade@leadrank.com.br?subject=LeadRank%20Enterprise"
     };
     const PRICING_ICONS = {
       star: `<svg class="icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 2l2.9 6.1L22 9.2l-5 4.9 1.2 7L12 17.8 5.8 21.1 7 14.1 2 9.2l7.1-1.1L12 2z"/></svg>`
@@ -210,21 +210,29 @@
       }
     ];
 
-    function swapCtaLinks(plans) {
-      const starterPlan = plans.find((plan) => /assinar\s*stan/i.test(plan.cta || "") || /starter|stander/i.test(plan.name || ""));
-      const salesPlan = plans.find((plan) => /falar com vendas/i.test(plan.cta || "") || /enterprise/i.test(plan.name || "") || /enterprise/i.test(plan.tag || ""));
+    function alignPlanLinks(plans) {
+      plans.forEach((plan) => {
+        const name = (plan.name || "").toLowerCase();
+        const tag = (plan.tag || "").toLowerCase();
+        const cta = (plan.cta || "").toLowerCase();
 
-      if (starterPlan && salesPlan) {
-        const starterHref = starterPlan.href;
-        starterPlan.href = salesPlan.href;
-        salesPlan.href = starterHref;
-      }
+        if (name.includes("pro") || tag.includes("pro") || cta.includes("assinar pro")) {
+          plan.href = KIWIFY_LINKS.pro;
+          plan.cta = plan.cta || "Assinar Pro";
+          return;
+        }
+
+        if (name.includes("enterprise") || tag.includes("enterprise") || cta.includes("falar com vendas")) {
+          plan.href = KIWIFY_LINKS.enterprise;
+          plan.cta = plan.cta || "Falar com vendas";
+        }
+      });
 
       return plans;
     }
 
     function normalizePlans(data) {
-      if (!data) return swapCtaLinks(fallbackPlans.map((plan) => ({ ...plan })));
+      if (!data) return alignPlanLinks(fallbackPlans.map((plan) => ({ ...plan })));
       let rawPlans = [];
       if (Array.isArray(data)) {
         rawPlans = data;
@@ -238,7 +246,7 @@
         rawPlans = Object.entries(data.data).map(([id, meta]) => ({ id, ...(meta || {}) }));
       }
 
-      if (!rawPlans.length) return swapCtaLinks(fallbackPlans.map((plan) => ({ ...plan })));
+      if (!rawPlans.length) return alignPlanLinks(fallbackPlans.map((plan) => ({ ...plan })));
 
       const normalized = rawPlans.map((plan) => {
         const name = plan.name || plan.nome || "Plano";
@@ -265,7 +273,7 @@
           href: plan.href || fallback.href || "onboarding.html"
         };
       });
-      return swapCtaLinks(normalized);
+      return alignPlanLinks(normalized);
     }
 
     function buildCard(plan) {
@@ -301,7 +309,7 @@
         const plans = normalizePlans(data);
         plans.forEach((plan) => grid.appendChild(buildCard(plan)));
       } catch (error) {
-        const plans = swapCtaLinks(fallbackPlans.map((plan) => ({ ...plan })));
+        const plans = alignPlanLinks(fallbackPlans.map((plan) => ({ ...plan })));
         plans.forEach((plan) => grid.appendChild(buildCard(plan)));
       }
     }

@@ -85,6 +85,7 @@ const applyThemeToggle = (root) => {
 
 applyTheme(resolveInitialTheme());
 
+<<<<<<< HEAD
 
 const scrollToContato = () => {
   const anchor = document.getElementById("contato");
@@ -153,6 +154,10 @@ const maybeAutoScrollContato = () => {
 document.addEventListener("DOMContentLoaded", async () => {
   const activeNav = document.body.dataset.activeNav;
   wireIntentLinks();
+=======
+document.addEventListener("DOMContentLoaded", async () => {
+  const activeNav = document.body.dataset.activeNav;
+>>>>>>> 108162afd2169e22a8a1f4a1309806b11869c143
 
   try {
     const header = await loadPartial("[data-include='site-header']", "partials/site-header.html");
@@ -162,7 +167,10 @@ document.addEventListener("DOMContentLoaded", async () => {
     document.dispatchEvent(new CustomEvent("site-shell:header-ready"));
 
     await loadPartial("[data-include='site-footer']", "partials/site-footer.html");
+<<<<<<< HEAD
     maybeAutoScrollContato();
+=======
+>>>>>>> 108162afd2169e22a8a1f4a1309806b11869c143
   } catch (error) {
     console.warn("Falha ao carregar o template base.", error);
   }

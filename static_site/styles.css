@@ -837,6 +837,16 @@ main {
   border: 0;
 }
 
+.filter-chip {
+  transition: background 0.2s ease, border-color 0.2s ease, color 0.2s ease;
+}
+
+.filter-chip.is-active {
+  background: var(--primary-soft);
+  border-color: var(--primary);
+  color: var(--text);
+}
+
 
 
 
@@ -1522,6 +1532,39 @@ main {
   width: 20px;
   height: 20px;
   color: var(--success);
+}
+
+body[data-theme="light"] .text-white,
+body[data-theme="light"] .text-slate-100,
+body[data-theme="light"] .text-slate-200 {
+  color: var(--text);
+}
+
+body[data-theme="light"] .text-slate-300,
+body[data-theme="light"] .text-slate-400,
+body[data-theme="light"] .text-slate-500 {
+  color: var(--muted);
+}
+
+body[data-theme="light"] .placeholder\\:text-slate-500::placeholder {
+  color: var(--muted);
+}
+
+body[data-theme="light"] .bg-slate-950,
+body[data-theme="light"] .bg-slate-900,
+body[data-theme="light"] .bg-slate-900\\/40,
+body[data-theme="light"] .bg-slate-900\\/50,
+body[data-theme="light"] .bg-slate-900\\/60,
+body[data-theme="light"] .bg-slate-950\\/40,
+body[data-theme="light"] .bg-slate-950\\/50,
+body[data-theme="light"] .bg-slate-950\\/60,
+body[data-theme="light"] .bg-white\\/5 {
+  background-color: var(--bg-light);
+}
+
+body[data-theme="light"] .border-slate-700,
+body[data-theme="light"] .border-slate-800 {
+  border-color: var(--stroke);
 }
 
 @media (max-width: 900px) {

@@ -85,13 +85,12 @@ const applyThemeToggle = (root) => {
 
 applyTheme(resolveInitialTheme());
 
-<<<<<<< HEAD
+
 
 const scrollToContato = () => {
   const anchor = document.getElementById("contato");
   if (!anchor) return false;
 
-  // Scroll after any layout shifts (header injection, fonts, etc.)
   requestAnimationFrame(() => {
     anchor.scrollIntoView({ behavior: "smooth", block: "start" });
 
@@ -109,7 +108,6 @@ const syncIntentParam = (intent) => {
   try {
     const url = new URL(window.location.href);
     url.searchParams.set("intent", intent);
-    // Preserve current hash if present
     window.history.replaceState({}, "", url.toString());
   } catch {
     // ignore
@@ -124,13 +122,11 @@ const wireIntentLinks = () => {
     const intent = link.getAttribute("data-intent");
     if (!intent) return;
 
-    // Keep navigation as in-page anchor (fallback) but also tag the URL with intent.
     syncIntentParam(intent);
 
     const href = link.getAttribute("href") || "";
     if (href.startsWith("#")) {
       event.preventDefault();
-      // Update hash without jumping abruptly; scroll smoothly.
       if (href.length > 1) {
         window.history.replaceState({}, "", `${window.location.pathname}${window.location.search}${href}`);
       }
@@ -145,7 +141,6 @@ const maybeAutoScrollContato = () => {
   const wantsContatoHash = window.location.hash === "#contato";
   if (!wantsEnterprise && !wantsContatoHash) return;
 
-  // Give the page a moment to render injected header/footer
   setTimeout(() => {
     scrollToContato();
   }, 80);
@@ -154,10 +149,6 @@ const maybeAutoScrollContato = () => {
 document.addEventListener("DOMContentLoaded", async () => {
   const activeNav = document.body.dataset.activeNav;
   wireIntentLinks();
-=======
-document.addEventListener("DOMContentLoaded", async () => {
-  const activeNav = document.body.dataset.activeNav;
->>>>>>> 108162afd2169e22a8a1f4a1309806b11869c143
 
   try {
     const header = await loadPartial("[data-include='site-header']", "partials/site-header.html");
@@ -167,10 +158,7 @@ document.addEventListener("DOMContentLoaded", async () => {
     document.dispatchEvent(new CustomEvent("site-shell:header-ready"));
 
     await loadPartial("[data-include='site-footer']", "partials/site-footer.html");
-<<<<<<< HEAD
     maybeAutoScrollContato();
-=======
->>>>>>> 108162afd2169e22a8a1f4a1309806b11869c143
   } catch (error) {
     console.warn("Falha ao carregar o template base.", error);
   }

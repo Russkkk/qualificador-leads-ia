@@ -271,6 +271,7 @@
         const statusStorageKey = "leadrankLeadStatus";
         let activeFilter = "hot";
         let searchTerm = "";
+        let loading = true;
 
         const loadStatusMap = () => {
           try {
@@ -295,8 +296,8 @@
           }
         };
 
-        const countByPriority = (filteredRows) => {
-          const counts = filteredRows.reduce(
+        const countByPriority = (rowsToCount) => {
+          const counts = rowsToCount.reduce(
             (acc, row) => {
               const priority = row.dataset.priority || "all";
               acc.all += 1;
@@ -324,17 +325,31 @@
         };
 
         const applyFilters = () => {
-          const filtered = rows.filter((row) => {
-            const matchesFilter = activeFilter === "all" || row.dataset.priority === activeFilter;
+          const searchableRows = rows.filter((row) => {
             const target = `${row.dataset.name || ""} ${row.dataset.company || ""}`.toLowerCase();
-            const matchesSearch = !searchTerm || target.includes(searchTerm);
-            const shouldShow = matchesFilter && matchesSearch;
-            row.style.display = shouldShow ? "" : "none";
-            return shouldShow;
+            return !searchTerm || target.includes(searchTerm);
           });
-          countByPriority(filtered);
+
+          const visibleRows = searchableRows.filter((row) => {
+            const matchesFilter = activeFilter === "all" || row.dataset.priority === activeFilter;
+            row.style.display = matchesFilter ? "" : "none";
+            return matchesFilter;
+          });
+
+          rows.forEach((row) => {
+            if (!searchableRows.includes(row)) {
+              row.style.display = "none";
+            }
+          });
+
+          countByPriority(searchableRows);
+
+          if (leadLoading) {
+            leadLoading.hidden = !loading;
+          }
+
           if (leadEmpty) {
-            leadEmpty.hidden = filtered.length !== 0;
+            leadEmpty.hidden = loading || visibleRows.length !== 0;
           }
         };
 
@@ -473,9 +488,7 @@
           });
         }
 
-        if (leadLoading) {
-          leadLoading.hidden = true;
-        }
+        loading = false;
         applyFilters();
       });
     </script>

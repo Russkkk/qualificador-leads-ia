@@ -64,14 +64,14 @@
           <div class="overflow-hidden rounded-3xl border border-white/10 bg-white/5">
             <div class="flex flex-wrap items-center justify-between gap-4 border-b border-white/10 px-6 py-4">
               <div class="flex flex-wrap gap-2 text-xs text-slate-300">
-                <button class="filter-chip rounded-full border border-emerald-500/40 px-3 py-1 text-emerald-200" type="button" data-filter="hot" aria-pressed="true">
-                  Hot <span class="filter-count" data-count="hot">(0)</span>
+                <button class="filter-chip rounded-full border border-emerald-500/40 px-3 py-1 text-emerald-200 is-active" type="button" data-filter="hot" aria-pressed="true">
+                  Hot <span class="filter-count" data-count="hot">(2)</span>
                 </button>
                 <button class="filter-chip rounded-full border border-blue-500/40 px-3 py-1 text-blue-200" type="button" data-filter="medium" aria-pressed="false">
-                  Médio <span class="filter-count" data-count="medium">(0)</span>
+                  Médio <span class="filter-count" data-count="medium">(2)</span>
                 </button>
                 <button class="filter-chip rounded-full border border-white/20 px-3 py-1 text-slate-200" type="button" data-filter="all" aria-pressed="false">
-                  Todos <span class="filter-count" data-count="all">(0)</span>
+                  Todos <span class="filter-count" data-count="all">(4)</span>
                 </button>
               </div>
               <div class="flex flex-wrap items-center gap-3">
@@ -88,7 +88,7 @@
               </div>
             </div>
             <div class="alert mx-6 mt-4 rounded-xl border border-white/10 bg-white/5 px-4 py-3 text-xs text-slate-300" id="leadAlert" role="status" aria-live="polite" hidden></div>
-            <div class="px-6 py-6 text-sm text-slate-300" id="leadLoading">
+            <div class="px-6 py-6 text-sm text-slate-300" id="leadLoading" hidden>
               Carregando leads priorizados...
             </div>
             <div class="px-6 py-6 text-sm text-slate-300" id="leadEmpty" hidden>
@@ -271,7 +271,6 @@
         const statusStorageKey = "leadrankLeadStatus";
         let activeFilter = "hot";
         let searchTerm = "";
-        let loading = true;
 
         const loadStatusMap = () => {
           try {
@@ -296,8 +295,8 @@
           }
         };
 
-        const countByPriority = (rowsToCount) => {
-          const counts = rowsToCount.reduce(
+        const countByPriority = (filteredRows) => {
+          const counts = filteredRows.reduce(
             (acc, row) => {
               const priority = row.dataset.priority || "all";
               acc.all += 1;
@@ -325,31 +324,17 @@
         };
 
         const applyFilters = () => {
-          const searchableRows = rows.filter((row) => {
-            const target = `${row.dataset.name || ""} ${row.dataset.company || ""}`.toLowerCase();
-            return !searchTerm || target.includes(searchTerm);
-          });
-
-          const visibleRows = searchableRows.filter((row) => {
+          const filtered = rows.filter((row) => {
             const matchesFilter = activeFilter === "all" || row.dataset.priority === activeFilter;
-            row.style.display = matchesFilter ? "" : "none";
-            return matchesFilter;
+            const target = `${row.dataset.name || ""} ${row.dataset.company || ""}`.toLowerCase();
+            const matchesSearch = !searchTerm || target.includes(searchTerm);
+            const shouldShow = matchesFilter && matchesSearch;
+            row.style.display = shouldShow ? "" : "none";
+            return shouldShow;
           });
-
-          rows.forEach((row) => {
-            if (!searchableRows.includes(row)) {
-              row.style.display = "none";
-            }
-          });
-
-          countByPriority(searchableRows);
-
-          if (leadLoading) {
-            leadLoading.hidden = !loading;
-          }
-
+          countByPriority(filtered);
           if (leadEmpty) {
-            leadEmpty.hidden = loading || visibleRows.length !== 0;
+            leadEmpty.hidden = filtered.length !== 0;
           }
         };
 
@@ -488,7 +473,9 @@
           });
         }
 
-        loading = false;
+        if (leadLoading) {
+          leadLoading.hidden = true;
+        }
         applyFilters();
       });
     </script>

@@ -1634,22 +1634,3 @@ body[data-theme="light"] .border-blue-500\\/40 {
     padding-top: 48px;
   }
 }
-
-
-/* Anchor offsets for sticky header */
-#contato,
-#lead-capture {
-  scroll-margin-top: 110px;
-}
-
-/* Safety: pages using Tailwind dark palette remain readable even if theme is toggled to light.
-   These pages carry `bg-slate-950` on body; keep dark gradient + tokens to avoid white-on-white. */
-body[data-theme="light"].bg-slate-950 {
-  --body-gradient: radial-gradient(circle at top, #1a1f45, #090b1b 60%);
-  --text: #f9faff;
-  --muted: #a7b0d4;
-  --stroke: rgba(255, 255, 255, 0.08);
-}
-body[data-theme="light"].bg-slate-950 .site-header {
-  background: rgba(8, 10, 25, 0.85);
-}

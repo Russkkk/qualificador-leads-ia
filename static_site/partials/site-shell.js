@@ -56,6 +56,42 @@ const applyTheme = (theme) => {
   localStorage.setItem(THEME_KEY, theme);
 };
 
+
+const scrollToContatoIfNeeded = () => {
+  const params = new URLSearchParams(window.location.search || "");
+  const shouldScroll = window.location.hash === "#contato" || params.get("intent") === "enterprise";
+  if (!shouldScroll) return;
+
+  const anchor = document.getElementById("contato");
+  if (!anchor) return;
+
+  // Aguarda layout estabilizar e o header sticky ser renderizado
+  setTimeout(() => {
+    anchor.scrollIntoView({ behavior: "smooth", block: "start" });
+    const leadForm = document.getElementById("leadForm");
+    const firstField = leadForm ? leadForm.querySelector("input, textarea, select") : null;
+    if (firstField) {
+      firstField.focus({ preventScroll: true });
+    } else {
+      anchor.focus?.({ preventScroll: true });
+    }
+  }, 60);
+};
+
+const bindIntentLinks = () => {
+  document.querySelectorAll("[data-intent]").forEach((link) => {
+    link.addEventListener("click", () => {
+      const intent = link.getAttribute("data-intent");
+      if (!intent) return;
+      try {
+        const url = new URL(window.location.href);
+        url.searchParams.set("intent", intent);
+        window.history.replaceState({}, "", url.toString());
+      } catch (_) {}
+    });
+  });
+};
+
 const applyThemeToggle = (root) => {
   const actionsSlot = root?.querySelector("[data-header-actions]");
   if (!actionsSlot) return;
@@ -83,91 +119,10 @@ const applyThemeToggle = (root) => {
   actionsSlot.append(button);
 };
 
-
-<<<<<<< HEAD
-
-const scrollToContato = () => {
-=======
-
-
-const scrollToContato = () => {
-  const anchor = document.getElementById("contato");
-  if (!anchor) return false;
-
-  requestAnimationFrame(() => {
-    anchor.scrollIntoView({ behavior: "smooth", block: "start" });
-
-    const form = document.getElementById("leadForm");
-    const firstField = form?.querySelector("input, textarea, select");
-    if (firstField) {
-      firstField.focus({ preventScroll: true });
-    }
-  });
-
-  return true;
-};
-
-const syncIntentParam = (intent) => {
-  try {
-    const url = new URL(window.location.href);
-    url.searchParams.set("intent", intent);
-    window.history.replaceState({}, "", url.toString());
-  } catch {
-    // ignore
-  }
-};
-
-const wireIntentLinks = () => {
-  document.addEventListener("click", (event) => {
-    const link = event.target?.closest?.("a[data-intent]");
-    if (!link) return;
-
-    const intent = link.getAttribute("data-intent");
-    if (!intent) return;
-
-    syncIntentParam(intent);
-
-    const href = link.getAttribute("href") || "";
-    if (href.startsWith("#")) {
-      event.preventDefault();
-      if (href.length > 1) {
-        window.history.replaceState({}, "", `${window.location.pathname}${window.location.search}${href}`);
-      }
-      scrollToContato();
-    }
-  });
-};
-
-const maybeAutoScrollContato = () => {
->>>>>>> d331af77ff7d4e690b80767b186091098952d9a5
-  const params = new URLSearchParams(window.location.search);
-  const wantsContato = window.location.hash === "#contato" || params.get("intent") === "enterprise";
-  if (!wantsContato) return;
-
-  const target = document.getElementById("contato");
-  if (!target) return;
-
-  setTimeout(() => {
-    target.scrollIntoView({ behavior: "smooth", block: "start" });
-
-    const section = target.closest("section") || target.parentElement;
-    const focusable = section?.querySelector("input, textarea, select, button");
-    if (focusable) {
-      focusable.focus({ preventScroll: true });
-    } else if (typeof target.focus === "function") {
-      target.focus({ preventScroll: true });
-    }
-  }, 50);
-};
-
 applyTheme(resolveInitialTheme());
 
 document.addEventListener("DOMContentLoaded", async () => {
   const activeNav = document.body.dataset.activeNav;
-<<<<<<< HEAD
-=======
-  wireIntentLinks();
->>>>>>> d331af77ff7d4e690b80767b186091098952d9a5
 
   try {
     const header = await loadPartial("[data-include='site-header']", "partials/site-header.html");
@@ -175,14 +130,10 @@ document.addEventListener("DOMContentLoaded", async () => {
     applyHeaderActions(header);
     applyThemeToggle(header);
     document.dispatchEvent(new CustomEvent("site-shell:header-ready"));
+    bindIntentLinks();
+    scrollToContatoIfNeeded();
 
     await loadPartial("[data-include='site-footer']", "partials/site-footer.html");
-<<<<<<< HEAD
-    scrollToContato();
-    scrollToContato();
-=======
-    maybeAutoScrollContato();
->>>>>>> d331af77ff7d4e690b80767b186091098952d9a5
   } catch (error) {
     console.warn("Falha ao carregar o template base.", error);
   }

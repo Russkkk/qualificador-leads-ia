@@ -179,8 +179,21 @@
       }
     ];
 
+    function swapCtaLinks(plans) {
+      const starterPlan = plans.find((plan) => /assinar\s*stan/i.test(plan.cta || ""));
+      const salesPlan = plans.find((plan) => /falar com vendas/i.test(plan.cta || ""));
+
+      if (starterPlan && salesPlan) {
+        const starterHref = starterPlan.href;
+        starterPlan.href = salesPlan.href;
+        salesPlan.href = starterHref;
+      }
+
+      return plans;
+    }
+
     function normalizePlans(data) {
-      if (!data) return fallbackPlans;
+      if (!data) return swapCtaLinks(fallbackPlans.map((plan) => ({ ...plan })));
       let rawPlans = [];
       if (Array.isArray(data)) {
         rawPlans = data;
@@ -194,9 +207,9 @@
         rawPlans = Object.entries(data.data).map(([id, meta]) => ({ id, ...(meta || {}) }));
       }
 
-      if (!rawPlans.length) return fallbackPlans;
+      if (!rawPlans.length) return swapCtaLinks(fallbackPlans.map((plan) => ({ ...plan })));
 
-      return rawPlans.map((plan) => {
+      const normalized = rawPlans.map((plan) => {
         const name = plan.name || plan.nome || "Plano";
         const id = (plan.id || plan.slug || name).toString().toLowerCase();
         const priceValue = plan.price || plan.preco || plan.price_value || "";
@@ -221,6 +234,7 @@
           href: plan.href || fallback.href || "onboarding.html"
         };
       });
+      return swapCtaLinks(normalized);
     }
 
     function buildCard(plan) {
@@ -256,7 +270,8 @@
         const plans = normalizePlans(data);
         plans.forEach((plan) => grid.appendChild(buildCard(plan)));
       } catch (error) {
-        fallbackPlans.forEach((plan) => grid.appendChild(buildCard(plan)));
+        const plans = swapCtaLinks(fallbackPlans.map((plan) => ({ ...plan })));
+        plans.forEach((plan) => grid.appendChild(buildCard(plan)));
       }
     }
 

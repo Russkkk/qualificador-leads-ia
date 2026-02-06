@@ -169,7 +169,7 @@
           <div class="step-panel" data-step-panel="4" id="final">
             <h2 class="text-2xl font-semibold text-white">Pronto! Vá para o dashboard</h2>
             <p class="subtitle text-slate-300">Sua conta está configurada e a Ação do Dia está pronta para você.</p>
-            <a class="btn btn--block mt-6 inline-flex w-full items-center justify-center rounded-full bg-indigo-500 px-6 py-3 text-sm font-semibold text-white shadow-lg shadow-indigo-500/30 hover:bg-indigo-400" id="goDashboard" href="#final">Ir para Ação do Dia</a>
+            <a class="btn btn--block mt-6 inline-flex w-full items-center justify-center rounded-full bg-indigo-500 px-6 py-3 text-sm font-semibold text-white shadow-lg shadow-indigo-500/30 hover:bg-indigo-400" id="goDashboard" href="acao.html">Ir para Ação do Dia</a>
           </div>
         </section>
           </div>
@@ -271,7 +271,7 @@
         localStorage.setItem("LR_API_KEY", apiKey);
       }
       apiKeyValue.textContent = apiKey || "—";
-      goDashboard.href = "#final";
+      goDashboard.href = "acao.html";
     }
 
     async function seedLeads(count, messageTarget) {

@@ -180,8 +180,8 @@
     ];
 
     function swapCtaLinks(plans) {
-      const starterPlan = plans.find((plan) => /assinar\s*stan/i.test(plan.cta || ""));
-      const salesPlan = plans.find((plan) => /falar com vendas/i.test(plan.cta || ""));
+      const starterPlan = plans.find((plan) => /assinar\s*stan/i.test(plan.cta || "") || /starter|stander/i.test(plan.name || ""));
+      const salesPlan = plans.find((plan) => /falar com vendas/i.test(plan.cta || "") || /enterprise/i.test(plan.name || "") || /enterprise/i.test(plan.tag || ""));
 
       if (starterPlan && salesPlan) {
         const starterHref = starterPlan.href;

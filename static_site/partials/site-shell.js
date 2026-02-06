@@ -83,81 +83,33 @@ const applyThemeToggle = (root) => {
   actionsSlot.append(button);
 };
 
-applyTheme(resolveInitialTheme());
 
-<<<<<<< HEAD
 
 const scrollToContato = () => {
-  const anchor = document.getElementById("contato");
-  if (!anchor) return false;
-
-  // Scroll after any layout shifts (header injection, fonts, etc.)
-  requestAnimationFrame(() => {
-    anchor.scrollIntoView({ behavior: "smooth", block: "start" });
-
-    const form = document.getElementById("leadForm");
-    const firstField = form?.querySelector("input, textarea, select");
-    if (firstField) {
-      firstField.focus({ preventScroll: true });
-    }
-  });
-
-  return true;
-};
-
-const syncIntentParam = (intent) => {
-  try {
-    const url = new URL(window.location.href);
-    url.searchParams.set("intent", intent);
-    // Preserve current hash if present
-    window.history.replaceState({}, "", url.toString());
-  } catch {
-    // ignore
-  }
-};
-
-const wireIntentLinks = () => {
-  document.addEventListener("click", (event) => {
-    const link = event.target?.closest?.("a[data-intent]");
-    if (!link) return;
-
-    const intent = link.getAttribute("data-intent");
-    if (!intent) return;
-
-    // Keep navigation as in-page anchor (fallback) but also tag the URL with intent.
-    syncIntentParam(intent);
-
-    const href = link.getAttribute("href") || "";
-    if (href.startsWith("#")) {
-      event.preventDefault();
-      // Update hash without jumping abruptly; scroll smoothly.
-      if (href.length > 1) {
-        window.history.replaceState({}, "", `${window.location.pathname}${window.location.search}${href}`);
-      }
-      scrollToContato();
-    }
-  });
-};
-
-const maybeAutoScrollContato = () => {
   const params = new URLSearchParams(window.location.search);
-  const wantsEnterprise = params.get("intent") === "enterprise";
-  const wantsContatoHash = window.location.hash === "#contato";
-  if (!wantsEnterprise && !wantsContatoHash) return;
+  const wantsContato = window.location.hash === "#contato" || params.get("intent") === "enterprise";
+  if (!wantsContato) return;
 
-  // Give the page a moment to render injected header/footer
+  const target = document.getElementById("contato");
+  if (!target) return;
+
   setTimeout(() => {
-    scrollToContato();
-  }, 80);
+    target.scrollIntoView({ behavior: "smooth", block: "start" });
+
+    const section = target.closest("section") || target.parentElement;
+    const focusable = section?.querySelector("input, textarea, select, button");
+    if (focusable) {
+      focusable.focus({ preventScroll: true });
+    } else if (typeof target.focus === "function") {
+      target.focus({ preventScroll: true });
+    }
+  }, 50);
 };
 
+applyTheme(resolveInitialTheme());
+
 document.addEventListener("DOMContentLoaded", async () => {
   const activeNav = document.body.dataset.activeNav;
-  wireIntentLinks();
-=======
-document.addEventListener("DOMContentLoaded", async () => {
-  const activeNav = document.body.dataset.activeNav;
->>>>>>> 108162afd2169e22a8a1f4a1309806b11869c143
 
   try {
     const header = await loadPartial("[data-include='site-header']", "partials/site-header.html");
@@ -167,10 +119,8 @@ document.addEventListener("DOMContentLoaded", async () => {
     document.dispatchEvent(new CustomEvent("site-shell:header-ready"));
 
     await loadPartial("[data-include='site-footer']", "partials/site-footer.html");
-<<<<<<< HEAD
-    maybeAutoScrollContato();
-=======
->>>>>>> 108162afd2169e22a8a1f4a1309806b11869c143
+    scrollToContato();
+    scrollToContato();
   } catch (error) {
     console.warn("Falha ao carregar o template base.", error);
   }

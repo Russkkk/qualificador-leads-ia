@@ -84,8 +84,62 @@ const applyThemeToggle = (root) => {
 };
 
 
+<<<<<<< HEAD
 
 const scrollToContato = () => {
+=======
+
+
+const scrollToContato = () => {
+  const anchor = document.getElementById("contato");
+  if (!anchor) return false;
+
+  requestAnimationFrame(() => {
+    anchor.scrollIntoView({ behavior: "smooth", block: "start" });
+
+    const form = document.getElementById("leadForm");
+    const firstField = form?.querySelector("input, textarea, select");
+    if (firstField) {
+      firstField.focus({ preventScroll: true });
+    }
+  });
+
+  return true;
+};
+
+const syncIntentParam = (intent) => {
+  try {
+    const url = new URL(window.location.href);
+    url.searchParams.set("intent", intent);
+    window.history.replaceState({}, "", url.toString());
+  } catch {
+    // ignore
+  }
+};
+
+const wireIntentLinks = () => {
+  document.addEventListener("click", (event) => {
+    const link = event.target?.closest?.("a[data-intent]");
+    if (!link) return;
+
+    const intent = link.getAttribute("data-intent");
+    if (!intent) return;
+
+    syncIntentParam(intent);
+
+    const href = link.getAttribute("href") || "";
+    if (href.startsWith("#")) {
+      event.preventDefault();
+      if (href.length > 1) {
+        window.history.replaceState({}, "", `${window.location.pathname}${window.location.search}${href}`);
+      }
+      scrollToContato();
+    }
+  });
+};
+
+const maybeAutoScrollContato = () => {
+>>>>>>> d331af77ff7d4e690b80767b186091098952d9a5
   const params = new URLSearchParams(window.location.search);
   const wantsContato = window.location.hash === "#contato" || params.get("intent") === "enterprise";
   if (!wantsContato) return;
@@ -110,6 +164,10 @@ applyTheme(resolveInitialTheme());
 
 document.addEventListener("DOMContentLoaded", async () => {
   const activeNav = document.body.dataset.activeNav;
+<<<<<<< HEAD
+=======
+  wireIntentLinks();
+>>>>>>> d331af77ff7d4e690b80767b186091098952d9a5
 
   try {
     const header = await loadPartial("[data-include='site-header']", "partials/site-header.html");
@@ -119,8 +177,12 @@ document.addEventListener("DOMContentLoaded", async () => {
     document.dispatchEvent(new CustomEvent("site-shell:header-ready"));
 
     await loadPartial("[data-include='site-footer']", "partials/site-footer.html");
+<<<<<<< HEAD
     scrollToContato();
     scrollToContato();
+=======
+    maybeAutoScrollContato();
+>>>>>>> d331af77ff7d4e690b80767b186091098952d9a5
   } catch (error) {
     console.warn("Falha ao carregar o template base.", error);
   }

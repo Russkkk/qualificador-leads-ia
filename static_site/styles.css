@@ -1464,6 +1464,8 @@ main {
   background: var(--primary);
   font-size: 1.4rem;
   box-shadow: 0 12px 30px rgba(79, 124, 255, 0.45);
+}
+
 .video-frame {
   position: relative;
   padding-top: 56.25%;

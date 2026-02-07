@@ -294,7 +294,7 @@
         class="grid gap-10 rounded-3xl border border-white/10 bg-white/5 p-8 md:grid-cols-[1.1fr_0.9fr]"
         id="lead-capture"
       >
-        <span id="contato" tabindex="-1" aria-hidden="true"></span>
+        <div id="contato" class="sr-only" tabindex="-1" aria-hidden="true"></div>
         <div class="space-y-4">
           <h2 class="text-3xl font-semibold text-white">Pronto para priorizar leads quentes com IA?</h2>
           <p class="text-slate-300">
@@ -380,5 +380,34 @@
     <script src="https://unpkg.com/lucide@latest"></script>
     <script src="partials/site-shell.js"></script>
     <script src="lead-form.js"></script>
+    <script>
+      (function () {
+        const scrollToHashTarget = (targetId) => {
+          const target = document.getElementById(targetId);
+          if (!target) return false;
+          target.scrollIntoView({ behavior: "smooth", block: "start" });
+          return true;
+        };
+
+        document.addEventListener("click", (event) => {
+          const link = event.target.closest('a[href*="#"]');
+          if (!link) return;
+
+          const href = link.getAttribute("href");
+          if (!href) return;
+
+          const url = new URL(href, window.location.href);
+          if (url.pathname !== window.location.pathname || !url.hash) return;
+
+          const targetId = decodeURIComponent(url.hash.slice(1));
+          if (!targetId) return;
+
+          if (scrollToHashTarget(targetId)) {
+            event.preventDefault();
+            history.replaceState(null, "", `${window.location.pathname}${window.location.search}#${targetId}`);
+          }
+        });
+      })();
+    </script>
   </body>
 </html>

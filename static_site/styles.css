@@ -79,6 +79,12 @@ textarea:focus-visible {
   box-shadow: 0 0 0 4px var(--primary-soft);
 }
 
+
+#lead-capture,
+#contato {
+  scroll-margin-top: 96px;
+}
+
 .page {
   display: flex;
   flex-direction: column;

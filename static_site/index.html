@@ -42,7 +42,7 @@
   </head>
   <body data-active-nav="home" class="bg-slate-950 text-slate-100">
     <template id="header-actions-template">
-      <a class="btn btn--small" href="onboarding.html" aria-label="Iniciar teste grátis do LeadRank">Começar teste grátis</a>
+      <a class="btn btn--small" href="#lead-capture" role="button" aria-label="Ir para a seção de teste grátis do LeadRank">Começar teste grátis</a>
     </template>
     <div class="page">
       <div data-include="site-header"></div>
@@ -64,8 +64,8 @@
             mantém seu time focado no que gera receita.
           </p>
           <div class="flex flex-wrap gap-4">
-            <a class="btn" href="#lead-capture" aria-label="Ir para a seção de teste grátis do LeadRank">Quero testar agora</a>
-            <a class="btn btn--ghost" href="#demo" aria-label="Ir para a seção de demonstração do LeadRank">Ver demo</a>
+            <a class="btn" href="#lead-capture" role="button" aria-label="Ir para a seção de teste grátis do LeadRank">Quero testar agora</a>
+            <a class="btn btn--ghost" href="#demo" role="button" aria-label="Ir para a seção de demonstração do LeadRank">Ver demo</a>
           </div>
           <div class="grid gap-4 pt-6 sm:grid-cols-3">
             <div class="rounded-2xl border border-white/10 bg-gradient-to-br from-blue-500/20 via-slate-900 to-slate-950 p-4">
@@ -285,7 +285,7 @@
           <p class="mt-2 text-sm text-slate-200">
             Receba um plano de migração em 48h, com checklist técnico e cronograma.
           </p>
-          <a class="btn btn--secondary mt-4 inline-flex items-center gap-2" href="#contato" data-intent="enterprise" aria-label="Falar sobre migração para plano pago do LeadRank">
+          <a class="btn btn--secondary mt-4 inline-flex items-center gap-2" href="#contato" role="button" data-intent="enterprise" aria-label="Falar sobre migração para plano pago do LeadRank">
             Falar sobre migração
             <span class="inline-flex items-center justify-center rounded-full border border-white/20 p-1"><i data-lucide="arrow-up-right" class="h-3.5 w-3.5" aria-hidden="true"></i></span>
           </a>
@@ -369,7 +369,7 @@
             Teste grátis por 14 dias e acelere o pipeline ainda esta semana.
           </p>
         </div>
-        <a class="btn" href="#lead-capture" aria-label="Iniciar teste grátis do LeadRank">
+        <a class="btn" href="#lead-capture" role="button" aria-label="Ir para a seção de teste grátis do LeadRank">
           Começar teste grátis
         </a>
       </section>
@@ -387,6 +387,19 @@
           const target = document.getElementById(targetId);
           if (!target) return false;
           target.scrollIntoView({ behavior: "smooth", block: "start" });
+
+          if (targetId === "lead-capture") {
+            window.setTimeout(() => {
+              const firstField = target.querySelector("input, select, textarea, button");
+              if (!firstField) return;
+              if (!firstField.hasAttribute("tabindex")) {
+                firstField.focus({ preventScroll: true });
+                return;
+              }
+              firstField.focus();
+            }, 350);
+          }
+
           return true;
         };
 

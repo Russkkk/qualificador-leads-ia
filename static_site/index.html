@@ -17,7 +17,7 @@
     />
     <meta
       property="og:image"
-      content="https://images.unsplash.com/photo-1551434678-e076c223a692?auto=format&fit=crop&w=1200&q=80"
+      content="https://qualificador-leads-ia.onrender.com/assets/og-image.svg"
     />
     <meta property="og:url" content="https://qualificador-leads-ia.onrender.com/" />
     <meta property="og:type" content="website" />
@@ -29,7 +29,7 @@
     />
     <meta
       name="twitter:image"
-      content="https://images.unsplash.com/photo-1551434678-e076c223a692?auto=format&fit=crop&w=1200&q=80"
+      content="https://qualificador-leads-ia.onrender.com/assets/og-image.svg"
     />
     <meta name="theme-color" content="#2563EB" />
     <meta name="backend-url" content="https://qualificador-leads-ia.onrender.com" />
@@ -42,28 +42,30 @@
   </head>
   <body data-active-nav="home" class="bg-slate-950 text-slate-100">
     <template id="header-actions-template">
-      <a class="btn btn--small" href="onboarding.html">Começar teste grátis</a>
+      <a class="btn btn--small" href="#lead-capture" role="button" aria-label="Ir para a seção de teste grátis do LeadRank">Começar teste grátis</a>
     </template>
     <div class="page">
       <div data-include="site-header"></div>
 
       <main class="mx-auto w-full max-w-5xl px-6 pb-16">
+      <h1 class="sr-only">LeadRank | Qualificador de Leads com IA</h1>
       <section class="relative grid gap-10 pb-16 pt-10 lg:grid-cols-[1.1fr_0.9fr]">
         <div class="space-y-6">
           <span class="inline-flex items-center gap-2 rounded-full bg-emerald-500/10 px-4 py-2 text-xs font-semibold text-emerald-200">
             <i data-lucide="sparkles" class="h-4 w-4"></i>
             IA + dados para vender mais rápido
           </span>
-          <h1 class="text-4xl font-bold tracking-tight text-white md:text-5xl">
+          <h1 class="text-4xl font-bold tracking-tight text-white md:text-5xl" aria-label="LeadRank | Qualificador de Leads com IA">
+          <h2 class="text-4xl font-bold tracking-tight text-white md:text-5xl">
             Transforme novos leads em reuniões em poucas horas.
-          </h1>
+          </h2>
           <p class="text-base text-slate-200 md:text-lg">
             O LeadRank prioriza automaticamente quem está pronto para comprar, entrega a Ação do Dia e
             mantém seu time focado no que gera receita.
           </p>
           <div class="flex flex-wrap gap-4">
-            <a class="btn" href="#lead-capture">Quero testar agora</a>
-            <a class="btn btn--ghost" href="#demo">Ver demo</a>
+            <a class="btn" href="#lead-capture" role="button" aria-label="Ir para a seção de teste grátis do LeadRank">Quero testar agora</a>
+            <a class="btn btn--ghost" href="#demo" role="button" aria-label="Ir para a seção de demonstração do LeadRank">Ver demo</a>
           </div>
           <div class="grid gap-4 pt-6 sm:grid-cols-3">
             <div class="rounded-2xl border border-white/10 bg-gradient-to-br from-blue-500/20 via-slate-900 to-slate-950 p-4">
@@ -278,12 +280,12 @@
             </div>
           </div>
         </div>
-        <div class="rounded-3xl border border-white/10 bg-gradient-to-br from-indigo-500/20 via-slate-900 to-slate-950 p-6">
+        <div id="contato" class="rounded-3xl border border-white/10 bg-gradient-to-br from-indigo-500/20 via-slate-900 to-slate-950 p-6">
           <h3 class="text-lg font-semibold text-white">Diagnóstico gratuito de infraestrutura</h3>
           <p class="mt-2 text-sm text-slate-200">
             Receba um plano de migração em 48h, com checklist técnico e cronograma.
           </p>
-          <a class="btn btn--secondary mt-4 inline-flex items-center gap-2" href="index.html?intent=enterprise#contato" data-intent="enterprise">
+          <a class="btn btn--secondary mt-4 inline-flex items-center gap-2" href="#lead-capture" role="button" data-intent="enterprise" aria-label="Ir para o formulário e falar sobre migração para plano pago do LeadRank">
             Falar sobre migração
             <span class="inline-flex items-center justify-center rounded-full border border-white/20 p-1"><i data-lucide="arrow-up-right" class="h-3.5 w-3.5" aria-hidden="true"></i></span>
           </a>
@@ -294,11 +296,10 @@
         class="grid gap-10 rounded-3xl border border-white/10 bg-white/5 p-8 md:grid-cols-[1.1fr_0.9fr]"
         id="lead-capture"
       >
-        <span id="contato" tabindex="-1" aria-hidden="true"></span>
         <div class="space-y-4">
           <h2 class="text-3xl font-semibold text-white">Pronto para priorizar leads quentes com IA?</h2>
           <p class="text-slate-300">
-            Receba acesso ao teste grátis e ao checklist de integração em até 24 horas úteis.
+            Receba acesso ao teste grátis e ao checklist de integração de forma imediata.
           </p>
           <ul class="space-y-3 text-sm text-slate-200">
             <li class="flex items-center gap-2">
@@ -368,7 +369,7 @@
             Teste grátis por 14 dias e acelere o pipeline ainda esta semana.
           </p>
         </div>
-        <a class="btn" href="#lead-capture">
+        <a class="btn" href="#lead-capture" role="button" aria-label="Ir para a seção de teste grátis do LeadRank">
           Começar teste grátis
         </a>
       </section>
@@ -378,7 +379,59 @@
     </div>
 
     <script src="https://unpkg.com/lucide@latest"></script>
-    <script src="partials/site-shell.js"></script>
+    <script type="module" src="partials/site-shell.js"></script>
     <script src="lead-form.js"></script>
+    <script>
+      (function () {
+        const scrollToHashTarget = (targetId) => {
+          const target = document.getElementById(targetId);
+          if (!target) return false;
+          target.scrollIntoView({ behavior: "smooth", block: "start" });
+
+          window.setTimeout(() => {
+            if (targetId === "lead-capture") {
+              const firstField = target.querySelector("input, select, textarea, button");
+              firstField?.focus?.({ preventScroll: true });
+              return;
+            }
+
+            // Acessibilidade: após scroll, move o foco para o alvo (ou para o primeiro elemento focável dentro dele)
+            // para deixar claro o "próximo passo" para quem navega via teclado/leitor de tela.
+            const focusable = target.querySelector(
+              "a[href], button:not([disabled]), input:not([disabled]), select:not([disabled]), textarea:not([disabled]), iframe, [tabindex]:not([tabindex='-1'])"
+            );
+            if (focusable?.focus) {
+              focusable.focus({ preventScroll: true });
+              return;
+            }
+            if (!target.hasAttribute("tabindex")) {
+              target.setAttribute("tabindex", "-1");
+            }
+            target.focus?.({ preventScroll: true });
+          }, 350);
+
+          return true;
+        };
+
+        document.addEventListener("click", (event) => {
+          const link = event.target.closest('a[href*="#"]');
+          if (!link) return;
+
+          const href = link.getAttribute("href");
+          if (!href) return;
+
+          const url = new URL(href, window.location.href);
+          if (url.pathname !== window.location.pathname || !url.hash) return;
+
+          const targetId = decodeURIComponent(url.hash.slice(1));
+          if (!targetId) return;
+
+          if (scrollToHashTarget(targetId)) {
+            event.preventDefault();
+            history.replaceState(null, "", `${window.location.pathname}${window.location.search}#${targetId}`);
+          }
+        });
+      })();
+    </script>
   </body>
 </html>

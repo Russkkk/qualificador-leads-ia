@@ -46,15 +46,35 @@ const serializeForm = (form) => {
 
 let lastTrackedLeadKey = "";
 
+const readAttribution = () => {
+  try {
+    const raw = localStorage.getItem("leadrank_attr_last");
+    return raw ? JSON.parse(raw) : {};
+  } catch (_) {
+    return {};
+  }
+};
+
 const trackLeadConversion = ({ email = "", clientId = "" } = {}) => {
   const key = `${String(email).trim().toLowerCase()}::${String(clientId)}`;
   if (!key || key === lastTrackedLeadKey) return;
+
+  const attr = readAttribution();
 
   const payload = {
     event: "Lead",
     lead_email: String(email).trim().toLowerCase(),
     client_id: String(clientId),
     source: "landing_form",
+    utm_source: attr.utm_source,
+    utm_medium: attr.utm_medium,
+    utm_campaign: attr.utm_campaign,
+    utm_term: attr.utm_term,
+    utm_content: attr.utm_content,
+    gclid: attr.gclid,
+    fbclid: attr.fbclid,
+    ttclid: attr.ttclid,
+    msclkid: attr.msclkid,
   };
 
   if (typeof window.gtag === "function") {

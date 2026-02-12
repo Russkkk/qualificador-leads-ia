@@ -215,6 +215,83 @@ const bindCheckoutLinks = () => {
   });
 };
 
+// --- Lead Conversion (Obrigado page) ---
+// Para garantir disparo de conversão em um único lugar, gravamos um payload "pending"
+// no submit do formulário e processamos o evento apenas na página de Obrigado.
+const LEAD_PENDING_KEY = "leadrank_lead_pending";
+const LEAD_TRACKED_KEY = "leadrank_lead_tracked_key";
+
+const setPendingLeadConversion = (data) => {
+  if (!data) return;
+  safeLocalStorageSet(LEAD_PENDING_KEY, JSON.stringify(data));
+};
+
+const readPendingLeadConversion = () => {
+  return readJson(safeLocalStorageGet(LEAD_PENDING_KEY)) || null;
+};
+
+const clearPendingLeadConversion = () => {
+  try {
+    window.localStorage.removeItem(LEAD_PENDING_KEY);
+  } catch (_) {}
+};
+
+const trackLeadConversion = ({ email = "", clientId = "", source = "landing_form" } = {}) => {
+  const key = `${String(email).trim().toLowerCase()}::${String(clientId).trim()}`;
+  if (!key || key === "::") return;
+
+  const lastKey = (safeLocalStorageGet(LEAD_TRACKED_KEY) || "").trim();
+  if (lastKey && lastKey === key) return;
+
+  const attr = getAttribution();
+  const payload = {
+    event: "Lead",
+    lead_email: String(email).trim().toLowerCase(),
+    client_id: String(clientId).trim(),
+    source,
+    ...ATTR_FIELDS.reduce((acc, field) => {
+      if (attr[field]) acc[field] = attr[field];
+      return acc;
+    }, {}),
+  };
+
+  if (typeof window.gtag === "function") {
+    window.gtag("event", "Lead", payload);
+  }
+  if (typeof window.fbq === "function") {
+    window.fbq("track", "Lead", payload);
+  }
+  if (Array.isArray(window.dataLayer)) {
+    window.dataLayer.push(payload);
+  }
+
+  safeLocalStorageSet(LEAD_TRACKED_KEY, key);
+};
+
+const processPendingLeadConversion = () => {
+  const isThankYou =
+    document.body?.dataset?.conversionPage === "lead" ||
+    /\/obrigado\.html$/i.test(window.location.pathname || "");
+  if (!isThankYou) return;
+
+  const pending = readPendingLeadConversion();
+  if (!pending) return;
+
+  trackLeadConversion({
+    email: pending.email || "",
+    clientId: pending.client_id || pending.clientId || "",
+    source: pending.source || "landing_form",
+  });
+  clearPendingLeadConversion();
+};
+
+// Exposição mínima para uso por lead-form.js / obrigado.js (sem dependências externas)
+window.LeadrankTracking = window.LeadrankTracking || {};
+window.LeadrankTracking.setPendingLeadConversion = setPendingLeadConversion;
+window.LeadrankTracking.trackLeadConversion = trackLeadConversion;
+window.LeadrankTracking.getAttribution = getAttribution;
+window.LeadrankTracking.decorateCheckoutUrl = decorateCheckoutUrl;
+
 const resolveInitialTheme = () => {
   const stored = localStorage.getItem(THEME_KEY);
   if (stored === "light" || stored === "dark") return stored;
@@ -312,7 +389,9 @@ document.addEventListener("DOMContentLoaded", async () => {
 
   // Captura UTMs/click-ids e prepara tracking de checkout sem interferir no restante.
   captureAttributionFromUrl();
+  processPendingLeadConversion();
   bindCheckoutLinks();
+  processPendingLeadConversion();
 
   try {
     const header = await loadPartial("[data-include='site-header']", "partials/site-header.html");

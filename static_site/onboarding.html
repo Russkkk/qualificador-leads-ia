@@ -253,6 +253,52 @@
 
     const panels = document.querySelectorAll("[data-step-panel]");
     const stepperItems = document.querySelectorAll(".stepper__item");
+
+    // Helpers
+    function qs(key) {
+      try {
+        return new URLSearchParams(window.location.search).get(key);
+      } catch (_) {
+        return null;
+      }
+    }
+
+    function setStep(step) {
+      const s = String(step);
+
+      // Toggle panels
+      panels.forEach((panel) => {
+        const active = panel.getAttribute("data-step-panel") === s;
+        panel.classList.toggle("is-active", active);
+
+        if (active) {
+          // Accessibility: move focus to the panel heading without scrolling the page.
+          const heading = panel.querySelector("h1, h2, h3");
+          if (heading) {
+            const hadTabIndex = heading.hasAttribute("tabindex");
+            if (!hadTabIndex) heading.setAttribute("tabindex", "-1");
+            try { heading.focus({ preventScroll: true }); } catch (_) { heading.focus(); }
+            if (!hadTabIndex) setTimeout(() => heading.removeAttribute("tabindex"), 0);
+          }
+        }
+      });
+
+      // Toggle stepper items
+      stepperItems.forEach((item) => {
+        const active = item.getAttribute("data-step") === s;
+        item.classList.toggle("is-active", active);
+        if (active) item.setAttribute("aria-current", "step");
+        else item.removeAttribute("aria-current");
+      });
+
+      // Keep URL in sync (no reload)
+      try {
+        const url = new URL(window.location.href);
+        url.searchParams.set("step", s);
+        window.history.replaceState({}, "", url.toString());
+      } catch (_) {}
+    }
+
     const toggleLogin = document.getElementById("toggleLogin");
     const signupForm = document.getElementById("signupForm");
     const loginForm = document.getElementById("loginForm");

@@ -1,0 +1,5 @@
+Contact: mailto:security@leadrank.com.br
+Contact: mailto:privacidade@leadrank.com.br
+Preferred-Languages: pt-BR, en
+Canonical: https://qualificador-leads-ia.onrender.com/.well-known/security.txt
+Policy: https://qualificador-leads-ia.onrender.com/privacidade.html

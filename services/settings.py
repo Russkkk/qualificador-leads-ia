@@ -9,6 +9,7 @@ config = get_config()
 
 DATABASE_URL = config.DATABASE_URL
 DEMO_KEY = config.DEMO_KEY
+ADMIN_KEY = os.getenv("ADMIN_KEY", "").strip()
 DEBUG_MODE = config.DEBUG_MODE
 INCLUDE_TRACEBACK = config.INCLUDE_TRACEBACK
 TRUST_PROXY = config.TRUST_PROXY
@@ -42,6 +43,9 @@ def _int(value: str, default: int = 0) -> int:
         return int(value)
     except Exception:
         return int(default)
+
+
+ADMIN_ALLOW_DEMO_KEY = _bool(os.getenv("ADMIN_ALLOW_DEMO_KEY", ""))
 
 def _split_csv(value: str) -> list[str]:
     return [item.strip() for item in str(value or "").split(",") if item.strip()]

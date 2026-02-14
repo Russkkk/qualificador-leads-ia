@@ -401,7 +401,7 @@ const trackLeadConversion = ({ email = "", clientId = "", source = "landing_form
   const attr = getAttribution();
   const payload = {
     event: "Lead",
-    lead_email: String(email).trim().toLowerCase(),
+    // LGPD/políticas de mídia: não enviar PII (email) em texto puro para tags.
     client_id: String(clientId).trim(),
     source,
     ...ATTR_FIELDS.reduce((acc, field) => {

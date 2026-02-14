@@ -43,19 +43,20 @@ def _int(value: str, default: int = 0) -> int:
     except Exception:
         return int(default)
 
-ALLOWED_ORIGINS = [
-    "https://qualificador-leads-ia.onrender.com",
-    "https://leadrank.com.br",
-    r"^https://.*\.onrender\.com$",
-]
-ALLOWED_ORIGINS = [origin for origin in ALLOWED_ORIGINS if origin != "null"]
-if DEBUG_MODE:
-    ALLOWED_ORIGINS.extend([
+def _split_csv(value: str) -> list[str]:
+    return [item.strip() for item in str(value or "").split(",") if item.strip()]
+
+
+# CORS: em produção, deny-by-default quando ALLOWED_ORIGINS não estiver definido.
+_allowed_origins_env = _split_csv(os.getenv("ALLOWED_ORIGINS", ""))
+ALLOWED_ORIGINS = [origin for origin in _allowed_origins_env if origin not in {"null", "*"}]
+if not ALLOWED_ORIGINS and DEBUG_MODE:
+    ALLOWED_ORIGINS = [
         "http://localhost:8000",
         "http://127.0.0.1:8000",
         "http://localhost",
         "http://127.0.0.1",
-    ])
+    ]
 
 PLAN_CATALOG = {
     "demo": {"price_brl_month": 0, "setup_fee_brl": 0, "lead_limit_month": 30},

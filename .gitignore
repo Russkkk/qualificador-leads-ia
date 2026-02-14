@@ -1,6 +1,11 @@
 .env
 .venv
 __pycache__/
+*.pyc
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
 node_modules/
+dist/
+build/
 static_site/dist/
-

@@ -1,7 +1,8 @@
 const leadForm = document.getElementById("leadForm");
 const formStatus = document.getElementById("formStatus");
 const backendMeta = document.querySelector('meta[name="backend-url"]');
-const BACKEND = (backendMeta?.content || "https://qualificador-leads-ia.onrender.com").replace(/\/$/, "");
+// Evita hardcode de ambiente: usa meta quando definida, senão o host atual.
+const BACKEND = (window.BACKEND_URL || backendMeta?.content || window.location.origin || "").replace(/\/$/, "");
 const THANK_YOU_URL = "obrigado.html";
 
 const normalizePhone = (raw) => String(raw || "").replace(/\D+/g, "");

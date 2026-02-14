@@ -87,7 +87,7 @@ DEFAULT_CSP = (
     "img-src 'self' data: https:; "
     "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; "
     "font-src 'self' https://fonts.gstatic.com; "
-    "script-src 'self' https://cdn.jsdelivr.net https://challenges.cloudflare.com; "
+    "script-src 'self' https://cdn.jsdelivr.net https://unpkg.com https://challenges.cloudflare.com; "
     "connect-src 'self' https://qualificador-leads-ia.onrender.com https://leadrank.com.br; "
     "frame-src https://www.youtube.com https://challenges.cloudflare.com"
 )

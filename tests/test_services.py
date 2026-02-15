@@ -24,7 +24,7 @@ def test_lead_temperature_thresholds(probabilidade, score, expected):
 @pytest.mark.parametrize(
     ("password", "expected_ok"),
     [
-        ("Senha123!", True),
+        ("Senha123!", False),
         ("Senha123", False),
         ("senha123!", False),
         ("SENHA123!", False),

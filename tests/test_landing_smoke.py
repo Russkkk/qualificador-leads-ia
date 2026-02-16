@@ -87,6 +87,8 @@ def test_formulario_tem_validacao_e_retorno_visual():
     assert "submitBtn.textContent = \"Enviando...\"" in js
     assert "SUBMIT_COOLDOWN_MS" in js
     assert "company_site" in js
+    assert "showStatus(\"Criando sua conta...\", \"warning\")" in js
+    assert "showStatus(\"Cadastro concluído. Redirecionando...\", \"success\")" in js
 
 
 def test_demo_embed_responsivo_com_fallback():

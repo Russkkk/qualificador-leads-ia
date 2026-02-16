@@ -107,3 +107,28 @@ def test_termos_aponta_para_pagina_de_planos(static_server_url):
     termos = _get(f"{static_server_url}/termos.html")
     assert 'href="pricing.html"' in termos
     assert "página de planos" in termos
+
+
+def test_seo_meta_e_schema_na_home():
+    html = (STATIC_DIR / "index.html").read_text(encoding="utf-8")
+    assert '<link rel="canonical" href="https://qualificador-leads-ia.onrender.com/"' in html
+    assert 'property="og:title"' in html
+    assert 'name="twitter:card" content="summary_large_image"' in html
+    assert '"@type": "Organization"' in html
+    assert '"@type": "SoftwareApplication"' in html
+
+
+def test_robots_e_sitemap_estaticos():
+    robots = (STATIC_DIR / "robots.txt").read_text(encoding="utf-8")
+    sitemap = (STATIC_DIR / "sitemap.xml").read_text(encoding="utf-8")
+
+    assert "Sitemap: https://qualificador-leads-ia.onrender.com/sitemap.xml" in robots
+    assert "<loc>https://qualificador-leads-ia.onrender.com/termos.html</loc>" in sitemap
+    assert "<loc>https://qualificador-leads-ia.onrender.com/privacidade.html</loc>" in sitemap
+    assert "<loc>https://qualificador-leads-ia.onrender.com/pricing.html</loc>" in sitemap
+
+
+def test_faq_schema_em_pricing():
+    pricing = (STATIC_DIR / "pricing.html").read_text(encoding="utf-8")
+    assert '"@type": "FAQPage"' in pricing
+    assert '"Preciso de cartão para testar?"' in pricing

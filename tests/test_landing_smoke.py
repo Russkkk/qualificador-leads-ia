@@ -84,3 +84,14 @@ def test_formulario_tem_validacao_e_retorno_visual():
     assert 'id="formStatus"' in html
     assert "showStatus(\"Criando sua conta...\", \"warning\")" in js
     assert "showStatus(\"Cadastro concluído. Redirecionando...\", \"success\")" in js
+
+
+def test_demo_embed_responsivo_com_fallback():
+    html = (STATIC_DIR / "index.html").read_text(encoding="utf-8")
+
+    assert 'id="demo"' in html
+    assert 'class="aspect-video w-full bg-slate-950/40"' in html
+    assert 'src="https://www.youtube.com/embed/ysz5S6PUM-U"' in html
+    assert 'loading="lazy"' in html
+    assert 'title="Demonstração do LeadRank"' in html
+    assert 'Abrir no YouTube' in html

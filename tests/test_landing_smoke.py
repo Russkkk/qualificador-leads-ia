@@ -145,3 +145,13 @@ def test_a11y_basico_skip_link_e_heading_unico():
     assert 'id="main-content"' in html
     assert html.count("<h1") == 1
     assert 'alt="Mock do dashboard com ranking de leads"' in html
+
+
+def test_perf_basico_imagem_e_preconnect():
+    html = (STATIC_DIR / "index.html").read_text(encoding="utf-8")
+    assert 'rel="preconnect" href="https://fonts.googleapis.com"' in html
+    assert 'rel="preconnect" href="https://fonts.gstatic.com" crossorigin' in html
+    assert 'rel="preconnect" href="https://www.youtube.com"' in html
+    assert 'src="assets/dashboard-mock.svg"' in html
+    assert 'width="960"' in html and 'height="540"' in html
+    assert 'loading="lazy"' in html and 'decoding="async"' in html

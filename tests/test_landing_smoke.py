@@ -82,6 +82,11 @@ def test_formulario_tem_validacao_e_retorno_visual():
     assert 'name="telefone"' in html and 'type="tel"' in html and "required" in html
 
     assert 'id="formStatus"' in html
+    assert "showStatus(\"Enviando seus dados...\", \"warning\")" in js
+    assert "showStatus(\"Cadastro concluído com sucesso! Redirecionando...\", \"success\")" in js
+    assert "submitBtn.textContent = \"Enviando...\"" in js
+    assert "SUBMIT_COOLDOWN_MS" in js
+    assert "company_site" in js
     assert "showStatus(\"Criando sua conta...\", \"warning\")" in js
     assert "showStatus(\"Cadastro concluído. Redirecionando...\", \"success\")" in js
 

@@ -358,6 +358,8 @@
               class="mt-2 w-full rounded-xl border border-white/10 bg-slate-900 px-4 py-3 text-sm text-white placeholder:text-slate-500 focus:border-blue-400 focus:outline-none"
               type="text"
               name="name"
+              minlength="3"
+              autocomplete="name"
               placeholder="Seu nome"
               required
             />
@@ -368,6 +370,7 @@
               class="mt-2 w-full rounded-xl border border-white/10 bg-slate-900 px-4 py-3 text-sm text-white placeholder:text-slate-500 focus:border-blue-400 focus:outline-none"
               type="email"
               name="email"
+              autocomplete="email"
               placeholder="voce@empresa.com"
               required
             />
@@ -378,6 +381,9 @@
               class="mt-2 w-full rounded-xl border border-white/10 bg-slate-900 px-4 py-3 text-sm text-white placeholder:text-slate-500 focus:border-emerald-400 focus:outline-none"
               type="tel"
               name="telefone"
+              inputmode="tel"
+              minlength="10"
+              autocomplete="tel"
               placeholder="(11) 99999-9999"
               required
             />

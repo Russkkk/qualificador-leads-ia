@@ -6,6 +6,9 @@ const BACKEND = (window.BACKEND_URL || backendMeta?.content || window.location.o
 const THANK_YOU_URL = "obrigado.html";
 const OFFLINE_META_KEY = "leadrank_lead_offline_meta";
 const STORAGE_TTL_MS = 24 * 60 * 60 * 1000;
+const SUBMIT_COOLDOWN_MS = 15 * 1000;
+const LAST_SUBMIT_KEY = "leadrank_last_submit_ts";
+const REQUEST_TIMEOUT_MS = 12000;
 
 const normalizePhone = (raw) => String(raw || "").replace(/\D+/g, "");
 
@@ -39,6 +42,38 @@ const showStatus = (message, tone = "success") => {
   if (!formStatus) return;
   formStatus.textContent = message;
   formStatus.dataset.tone = tone;
+};
+
+
+const isValidEmail = (value) => /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(String(value || "").trim());
+
+const validateFormPayload = ({ name = "", email = "", telefone = "" } = {}) => {
+  if (!String(name || "").trim()) return "Informe seu nome completo.";
+  if (!isValidEmail(email)) return "Informe um e-mail válido.";
+  if (normalizePhone(telefone).length < 10) return "Informe um WhatsApp com DDD.";
+  return "";
+};
+
+const isInCooldown = () => {
+  const raw = safeStorageGet(LAST_SUBMIT_KEY);
+  const lastTs = Number(raw || 0);
+  if (!lastTs) return { active: false, remainingMs: 0 };
+  const remainingMs = lastTs + SUBMIT_COOLDOWN_MS - Date.now();
+  return { active: remainingMs > 0, remainingMs };
+};
+
+const markSubmitAttempt = () => {
+  safeStorageSet(LAST_SUBMIT_KEY, String(Date.now()));
+};
+
+const withTimeout = async (url, options = {}, timeoutMs = REQUEST_TIMEOUT_MS) => {
+  const controller = new AbortController();
+  const timeoutId = window.setTimeout(() => controller.abort(), timeoutMs);
+  try {
+    return await fetch(url, { ...options, signal: controller.signal });
+  } finally {
+    window.clearTimeout(timeoutId);
+  }
 };
 
 const generatePassword = () => {
@@ -166,11 +201,37 @@ if (leadForm) {
     const payload = Object.fromEntries(formData.entries());
     const tempPassword = generatePassword();
     const submitBtn = leadForm.querySelector("button[type='submit']");
+    const submitBtnDefaultText = submitBtn?.textContent || "Solicitar acesso ao teste grátis";
+
+    const validationMessage = validateFormPayload(payload);
+    if (validationMessage) {
+      showStatus(validationMessage, "error");
+      leadForm.reportValidity?.();
+      return;
+    }
+
+    if (String(payload.company_site || "").trim()) {
+      showStatus("Recebemos seu pedido. Em instantes você terá retorno.", "success");
+      return;
+    }
+
+    const cooldown = isInCooldown();
+    if (cooldown.active) {
+      const seconds = Math.ceil(cooldown.remainingMs / 1000);
+      showStatus(`Aguarde ${seconds}s para enviar novamente.`, "warning");
+      return;
+    }
 
     try {
-      if (submitBtn) submitBtn.disabled = true;
-      showStatus("Criando sua conta...", "warning");
-      const response = await fetch(`${BACKEND}/signup`, {
+      if (submitBtn) {
+        submitBtn.disabled = true;
+        submitBtn.setAttribute("aria-busy", "true");
+        submitBtn.textContent = "Enviando...";
+      }
+      leadForm.setAttribute("aria-busy", "true");
+      showStatus("Enviando seus dados...", "warning");
+
+      const response = await withTimeout(`${BACKEND}/signup`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -194,8 +255,12 @@ if (leadForm) {
       const data = await response.json().catch(() => ({}));
 
       if (!response.ok) {
-        const msg = data?.error || data?.message || "Não conseguimos criar sua conta agora.";
-        showStatus(msg, "error");
+        const serverMsg = data?.error || data?.message || "";
+        const fallbackMsg = response.status >= 500
+          ? "Serviço indisponível no momento. Tente novamente em instantes."
+          : "Não foi possível concluir seu cadastro. Revise os dados e tente de novo.";
+        showStatus(serverMsg || fallbackMsg, "error");
+        markSubmitAttempt();
         return;
       }
 
@@ -219,9 +284,11 @@ if (leadForm) {
       safeStorageRemove("leadrank_last_lead_email");
 
       setPendingLeadConversion({ email: payload.email || "", clientId });
+      markSubmitAttempt();
 
       leadForm.reset();
-      showStatus("Cadastro concluído. Redirecionando...", "success");
+      showStatus("Cadastro concluído com sucesso! Redirecionando...", "success");
+      await new Promise((resolve) => window.setTimeout(resolve, 900));
 
       try {
         window.location.assign(THANK_YOU_URL);
@@ -232,12 +299,17 @@ if (leadForm) {
       }
     } catch (error) {
       saveOfflineAttemptMeta();
-      showStatus(
-        "Falha de conexão. Registramos apenas uma tentativa local sem dados pessoais.",
-        "warning"
-      );
+      const msg = error?.name === "AbortError"
+        ? "Tempo de resposta excedido. Verifique sua conexão e tente novamente."
+        : "Falha de conexão. Verifique sua internet e tente novamente.";
+      showStatus(msg, "warning");
     } finally {
-      if (submitBtn) submitBtn.disabled = false;
+      leadForm.removeAttribute("aria-busy");
+      if (submitBtn) {
+        submitBtn.disabled = false;
+        submitBtn.removeAttribute("aria-busy");
+        submitBtn.textContent = submitBtnDefaultText;
+      }
     }
   });
 }

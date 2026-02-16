@@ -95,3 +95,15 @@ def test_demo_embed_responsivo_com_fallback():
     assert 'loading="lazy"' in html
     assert 'title="Demonstração do LeadRank"' in html
     assert 'Abrir no YouTube' in html
+
+
+def test_secao_planos_transparente():
+    html = (STATIC_DIR / "index.html").read_text(encoding="utf-8")
+    assert "Planos a partir de R$ 79/mês" in html
+    assert "Starter e Pro com checkout online" in html
+
+
+def test_termos_aponta_para_pagina_de_planos(static_server_url):
+    termos = _get(f"{static_server_url}/termos.html")
+    assert 'href="pricing.html"' in termos
+    assert "página de planos" in termos

@@ -137,3 +137,11 @@ def test_faq_schema_em_pricing():
     pricing = (STATIC_DIR / "pricing.html").read_text(encoding="utf-8")
     assert '"@type": "FAQPage"' in pricing
     assert '"Preciso de cartão para testar?"' in pricing
+
+
+def test_a11y_basico_skip_link_e_heading_unico():
+    html = (STATIC_DIR / "index.html").read_text(encoding="utf-8")
+    assert 'class="skip-link" href="#main-content"' in html
+    assert 'id="main-content"' in html
+    assert html.count("<h1") == 1
+    assert 'alt="Mock do dashboard com ranking de leads"' in html

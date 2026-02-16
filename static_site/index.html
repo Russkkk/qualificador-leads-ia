@@ -68,13 +68,14 @@
     </script>
   </head>
   <body data-active-nav="home" class="bg-slate-950 text-slate-100">
+    <a class="skip-link" href="#main-content">Pular para o conteúdo principal</a>
     <template id="header-actions-template">
       <a class="btn btn--small" href="#lead-capture" role="button" aria-label="Ir para a seção de teste grátis do LeadRank">Começar teste grátis</a>
     </template>
     <div class="page">
       <div data-include="site-header"></div>
 
-      <main class="mx-auto w-full max-w-5xl px-6 pb-16">
+      <main id="main-content" tabindex="-1" class="mx-auto w-full max-w-5xl px-6 pb-16">
       <p class="sr-only">LeadRank | Qualificador de Leads com IA</p>
       <section class="relative grid gap-10 pb-16 pt-10 lg:grid-cols-[1.1fr_0.9fr]">
         <div class="space-y-6">

@@ -1,3 +1,4 @@
 User-agent: *
 Allow: /
+
 Sitemap: https://qualificador-leads-ia.onrender.com/sitemap.xml
